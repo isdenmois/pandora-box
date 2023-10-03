@@ -2,8 +2,6 @@
   import { applyAction, deserialize, enhance } from '$app/forms'
   import { invalidateAll } from '$app/navigation'
   import type { LayoutData } from './$types'
-  import { Alert, Dropdown, DropdownItem, Navbar, NavBrand, NavHamburger, NavUl, NavLi, Badge } from 'flowbite-svelte'
-  import { ChevronDownOutline } from 'flowbite-svelte-icons'
 
   export let data: LayoutData
 
@@ -19,29 +17,26 @@
   }
 </script>
 
-<Navbar let:hidden let:toggle>
-  <NavBrand href="/">
-    <span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Pandora</span>
-  </NavBrand>
-  <NavHamburger on:click={toggle} />
-  <NavUl {hidden}>
-    <NavLi href="/">Home</NavLi>
-    <NavLi href="/series">Series</NavLi>
-    <NavLi href="/movies">Movies</NavLi>
-    <NavLi href="/users">Users</NavLi>
-    <NavLi class="cursor-pointer">
-      <Badge>{data.username}</Badge><ChevronDownOutline class="w-3 h-3 ml-2 text-primary-800 dark:text-white inline" />
-    </NavLi>
-    <Dropdown class="w-44 z-20">
-      <DropdownItem href="/">Dashboard</DropdownItem>
-      <DropdownItem href="/settings">Settings</DropdownItem>
-      <DropdownItem on:click={logout} slot="footer">Sign out</DropdownItem>
-    </Dropdown>
-  </NavUl>
-</Navbar>
+<nav>
+  <ul>
+    <li><strong>Pandora</strong></li>
+  </ul>
 
-<Alert>
-  Hello, <span class="font-medium">{data.username}!</span>!
-</Alert>
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="/users">Users</a></li>
+    <li><button on:click={logout}>Log out</button></li>
+    <li>
+      <details role="list">
+        <summary aria-haspopup="listbox">Details</summary>
+        <ul role="listbox">
+          <li><a href="#" on:click={logout}>Sign out</a></li>
+        </ul>
+      </details>
+    </li>
+  </ul>
+</nav>
+
+<h3><span class="font-medium">Hello, </span>{data.username}!</h3>
 
 <slot />
