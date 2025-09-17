@@ -15,10 +15,8 @@ RUN bun --bun run build
 FROM oven/bun:slim
 WORKDIR /app
 
-ARG PORT=3000
-ENV PORT=${PORT}
+ENV ORIGIN=http://localhost:3000
 ENV NODE_ENV=production
-EXPOSE $PORT
 
 COPY --from=builder /app/node_modules node_modules/
 COPY --from=builder /app/build build/
