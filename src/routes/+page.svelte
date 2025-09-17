@@ -6,7 +6,7 @@
 	import { m } from '$lib/paraglide/messages.js';
 </script>
 
-<h1>{m.hello_world({ name: data.user.username })}</h1>
+<h1>{m.hello_world({ name: data.user?.username })}</h1>
 <p>
 	If you use VSCode, install the <a
 		href="https://marketplace.visualstudio.com/items?itemName=inlang.vs-code-extension"
@@ -14,7 +14,7 @@
 	> for a better i18n experience.
 </p>
 
-<p>User: {data.user.username}</p>
+<p>User: {data.user?.username}</p>
 
 <div>
 	<button onclick={() => setLocale('en')}>en</button>
