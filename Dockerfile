@@ -8,7 +8,7 @@ ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
 VOLUME /data
 COPY . .
-RUN node run build
+RUN npm run build
 
 # Runner
 FROM node:22-alpine
