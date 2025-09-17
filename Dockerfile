@@ -15,7 +15,6 @@ RUN bun --bun run build
 FROM oven/bun:slim
 WORKDIR /app
 
-ENV ORIGIN=http://localhost:3000
 ENV NODE_ENV=production
 
 COPY --from=builder /app/node_modules node_modules/
