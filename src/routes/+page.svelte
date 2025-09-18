@@ -16,6 +16,8 @@
 
 <p>User: {data.user?.username}</p>
 
+<p>Role: {data.user?.role}</p>
+
 <div>
 	<button onclick={() => setLocale('en')}>en</button>
 	<button onclick={() => setLocale('ru')}>ru</button>

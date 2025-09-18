@@ -14,8 +14,9 @@ const handleParaglide: Handle = ({ event, resolve }) =>
 
 const handleAuth: Handle = async ({ event, resolve }) => {
 	const sessionToken = event.cookies.get(auth.sessionCookieName);
+	const route = event.route.id;
 
-	if (event.route.id !== '/login' && !sessionToken) {
+	if (!route?.startsWith('/login') && !sessionToken) {
 		throw redirect(302, '/login');
 	}
 
@@ -31,6 +32,10 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 	} else {
 		auth.deleteSessionTokenCookie(event);
+	}
+
+	if (route?.startsWith('/admin') && user?.role !== 'admin') {
+		throw redirect(302, '/');
 	}
 
 	event.locals.user = user;
