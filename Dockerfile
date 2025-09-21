@@ -1,25 +1,26 @@
-# Builder
-FROM node:22-alpine AS builder
+# install node_modules
+FROM oven/bun:slim AS modules
 WORKDIR /app
-COPY package*.json .
-RUN npm install
+COPY package.json .
+COPY bun.lock .
+RUN bun install
 
-ARG DATABASE_URL
-ENV DATABASE_URL=$DATABASE_URL
-VOLUME /data
+# build the files
+FROM oven/bun:slim AS builder
+WORKDIR /app
+COPY --from=modules /app/node_modules node_modules/
 COPY . .
-RUN npm run build
+RUN bun run server:build
+RUN bun run client:build
 
-# Runner
-FROM node:22-alpine
+# run the app
+FROM oven/bun:slim
 WORKDIR /app
 
+ENV PORT=3000
 ENV NODE_ENV=production
-ENV ORIGIN=http://localhost:3000
-
-COPY --from=builder /app/node_modules node_modules/
-COPY --from=builder /app/build build/
+EXPOSE $PORT
+COPY --from=builder /app/build build
+COPY --from=builder /app/public /app/dist public
 COPY --from=builder /app/drizzle drizzle
-
-CMD [ "node", "build/index.js" ]
-
+CMD ["bun", "build/index.js"]
