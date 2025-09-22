@@ -1,10 +1,12 @@
-import { http } from './client'
+import { http } from './http'
 
 export interface User {
   username: string
   role: string
 }
 
+const v1 = http.url('/v1/user')
+
 export const user = {
-  current: () => http.get('/v1/user/current') as Promise<User>,
+  current: () => v1.get('/current').json<User>(),
 }

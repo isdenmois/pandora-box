@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { api, getMessage } from '../../shared/api'
+  import { api } from '../../shared/api'
+  import { getMessage } from '../../shared/lib'
 
   let message = $state('')
   let username = $state('')

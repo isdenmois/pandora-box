@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { api, getMessage } from '../../shared/api'
+  import { auth, getMessage } from '../../shared/lib'
 
   let username = $state('')
   let password = $state('')
@@ -8,7 +8,7 @@
   const handleSubmit = async () => {
     try {
       if (username && password) {
-        await api.auth.login(username, password)
+        await auth.login(username, password)
       }
     } catch (error) {
       message = getMessage(error)

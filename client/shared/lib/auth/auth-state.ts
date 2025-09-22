@@ -1,5 +1,5 @@
 import { atom, computed } from 'nanostores'
-import type { User } from './user-api'
+import type { User } from '../../api'
 
 export const user$ = atom<User | null | undefined>(undefined)
 

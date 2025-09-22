@@ -1,13 +1,7 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
   import { LoginPage } from '../pages/login'
-  import { api } from '../shared/api'
+  import { initialized, isLoggedIn } from '../shared/lib/auth'
   import AppRouter from './router.svelte'
-
-  onMount(api.auth.init)
-
-  const initialized = api.auth.initialized
-  const isLoggedIn = api.auth.isLoggedIn
 </script>
 
 {#if $isLoggedIn}

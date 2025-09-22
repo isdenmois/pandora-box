@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { user$ } from '../../shared/api'
-  import { api } from '../../shared/api'
+  import { user$, auth } from '../../shared/lib'
 </script>
 
 <p>User: {$user$?.username}</p>
 
 <p>Role: {$user$?.role}</p>
 
-<button on:click={api.auth.logout}>Logout</button>
+<button on:click={auth.logout}>Logout</button>
