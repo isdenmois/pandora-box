@@ -1,12 +1,12 @@
 # install node_modules
-FROM oven/bun:slim AS modules
+FROM oven/bun:alpine AS modules
 WORKDIR /app
 COPY package.json .
 COPY bun.lock .
 RUN bun install
 
 # build the files
-FROM oven/bun:slim AS builder
+FROM oven/bun:alpine AS builder
 WORKDIR /app
 COPY --from=modules /app/node_modules node_modules/
 COPY . .
@@ -14,7 +14,7 @@ RUN bun run server:build
 RUN bun run client:build
 
 # run the app
-FROM oven/bun:slim
+FROM oven/bun:alpine
 WORKDIR /app
 
 ENV PORT=3000
