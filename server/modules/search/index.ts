@@ -16,7 +16,7 @@ export const searchApi = new Elysia({ prefix: '/v1/search' })
   .get(
     '/external/:provider',
     ({ params: { provider }, query }) => {
-      return providers[provider].search(query.q, query.type)
+      return providers[provider].search(query.q, query.type as undefined, query.year)
     },
     {
       params: t.Object({
@@ -24,7 +24,8 @@ export const searchApi = new Elysia({ prefix: '/v1/search' })
       }),
       query: t.Object({
         q: t.String({ minLength: 3 }),
-        type: t.Optional(t.UnionEnum(['movie', 'series'])),
+        type: t.Optional(t.String()),
+        year: t.Optional(t.Number()),
       }),
     },
   )

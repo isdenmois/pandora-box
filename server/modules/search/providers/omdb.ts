@@ -20,9 +20,18 @@ const SearchSchema = v.object({
 
 const searchParse = v.parser(SearchSchema)
 
+interface OmdbSearchQuery {
+  s: string
+  type?: string
+  y?: string
+}
+
 export const omdbProvider: SearchProvider = {
-  async search(query, type) {
-    const result = await api.query({ s: query, type }).get().json()
+  async search(s, type, y) {
+    const result = await api
+      .query({ s, type, y } as OmdbSearchQuery)
+      .get()
+      .json()
 
     return searchParse(result)
       .Search.filter((item) => item.Type === 'movie' || item.Type === 'series')

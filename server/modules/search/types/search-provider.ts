@@ -7,6 +7,6 @@ export interface SearchItem {
 }
 
 export interface SearchProvider {
-  search: (query: string, type?: SearchItem['type']) => Promise<SearchItem[]>
+  search: (query: string, type?: SearchItem['type'], year?: number) => Promise<SearchItem[]>
   getById: (id: string) => unknown
 }
