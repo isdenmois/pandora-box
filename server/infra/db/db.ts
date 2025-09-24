@@ -1,8 +1,8 @@
 import { drizzle } from 'drizzle-orm/bun-sqlite'
 import { migrate } from 'drizzle-orm/bun-sqlite/migrator'
 import { Database } from 'bun:sqlite'
-import { schema } from '../models'
-import { env } from '../env'
+import { schema } from '@/domain'
+import { env } from '@/infra/env'
 
 const client = new Database(env.DATABASE_URL)
 

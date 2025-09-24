@@ -1,5 +1,5 @@
 import { Cookie } from 'elysia'
-import { Session } from '../../infra'
+import { Session } from '@/domain'
 
 export type Cookies = Record<string, Cookie<unknown>>
 

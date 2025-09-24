@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { eq } from 'drizzle-orm'
-import { Session, table } from '../models'
+import { Session, table } from '@/domain'
 import { db } from '../db'
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24

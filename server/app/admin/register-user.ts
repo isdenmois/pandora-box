@@ -1,5 +1,5 @@
-import { userRepository } from '../../infra'
-import { hashPassword } from '../../shared'
+import { userRepository } from '@/infra'
+import { hashPassword } from '@/shared'
 
 export async function registerUser(username: string, password: string) {
   const passwordHash = hashPassword(password)

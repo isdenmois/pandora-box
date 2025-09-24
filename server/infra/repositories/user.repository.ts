@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { eq } from 'drizzle-orm'
+import { table, User } from '@/domain'
 import { db } from '../db'
-import { table, User } from '../models'
 
 export const userRepository = {
   createUser(username: string, passwordHash: string) {

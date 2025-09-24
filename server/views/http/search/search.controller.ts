@@ -1,6 +1,6 @@
 import Elysia from 'elysia'
-import { searchRepository } from '../../../infra'
-import { authGuard } from '../../auth'
+import { searchRepository } from '@/infra'
+import { authGuard } from '@/views/auth'
 import { searchJson } from './search.contract'
 
 export const searchController = new Elysia({

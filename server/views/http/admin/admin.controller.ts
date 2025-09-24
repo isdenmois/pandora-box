@@ -1,7 +1,7 @@
 import Elysia, { status, StatusMap } from 'elysia'
-import { admin } from '../../../app'
-import { toString } from '../../../shared'
-import { adminGuard } from '../../auth'
+import { toString } from '@/shared'
+import { admin } from '@/app'
+import { adminGuard } from '@/views/auth'
 import { RegisterUserBody } from './admin.contract'
 
 export const adminController = new Elysia({

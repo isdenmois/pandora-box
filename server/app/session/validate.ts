@@ -1,4 +1,4 @@
-import { sessionRepository } from '../../infra'
+import { sessionRepository } from '@/infra'
 
 export async function validate(sessionId: string) {
   const result = await sessionRepository.getById(sessionId)

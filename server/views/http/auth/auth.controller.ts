@@ -1,8 +1,8 @@
 import { Elysia, status } from 'elysia'
-import { auth } from '../../../app'
-import { sessionRepository } from '../../../infra'
-import { toString } from '../../../shared'
-import { authCookie, getSession } from '../../auth'
+import { toString } from '@/shared'
+import { sessionRepository } from '@/infra'
+import { auth } from '@/app'
+import { authCookie, getSession } from '@/views/auth'
 import { loginBody } from './auth.contract'
 
 export const authController = new Elysia({

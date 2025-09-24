@@ -1,5 +1,6 @@
-import { Session, sessionRepository } from '../../infra'
-import { sessionUC } from '../../app'
+import { Session } from '@/domain'
+import { sessionRepository } from '@/infra'
+import { sessionUC } from '@/app'
 import { authCookie, Cookies } from './auth-cookie'
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24

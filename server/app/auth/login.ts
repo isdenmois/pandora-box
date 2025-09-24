@@ -1,5 +1,5 @@
-import { sessionRepository, userRepository } from '../../infra'
-import { verifyPassword } from '../../shared'
+import { sessionRepository, userRepository } from '@/infra'
+import { verifyPassword } from '@/shared'
 
 export async function login(username: string, password: string) {
   const user = await userRepository.getByUsername(username)

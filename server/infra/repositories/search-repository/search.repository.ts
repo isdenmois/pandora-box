@@ -1,5 +1,4 @@
-import { SearchProvider } from '../../../domain'
-import { SearchItemType } from '../../../modules/search/types'
+import { SearchProvider, SearchItemType } from '@/domain'
 import { omdbSearchProvider } from './search-providers'
 
 const providers = {
