@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { user$, auth } from '@/shared/lib'
+  import { user$ } from '@/shared/lib'
 </script>
 
-<p>User: {$user$?.username}</p>
+<h1>Series</h1>
+
+<p class="mt-8">User: {$user$?.username}</p>
 
 <p>Role: {$user$?.role}</p>
-
-<button on:click={auth.logout}>Logout</button>

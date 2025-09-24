@@ -4,6 +4,12 @@
   --card: #fff;
   --primary: #353c49;
   --secondary: #a1a5aa;
+
+  --max-dialog-width: min(80vw, 600px);
+}
+
+#mobile {
+  --max-dialog-width: 80vw;
 }
 
 body,

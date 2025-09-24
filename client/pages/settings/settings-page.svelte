@@ -5,8 +5,12 @@
 
 <h1>Settings</h1>
 
-{#if $user$?.role === 'admin'}
-  <Link to="/admin">admin</Link>
-{/if}
+<div class="mt-8">
+  {#if $user$?.role === 'admin'}
+    <div>
+      <Link to="/admin">admin</Link>
+    </div>
+  {/if}
 
-<button on:click={auth.logout}>Logout</button>
+  <button class="mt-4" on:click={auth.logout}>Logout</button>
+</div>

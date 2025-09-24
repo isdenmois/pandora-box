@@ -1,10 +1,11 @@
 <script lang="ts">
   import { Router, Route } from 'svelte-routing'
   import { user$ } from '@/shared/lib'
-  import { HomePage } from '@/pages/home'
+  import { HomePage, SearchDialog } from '@/pages/home'
   import { AdminPage } from '@/pages/admin'
   import { SettingsPage } from '@/pages/settings'
   import NavBar from './navbar.svelte'
+  import Dialog from './dialog.svelte'
 </script>
 
 <div class="root">
@@ -25,6 +26,14 @@
 
         <Route path="/*">
           <HomePage />
+
+          <Router>
+            <Route path="search">
+              <Dialog>
+                <SearchDialog />
+              </Dialog>
+            </Route>
+          </Router>
         </Route>
       </div>
     </main>
