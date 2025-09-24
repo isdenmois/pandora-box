@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { user$, auth } from '../../shared/lib'
+  import { user$, auth } from '@/shared/lib'
 </script>
 
 <p>User: {$user$?.username}</p>

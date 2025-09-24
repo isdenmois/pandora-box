@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { api } from '../../shared/api'
-  import { getMessage } from '../../shared/lib'
+  import { api } from '@/shared/api'
+  import { getMessage } from '@/shared/lib'
 
   let message = $state('')
   let username = $state('')
@@ -22,19 +22,23 @@
 
 <h3>Register a user</h3>
 
-<form on:submit|preventDefault={register}>
-  <label>
-    Username
-    <input name="username" bind:value={username} />
-  </label>
-  <label>
-    Password
-    <input type="password" name="password" bind:value={password} />
-  </label>
+<form class="mt-8" on:submit|preventDefault={register}>
+  <input
+    name="username"
+    class:error={message}
+    type="text"
+    autocapitalize="off"
+    placeholder="Username"
+    bind:value={username}
+  />
 
-  <button type="submit">Register</button>
+  <input class="mt-4" class:error={message} type="password" placeholder="Password" bind:value={password} />
+
+  {#if message}
+    <p class="mt-4" style="color: red">{message}</p>
+  {/if}
+
+  <div class="mt-4">
+    <button type="submit">Register</button>
+  </div>
 </form>
-
-{#if message}
-  <p style="color: red">{message}</p>
-{/if}

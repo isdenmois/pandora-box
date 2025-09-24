@@ -1,0 +1,52 @@
+:root {
+  --background: #eee;
+  --accent: #313f4b;
+  --card: #fff;
+  --primary: #353c49;
+  --secondary: #a1a5aa;
+}
+
+body,
+html,
+#app {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1;
+}
+
+body {
+  color: var(--primary);
+  background-color: var(--background);
+  font-family: 'Proxima Nova', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app {
+  min-height: 100dvh;
+}
+
+a[target='_blank'] {
+  color: var(--selected);
+}
+
+a.not-link {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+a.not-link:hover {
+  opacity: 0.9;
+}
+
+.color-secondary {
+  color: var(--secondary);
+}
+
+a.nav-link {
+  color: var(--secondary);
+}
+
+a.nav-link[aria-current='page'] {
+  color: var(--accent);
+}

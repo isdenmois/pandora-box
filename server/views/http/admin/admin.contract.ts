@@ -1,6 +1,6 @@
 import { t } from 'elysia'
 
 export const RegisterUserBody = t.Object({
-  username: t.String(),
-  password: t.String(),
+  username: t.String({ minLength: 3, maxLength: 31 }),
+  password: t.String({ minLength: 4 }),
 })

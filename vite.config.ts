@@ -1,3 +1,4 @@
+import { resolve } from 'node:path'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import UnoCSS from 'unocss/vite'
 import { presetUno } from 'unocss'
@@ -18,6 +19,12 @@ export default defineConfig({
     assetsInlineLimit: 64,
     outDir: '../dist',
     emptyOutDir: true,
+  },
+
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'client'),
+    },
   },
   plugins: [
     svelte(),

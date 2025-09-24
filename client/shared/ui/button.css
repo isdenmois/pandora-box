@@ -1,0 +1,19 @@
+button {
+  all: unset;
+  background-color: var(--accent);
+  color: var(--card);
+  font-size: 16px;
+  padding: 1rem 2rem;
+  text-align: center;
+  cursor: pointer;
+}
+
+button:not(:disabled) {
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:active {
+    opacity: 0.5;
+  }
+}

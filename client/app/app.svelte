@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { LoginPage } from '../pages/login'
-  import { initialized, isLoggedIn } from '../shared/lib/auth'
+  import { LoginPage } from '@/pages/login'
+  import { initialized, isLoggedIn } from '@/shared/lib'
   import AppRouter from './router.svelte'
 </script>
 

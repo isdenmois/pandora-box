@@ -1,0 +1,6 @@
+<svg id="icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g>
+    <path d="M0 5.33333L0 2.66667C0 1.93029 0.26035 1.30175 0.781049 0.781049C1.30175 0.260349 1.93029 0 2.66667 0L24 0C24.7364 0 25.3649 0.260349 25.8856 0.781049C26.4063 1.30175 26.6667 1.93029 26.6667 2.66667L26.6667 17.3333C26.6667 18.0697 26.4063 18.6983 25.8856 19.219C25.3649 19.7397 24.7364 20 24 20L2.66667 20C1.93029 20 1.30175 19.7397 0.781049 19.219C0.26035 18.6983 0 18.0697 0 17.3333L0 5.33333Z" fill="none" stroke-width="2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" transform="translate(2.667 9.333)" />
+    <path d="M13.3333 0L6.66667 6.66667L0 0" fill="none" stroke-width="2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" transform="translate(9.333 2.667)" />
+  </g>
+</svg>
