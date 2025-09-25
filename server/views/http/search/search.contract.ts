@@ -9,7 +9,7 @@ export const searchJson = {
     }),
     query: t.Object({
       q: t.String({ minLength: 3 }),
-      type: t.Optional(t.UnionEnum(['movie', 'series'])),
+      type: t.Optional(t.String()), // enum always sets movie
       year: t.Optional(t.Number()),
     }),
   },
