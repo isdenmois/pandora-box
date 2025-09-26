@@ -2,9 +2,12 @@
   import { api, type SearchItem } from '@/shared/api'
   import { Item } from '@/shared/ui'
 
-  let query = $state('Black Mirror')
+  let query = $state('')
   let isSearching = $state(false)
   let result = $state<SearchItem[] | null>(null)
+
+  const series = $derived(result?.filter((item) => item.type === 'series') ?? [])
+  const movies = $derived(result?.filter((item) => item.type === 'movie') ?? [])
 
   const search = async () => {
     isSearching = true
@@ -21,17 +24,31 @@
 </script>
 
 <form on:submit|preventDefault={search}>
-  <input class="w-full" name="q" bind:value={query} placeholder="Search..." disabled={isSearching} />
+  <input class="w-full" type="text" name="q" bind:value={query} placeholder="Search..." disabled={isSearching} />
 </form>
 
 {#if result?.length}
-  <ul class="mt-4 flex flex-col gap-4">
-    {#each result as item (item.id)}
-      <li>
-        <Item title={item.title} description={item.type} imgUrl={item.poster} />
-      </li>
-    {/each}
-  </ul>
+  {#if series.length}
+    <h3 class="mt-8">Series</h3>
+    <ul class="mt-4 flex flex-col gap-4">
+      {#each series as item}
+        <li>
+          <Item title={item.title} description={item.year ? String(item.year) : null} imgUrl={item.poster} />
+        </li>
+      {/each}
+    </ul>
+  {/if}
+
+  {#if movies.length}
+    <h3 class="mt-8">Movies</h3>
+    <ul class="mt-4 flex flex-col gap-4">
+      {#each movies as item}
+        <li>
+          <Item title={item.title} description={item.year ? String(item.year) : null} imgUrl={item.poster} />
+        </li>
+      {/each}
+    </ul>
+  {/if}
 {:else if result}
   Nothing was found
 {/if}

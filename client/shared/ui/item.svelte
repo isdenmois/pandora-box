@@ -8,16 +8,16 @@
   const { title, description, imgUrl }: Props = $props()
 </script>
 
-<div class="flex item rounded-md gap-4 overflow-hidden">
+<div class="flex item rounded-md overflow-hidden">
   {#if imgUrl}
     <img class="object-cover h-20 w-12" src={imgUrl} alt={title} />
   {/if}
 
-  <div>
-    <div>{title}</div>
+  <div class="p-4">
+    <div class="text-m">{title}</div>
 
     {#if description}
-      <div>{description}</div>
+      <div class="text-s mt-2 secondary">{description}</div>
     {/if}
   </div>
 </div>

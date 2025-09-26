@@ -8,6 +8,10 @@
   --max-dialog-width: min(80vw, 600px);
 }
 
+* {
+  box-sizing: border-box;
+}
+
 #mobile {
   --max-dialog-width: 80vw;
 }
@@ -55,4 +59,8 @@ a.nav-link {
 
 a.nav-link[aria-current='page'] {
   color: var(--accent);
+}
+
+.secondary {
+  color: var(--secondary);
 }
