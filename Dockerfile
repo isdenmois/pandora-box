@@ -3,7 +3,9 @@ FROM oven/bun:1.2.22-alpine AS modules
 WORKDIR /app
 COPY package.json .
 COPY bun.lock .
-RUN bun install
+
+# Mount Bun's cache directory
+RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile
 
 # build the files
 FROM oven/bun:1.2.22-alpine AS builder
