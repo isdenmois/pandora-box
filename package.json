@@ -49,7 +49,7 @@
     "@unocss/reset": "66.5.2",
     "elysia": "1.4.8",
     "nanostores": "1.0.1",
-    "svelte-routing": "2.13.0",
+    "svelte5-router": "3.0.2",
     "unocss": "66.5.2",
     "valibot": "1.1.0",
     "wretch": "2.11.0"

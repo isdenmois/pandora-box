@@ -1,6 +1,6 @@
 <script lang="ts">
   import { api } from '@/shared/api'
-  import { getMessage } from '@/shared/lib'
+  import { getMessage, preventDefault } from '@/shared/lib'
 
   let message = $state('')
   let username = $state('')
@@ -22,7 +22,7 @@
 
 <h3>Register a user</h3>
 
-<form class="mt-8" on:submit|preventDefault={register}>
+<form class="mt-8" onsubmit={preventDefault(register)}>
   <input
     name="username"
     class:error={message}

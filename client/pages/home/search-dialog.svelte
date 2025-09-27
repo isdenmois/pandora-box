@@ -1,5 +1,6 @@
 <script lang="ts">
   import { api, type SearchItem } from '@/shared/api'
+  import { focusOnMount, preventDefault } from '@/shared/lib'
   import { Item, Spinner } from '@/shared/ui'
 
   let query = $state('')
@@ -23,8 +24,16 @@
   }
 </script>
 
-<form on:submit|preventDefault={search}>
-  <input class="w-full" type="text" name="q" bind:value={query} placeholder="Search..." disabled={isSearching} />
+<form class="sticky top-0 w-full" onsubmit={preventDefault(search)}>
+  <input
+    class="w-full"
+    type="text"
+    name="q"
+    bind:value={query}
+    placeholder="Search..."
+    disabled={isSearching}
+    use:focusOnMount
+  />
 </form>
 
 {#if isSearching}
@@ -61,9 +70,6 @@
 
 <style>
   form {
-    position: sticky;
-    top: 0;
-    width: 100%;
     background-color: var(--card);
   }
 </style>

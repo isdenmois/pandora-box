@@ -1,6 +1,6 @@
 <script lang="ts">
   import { auth, user$ } from '@/shared/lib'
-  import { Link } from 'svelte-routing'
+  import { Link } from 'svelte5-router'
 </script>
 
 <h1>Settings</h1>
@@ -12,5 +12,5 @@
     </div>
   {/if}
 
-  <button class="mt-4" on:click={auth.logout}>Logout</button>
+  <button class="mt-4" onclick={auth.logout}>Logout</button>
 </div>

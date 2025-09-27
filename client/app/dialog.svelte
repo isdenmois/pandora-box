@@ -1,41 +1,32 @@
 <script lang="ts">
-  import { navigate } from 'svelte-routing'
+  import { navigate } from 'svelte5-router'
 
-  const { parent = '/' } = $props()
+  const { parent = '/', children } = $props()
 
   const goBack = () => {
-    navigate(parent)
+    navigate(parent, { replace: true })
   }
 </script>
 
-<div class="dialog flex items-center justify-center">
-  <div class="backdrop" onclick={goBack}></div>
+<div class="inset-0 fixed flex items-center justify-center">
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <div class="backdrop absolute inset-0" onclick={goBack}></div>
 
-  <div class="content">
-    <slot />
+  <div class="content p-4 z-1 overflow-y-auto">
+    {@render children?.()}
   </div>
 </div>
 
 <style>
-  .dialog {
-    position: fixed;
-    inset: 0;
-  }
-
   .backdrop {
-    content: '';
-    position: absolute;
-    inset: 0;
     background-color: rgba(0, 0, 0, 0.5);
   }
 
   .content {
     background-color: var(--card);
     min-width: var(--max-dialog-width);
-    padding: 1rem;
-    z-index: 1;
     border-radius: 1rem;
     max-height: 80vh;
-    overflow-y: auto;
   }
 </style>

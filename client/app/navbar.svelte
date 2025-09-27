@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Link } from 'svelte-routing'
+  import { Link } from 'svelte5-router'
   import { Icon, icons } from '@/shared/ui'
 </script>
 
@@ -12,13 +12,13 @@
     <div>Series</div>
   </Link>
 
-  <Link class="nav-link plus not-link" to="/search">
+  <Link class="nav-link plus not-link" to="/search" replace>
     <div class="flex items-center justify-center icon">
       <Icon size={32} icon={icons.plus} />
     </div>
   </Link>
 
-  <Link class="nav-link not-link" to="/settings">
+  <Link class="nav-link not-link" to="/settings" replace>
     <div class="icon">
       <Icon size={40} icon={icons.settings} />
     </div>

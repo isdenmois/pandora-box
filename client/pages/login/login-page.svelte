@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { auth, getMessage } from '@/shared/lib'
+  import { auth, getMessage, preventDefault } from '@/shared/lib'
 
   let username = $state('')
   let password = $state('')
@@ -16,9 +16,9 @@
   }
 </script>
 
-<main>
-  <form on:submit|preventDefault={handleSubmit}>
-    <h1 class="pt-4">Login</h1>
+<main class="flex flex-col flex-1 items-center justify-center">
+  <form class="flex flex-col" onsubmit={preventDefault(handleSubmit)}>
+    <h1 class="pt-4 text-center">Login</h1>
 
     <input
       class="mt-8"
@@ -39,24 +39,10 @@
 </main>
 
 <style>
-  main {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-  }
-
   form {
-    display: flex;
-    flex-direction: column;
     background-color: var(--card);
     padding: 2rem 1.5rem;
     border-radius: 1rem;
-  }
-
-  h1 {
-    text-align: center;
   }
 
   input {
