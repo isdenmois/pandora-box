@@ -1,6 +1,6 @@
 <script lang="ts">
   import { api, type SearchItem } from '@/shared/api'
-  import { Item } from '@/shared/ui'
+  import { Item, Spinner } from '@/shared/ui'
 
   let query = $state('')
   let isSearching = $state(false)
@@ -26,6 +26,12 @@
 <form on:submit|preventDefault={search}>
   <input class="w-full" type="text" name="q" bind:value={query} placeholder="Search..." disabled={isSearching} />
 </form>
+
+{#if isSearching}
+  <div class="mt-6 text-center">
+    <Spinner size={24} />
+  </div>
+{/if}
 
 {#if result?.length}
   {#if series.length}
