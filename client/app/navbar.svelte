@@ -4,7 +4,7 @@
 </script>
 
 <nav>
-  <Link class="nav-link not-link" to="/">
+  <Link class="nav-link not-link" to="/" replace>
     <div class="icon">
       <Icon size={40} icon={icons.series} />
     </div>
@@ -12,7 +12,7 @@
     <div>Series</div>
   </Link>
 
-  <Link class="nav-link plus not-link" to="/search" replace>
+  <Link class="nav-link plus not-link" to="/search">
     <div class="flex items-center justify-center icon">
       <Icon size={32} icon={icons.plus} />
     </div>
