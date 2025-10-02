@@ -1,9 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { eq } from 'drizzle-orm'
-import { Session, table } from '@/domain'
+import { SESSION_EXPIRE_IN, Session, table } from '@/domain'
 import { db } from '../db'
-
-const DAY_IN_MS = 1000 * 60 * 60 * 24
 
 export const sessionRepository = {
   async create(userId: string) {
@@ -11,7 +9,7 @@ export const sessionRepository = {
     const session: Session = {
       id: sessionId,
       userId,
-      expiresAt: new Date(Date.now() + DAY_IN_MS * 30),
+      expiresAt: new Date(Date.now() + SESSION_EXPIRE_IN),
     }
 
     await db.insert(table.session).values(session)

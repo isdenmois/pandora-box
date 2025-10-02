@@ -1,9 +1,7 @@
-import { Session } from '@/domain'
+import { SESSION_ROTATE_IN, Session } from '@/domain'
 import { sessionRepository } from '@/infra'
 import { sessionUC } from '@/app'
 import { authCookie, Cookies } from './auth-cookie'
-
-const DAY_IN_MS = 1000 * 60 * 60 * 24
 
 export async function getSession(cookies: Cookies) {
   const sessionId = authCookie.getSessionId(cookies)
@@ -22,7 +20,7 @@ export async function getSession(cookies: Cookies) {
 }
 
 async function rotateSession(cookies: Cookies, session: Session) {
-  const renewSession = Date.now() >= session.expiresAt.getTime() - DAY_IN_MS * 15
+  const renewSession = Date.now() >= session.expiresAt.getTime() - SESSION_ROTATE_IN
 
   if (renewSession) {
     const newSession = await sessionRepository.create(session.userId)
