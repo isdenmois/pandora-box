@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Link } from 'svelte5-router'
   import { api, type SearchItem } from '@/shared/api'
   import { focusOnMount, preventDefault } from '@/shared/lib'
   import { Item, Spinner } from '@/shared/ui'
@@ -48,7 +49,9 @@
     <ul class="mt-4 flex flex-col gap-4">
       {#each series as item}
         <li>
-          <Item title={item.title} description={item.year ? String(item.year) : null} imgUrl={item.poster} />
+          <Link class="not-link" to={`/edit/${item.id}`}>
+            <Item title={item.title} description={item.year ? String(item.year) : null} imgUrl={item.poster} />
+          </Link>
         </li>
       {/each}
     </ul>
@@ -59,7 +62,9 @@
     <ul class="mt-4 flex flex-col gap-4">
       {#each movies as item}
         <li>
-          <Item title={item.title} description={item.year ? String(item.year) : null} imgUrl={item.poster} />
+          <Link class="not-link" to={`/edit/${item.id}`}>
+            <Item title={item.title} description={item.year ? String(item.year) : null} imgUrl={item.poster} />
+          </Link>
         </li>
       {/each}
     </ul>

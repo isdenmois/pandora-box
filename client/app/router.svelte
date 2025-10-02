@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Router, Route } from 'svelte5-router'
   import { user$ } from '@/shared/lib'
-  import { HomePage, SearchDialog } from '@/pages/home'
+  import { EditDialog, HomePage, SearchDialog } from '@/pages/home'
   import { AdminPage } from '@/pages/admin'
   import { SettingsPage } from '@/pages/settings'
   import NavBar from './navbar.svelte'
@@ -32,6 +32,13 @@
               <Dialog>
                 <SearchDialog />
               </Dialog>
+            </Route>
+            <Route path="edit/:id">
+              {#snippet children(params)}
+                <Dialog>
+                  <EditDialog id={params.id} />
+                </Dialog>
+              {/snippet}
             </Route>
           </Router>
         </Route>

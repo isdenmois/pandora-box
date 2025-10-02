@@ -13,7 +13,7 @@ export const searchController = new Elysia({
   .get(
     '/external/:provider',
     ({ params: { provider }, query }) => {
-      return searchRepository.search(provider, query.q, query.type, query.year)
+      return searchRepository.search(provider, query.q, query.type as undefined, query.year)
     },
     {
       ...searchJson.external,

@@ -18,7 +18,19 @@ const SearchSchema = v.object({
   Search: v.optional(v.array(SearchItemSchema), []),
 })
 
+const ByIdSchema = v.looseObject({
+  imdbID: v.pipe(v.string(), v.nonEmpty()),
+  Title: v.pipe(v.string(), v.nonEmpty()),
+  Type: v.string(),
+  Year: v.optional(v.string()),
+  Poster: v.optional(v.string()),
+  imdbRating: v.optional(v.string()),
+  Genre: v.optional(v.string()),
+  Language: v.optional(v.string()),
+})
+
 const searchParse = v.parser(SearchSchema)
+const byIdParse = v.parser(ByIdSchema)
 
 interface OmdbSearchQuery {
   s: string
@@ -47,6 +59,30 @@ export const omdbSearchProvider: SearchProvider = {
       )
   },
   async getById(id) {
-    return await api.query({ i: id }).get().json()
+    const result = await api.query({ i: id }).get().json()
+    const { imdbID, Type, Title, Year, Poster, imdbRating, Genre, Language, ...extra } = byIdParse(result)
+
+    if (Type !== 'movie' && Type !== 'series') {
+      throw 'Bad type'
+    }
+
+    // TODO: use omit
+    delete extra['Metascore']
+    delete extra['Ratings']
+    delete extra['Response']
+    delete extra['Awards']
+
+    return {
+      id: imdbID,
+      provider: 'omdb',
+      title: Title,
+      type: Type,
+      poster: Poster || null,
+      year: Year ? parseInt(Year) : null,
+      rating: imdbRating ? parseFloat(imdbRating) : null,
+      genre: Genre || null,
+      language: Language || null,
+      extra,
+    }
   },
 }
