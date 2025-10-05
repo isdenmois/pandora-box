@@ -16,6 +16,8 @@ test('home page', async ({ page }) => {
     await new SeriesBuilder(page).build()
     await new MovieBuilder(page).build()
     await new SearchBuilder(page)
+      .addItem(searchFixture.series)
+      .addItem(searchFixture.movie)
       .addDetails(searchFixture.details.series)
       .addDetails(searchFixture.details.movie)
       .build()
@@ -38,9 +40,6 @@ test('home page', async ({ page }) => {
   })
 
   await test.step('Search by query', async () => {
-    // arrange
-    await new SearchBuilder(page).addItem(searchFixture.series).addItem(searchFixture.movie).build()
-
     // act
     await searchDialogPageObject.input.fill('Black M')
     await searchDialogPageObject.input.press('Enter')
