@@ -56,7 +56,7 @@
     <ul class="mt-4 flex flex-col gap-4">
       {#each series as item}
         <li>
-          <Link class="not-link" to={`/edit/${item.id}`}>
+          <Link class="not-link" to={`/edit/${item.id}`} data-testid={`search-series-${item.id}`}>
             <Item title={item.title} description={item.year ? String(item.year) : null} imgUrl={item.poster} />
           </Link>
         </li>
@@ -69,7 +69,7 @@
     <ul class="mt-4 flex flex-col gap-4">
       {#each movies as item}
         <li>
-          <Link class="not-link" to={`/edit/${item.id}`}>
+          <Link class="not-link" to={`/edit/${item.id}`} data-testid={`search-movie-${item.id}`}>
             <Item title={item.title} description={item.year ? String(item.year) : null} imgUrl={item.poster} />
           </Link>
         </li>

@@ -9,4 +9,4 @@
   const { movie }: Props = $props()
 </script>
 
-<Item title={movie.title} imgUrl={movie.poster} />
+<Item title={movie.title} imgUrl={movie.poster} testId={`movie-${movie.id}`} />

@@ -1,14 +1,14 @@
 <script lang="ts">
   import { navigate } from 'svelte5-router'
 
-  const { parent = '/', children } = $props()
+  const { parent = '/', id, children } = $props()
 
   const goBack = () => {
     navigate(parent, { replace: true })
   }
 </script>
 
-<div class="inset-0 fixed flex items-center justify-center">
+<div class="inset-0 fixed flex items-center justify-center" data-testid={`dialog-${id}`}>
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <div class="backdrop absolute inset-0" onclick={goBack}></div>

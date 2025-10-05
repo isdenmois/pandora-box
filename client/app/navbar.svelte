@@ -12,7 +12,7 @@
     <div>Series</div>
   </Link>
 
-  <Link class="nav-link plus not-link" to="/search">
+  <Link class="nav-link plus not-link" to="/search" data-testid="search-button">
     <div class="flex items-center justify-center icon">
       <Icon size={32} icon={icons.plus} />
     </div>

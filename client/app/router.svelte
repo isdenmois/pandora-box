@@ -29,13 +29,13 @@
 
           <Router>
             <Route path="search">
-              <Dialog>
+              <Dialog id="search">
                 <SearchDialog />
               </Dialog>
             </Route>
             <Route path="edit/:id">
               {#snippet children(params)}
-                <Dialog>
+                <Dialog id="add">
                   <EditDialog id={params.id} />
                 </Dialog>
               {/snippet}

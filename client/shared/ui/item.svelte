@@ -3,12 +3,13 @@
     title: string
     description?: string | null
     imgUrl?: string | null
+    testId?: string
   }
 
-  const { title, description, imgUrl }: Props = $props()
+  const { title, description, imgUrl, testId }: Props = $props()
 </script>
 
-<div class="flex item rounded-md overflow-hidden">
+<div class="flex item rounded-md overflow-hidden" data-testid={testId}>
   {#if imgUrl}
     <img class="object-cover h-20 w-12" src={imgUrl} alt={title} />
   {/if}
