@@ -15,6 +15,13 @@
       "when": 1758213118485,
       "tag": "0001_gifted_human_cannonball",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1759586950246,
+      "tag": "0002_slippery_spectrum",
+      "breakpoints": true
     }
   ]
 }
