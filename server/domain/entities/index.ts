@@ -9,4 +9,5 @@ export { type Session } from './session'
 export { type User } from './user'
 
 export const table = { movie, series, session, user }
+export const toBackup = { movie, series, user }
 export const schema = table

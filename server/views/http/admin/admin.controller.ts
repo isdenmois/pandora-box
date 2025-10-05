@@ -1,8 +1,9 @@
-import Elysia, { status, StatusMap } from 'elysia'
-import { toString } from '@/shared'
 import { admin } from '@/app'
+import { backupRepository } from '@/infra'
+import { toString } from '@/shared'
 import { adminGuard } from '@/views/auth'
-import { RegisterUserBody } from './admin.contract'
+import Elysia, { status, StatusMap } from 'elysia'
+import { BackupRestoreBody, RegisterUserBody } from './admin.contract'
 
 export const adminController = new Elysia({
   prefix: '/v1/admin',
@@ -29,3 +30,5 @@ export const adminController = new Elysia({
       },
     },
   )
+  .get('/backup', () => backupRepository.create())
+  .post('/backup', ({ body }) => backupRepository.restore(body), { body: BackupRestoreBody })

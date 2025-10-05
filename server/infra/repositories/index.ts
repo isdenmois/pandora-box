@@ -1,3 +1,4 @@
+export * from './backup.repository'
 export * from './movie.repository'
 export * from './search-repository'
 export * from './series.repository'

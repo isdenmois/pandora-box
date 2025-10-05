@@ -2,7 +2,7 @@
   import { Router, Route } from 'svelte5-router'
   import { user$ } from '@/shared/lib'
   import { EditDialog, HomePage, SearchDialog } from '@/pages/home'
-  import { AdminPage } from '@/pages/admin'
+  import { AdminPage, BackupPage, RegisterUserPage } from '@/pages/admin'
   import { SettingsPage } from '@/pages/settings'
   import NavBar from './navbar.svelte'
   import Dialog from './dialog.svelte'
@@ -15,7 +15,15 @@
     <main class="flex flex-1 p-8">
       <div class="p-4 pb-5 sm:pb-4 flex-1 overflow-y-auto">
         {#if $user$?.role === 'admin'}
-          <Route path="/admin">
+          <Route path="/admin/register">
+            <RegisterUserPage />
+          </Route>
+
+          <Route path="/admin/backup">
+            <BackupPage />
+          </Route>
+
+          <Route path="/admin/*">
             <AdminPage />
           </Route>
         {/if}
