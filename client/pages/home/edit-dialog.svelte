@@ -86,7 +86,7 @@
 
     try {
       if (type === 'series') {
-        await addSeries
+        await addSeries()
       } else if (type === 'movie') {
         await addMovie()
       }
