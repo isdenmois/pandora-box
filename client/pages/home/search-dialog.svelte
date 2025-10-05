@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Link } from 'svelte5-router'
+  import { Link, navigate } from 'svelte5-router'
   import { api, type SearchItem } from '@/shared/api'
   import { focusOnMount, preventDefault } from '@/shared/lib'
   import { Item, Spinner } from '@/shared/ui'
@@ -10,8 +10,15 @@
 
   const series = $derived(result?.filter((item) => item.type === 'series') ?? [])
   const movies = $derived(result?.filter((item) => item.type === 'movie') ?? [])
+  const omdbId = /^tt\d+/
 
   const search = async () => {
+    query = query.trim()
+
+    if (query.match(omdbId)) {
+      return navigate(`/edit/${query}`)
+    }
+
     isSearching = true
     result = null
 
