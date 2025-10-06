@@ -1,6 +1,7 @@
 import Elysia from 'elysia'
-import { createSeriesBody } from './series.contract'
+import { authGuard } from '@/views/auth'
 import { seriesRepository } from '@/infra'
+import { createSeriesBody } from './series.contract'
 
 export const seriesController = new Elysia({
   prefix: '/v1/series',
@@ -8,6 +9,7 @@ export const seriesController = new Elysia({
     tags: ['series'],
   },
 })
+  .use(authGuard)
   .post(
     '',
     async ({ body }) => {

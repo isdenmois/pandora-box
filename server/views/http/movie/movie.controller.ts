@@ -1,5 +1,6 @@
 import Elysia from 'elysia'
 import { movieRepository } from '@/infra'
+import { authGuard } from '@/views/auth'
 import { createMovieBody } from './movie.contract'
 
 export const movieController = new Elysia({
@@ -8,6 +9,7 @@ export const movieController = new Elysia({
     tags: ['movie'],
   },
 })
+  .use(authGuard)
   .post(
     '',
     async ({ body }) => {
