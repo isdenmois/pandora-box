@@ -1,8 +1,10 @@
 import 'uno.css'
 import '@unocss/reset/eric-meyer.css'
-import { mount } from 'svelte'
-import '@/shared/ui'
-import App from './app.svelte'
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+
+import App from './app.vue'
+import router from './router'
 
 const mobileQuery = matchMedia('(max-width: 639px)')
 const setMobile = () => {
@@ -12,8 +14,9 @@ const setMobile = () => {
 mobileQuery.addEventListener('change', setMobile)
 setMobile()
 
-const app = mount(App, {
-  target: document.getElementById('app')!,
-})
+const app = createApp(App)
 
-export default app
+app.use(createPinia())
+app.use(router)
+
+app.mount('#app')

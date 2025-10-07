@@ -1,41 +1,34 @@
-import prettier from 'eslint-config-prettier'
-import { fileURLToPath } from 'node:url'
-import { includeIgnoreFile } from '@eslint/compat'
-import js from '@eslint/js'
-import svelte from 'eslint-plugin-svelte'
-import { defineConfig } from 'eslint/config'
-import globals from 'globals'
-import ts from 'typescript-eslint'
-import svelteConfig from './svelte.config.js'
+import { globalIgnores } from 'eslint/config'
+import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
+import pluginVue from 'eslint-plugin-vue'
+import pluginVitest from '@vitest/eslint-plugin'
+import pluginPlaywright from 'eslint-plugin-playwright'
+import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 
-const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url))
+// To allow more languages other than `ts` in `.vue` files, uncomment the following lines:
+// import { configureVueProject } from '@vue/eslint-config-typescript'
+// configureVueProject({ scriptLangs: ['ts', 'tsx'] })
+// More info at https://github.com/vuejs/eslint-config-typescript/#advanced-setup
 
-export default defineConfig(
-  includeIgnoreFile(gitignorePath),
-  js.configs.recommended,
-  ...ts.configs.recommended,
-  ...svelte.configs.recommended,
-  prettier,
-  ...svelte.configs.prettier,
+export default defineConfigWithVueTs(
   {
-    languageOptions: {
-      globals: { ...globals.browser, ...globals.node },
-    },
-    rules: {
-      // typescript-eslint strongly recommend that you do not use the no-undef lint rule on TypeScript projects.
-      // see: https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
-      'no-undef': 'off',
-    },
+    name: 'app/files-to-lint',
+    files: ['**/*.{ts,mts,tsx,vue}'],
   },
+
+  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
+
+  pluginVue.configs['flat/essential'],
+  vueTsConfigs.recommended,
+
   {
-    files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        extraFileExtensions: ['.svelte'],
-        parser: ts.parser,
-        svelteConfig,
-      },
-    },
+    ...pluginVitest.configs.recommended,
+    files: ['src/**/__tests__/*'],
   },
+
+  {
+    ...pluginPlaywright.configs['flat/recommended'],
+    files: ['e2e/**/*.{test,spec}.{js,ts,jsx,tsx}'],
+  },
+  skipFormatting,
 )

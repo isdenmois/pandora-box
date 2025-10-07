@@ -1,9 +1,13 @@
-import { resolve } from 'node:path'
-import { svelte } from '@sveltejs/vite-plugin-svelte'
+import { fileURLToPath, URL } from 'node:url'
+
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vueDevTools from 'vite-plugin-vue-devtools'
+
 import UnoCSS from 'unocss/vite'
 import { presetUno } from 'unocss'
-import { defineConfig } from 'vite'
 
+// https://vite.dev/config/
 export default defineConfig({
   root: 'client',
   server: {
@@ -20,45 +24,16 @@ export default defineConfig({
     outDir: '../dist',
     emptyOutDir: true,
   },
-
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'client'),
+      '@': fileURLToPath(new URL('./client', import.meta.url)),
     },
   },
   plugins: [
-    svelte(),
+    vue(),
+    vueDevTools(),
     UnoCSS({
       presets: [presetUno({ preflight: false })],
     }),
   ],
-  test: {
-    expect: { requireAssertions: true },
-    projects: [
-      {
-        extends: './vite.config.ts',
-        test: {
-          name: 'client',
-          environment: 'browser',
-          browser: {
-            enabled: true,
-            provider: 'playwright',
-            instances: [{ browser: 'chromium' }],
-          },
-          include: ['src/**/*.svelte.{test,spec}.{js,ts}'],
-          exclude: ['src/lib/server/**'],
-          setupFiles: ['./vitest-setup-client.ts'],
-        },
-      },
-      {
-        extends: './vite.config.ts',
-        test: {
-          name: 'server',
-          environment: 'node',
-          include: ['src/**/*.{test,spec}.{js,ts}'],
-          exclude: ['src/**/*.svelte.{test,spec}.{js,ts}'],
-        },
-      },
-    ],
-  },
 })

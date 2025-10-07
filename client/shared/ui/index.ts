@@ -4,6 +4,9 @@ import './input.css'
 import './typography.css'
 
 export * from './icons'
-export { default as Icon } from './icon.svelte'
-export { default as Item } from './item.svelte'
-export { default as Spinner } from './spinner.svelte'
+
+export { default as Dialog } from './dialog.vue'
+export { default as Icon } from './icon.vue'
+export { default as Item } from './item.vue'
+export { default as Navbar } from './navbar.vue'
+export { default as Spinner } from './spinner.vue'

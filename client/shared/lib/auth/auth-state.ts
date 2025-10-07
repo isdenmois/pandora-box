@@ -1,11 +1,21 @@
-import { atom, computed } from 'nanostores'
+import { computed, shallowRef } from 'vue'
 import type { User } from '../../api'
+import { defineStore } from 'pinia'
 
-export const user$ = atom<User | null | undefined>(undefined)
+export const useAuth = defineStore('auth', () => {
+  const user = shallowRef<User | null | undefined>(undefined)
 
-export const initialized = computed(user$, (user) => user !== undefined)
-export const isLoggedIn = computed(user$, (user) => !!user)
+  const initialized = computed(() => user.value !== undefined)
+  const isLoggedIn = computed(() => !!user.value)
 
-export const setAuthState = (user: User | null) => {
-  user$.set(user || null)
-}
+  const setUser = (data: User | null) => {
+    user.value = data
+  }
+
+  return {
+    user,
+    initialized,
+    isLoggedIn,
+    setUser,
+  }
+})

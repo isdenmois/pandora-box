@@ -1,1 +1,1 @@
-export * from './series.svelte'
+export * from './series'

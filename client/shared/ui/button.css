@@ -8,6 +8,16 @@ button {
   cursor: pointer;
 }
 
+button.secondary {
+  background-color: var(--secondary);
+  color: var(--background);
+}
+
+button.selected {
+  background-color: var(--success);
+  color: var(--background);
+}
+
 button:not(:disabled) {
   &:hover {
     opacity: 0.9;

@@ -1,3 +1,3 @@
-export function focusOnMount(node: HTMLElement) {
-  node.focus()
+export const vFocusOnMount = {
+  mounted: (el: HTMLElement) => el.focus(),
 }

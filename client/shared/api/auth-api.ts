@@ -6,5 +6,5 @@ const api = http.url('/auth')
 export const auth = {
   login: (username: string, password: string) => api.post({ username, password }, '/login').json<User>(),
 
-  logout: () => api.post({}, '/logout'),
+  logout: () => api.post({}, '/logout').text(),
 }

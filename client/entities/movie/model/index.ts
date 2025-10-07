@@ -1,1 +1,1 @@
-export * from './movies.svelte'
+export * from './movies'
