@@ -18,7 +18,10 @@ onBeforeMount(() => {
 <template>
   <h1>Home</h1>
 
-  <button class="secondary" :class="{ selected: home.forMe }" @click="home.toggleForMe">For Me</button>
+  <div class="flex gap-4">
+    <button class="secondary" :class="{ selected: home.forMe }" @click="home.toggleForMe">For Me</button>
+    <button @click="home.toggleSort">By {{ home.sort }}</button>
+  </div>
 
   <p class="mt-8">All Series</p>
 
