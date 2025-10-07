@@ -10,4 +10,4 @@ bun.lockb
 /drizzle/
 /dist
 /build
-/client-pw/results
+/e2e/results
