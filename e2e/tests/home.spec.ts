@@ -27,8 +27,8 @@ test('home page', async ({ page }) => {
 
     // assert
     await expect(homePageObject.header).toContainText('Home')
-    await expect(homePageObject.series('1')).not.toBeVisible()
-    await expect(homePageObject.movie('1')).not.toBeVisible()
+    await expect(homePageObject.series('1')).toBeHidden()
+    await expect(homePageObject.movie('1')).toBeHidden()
   })
 
   await test.step('Open search', async () => {
@@ -73,12 +73,12 @@ test('home page', async ({ page }) => {
     await addDialogPageObject.button.click()
 
     // assert
-    await expect(addDialogPageObject.dialog).not.toBeVisible()
+    await expect(addDialogPageObject.dialog).toBeHidden()
 
     await expect(homePageObject.series('1')).toBeVisible()
     await expect(homePageObject.series('1')).toContainText('Black Mirror 7')
 
-    await expect(homePageObject.movie('1')).not.toBeVisible()
+    await expect(homePageObject.movie('1')).toBeHidden()
   })
 
   await test.step('Add movie', async () => {
@@ -92,7 +92,7 @@ test('home page', async ({ page }) => {
     await addDialogPageObject.button.click()
 
     // assert
-    await expect(addDialogPageObject.dialog).not.toBeVisible()
+    await expect(addDialogPageObject.dialog).toBeHidden()
 
     await expect(homePageObject.movie('1')).toBeVisible()
     await expect(homePageObject.movie('1')).toContainText('Black Magic Sequel')

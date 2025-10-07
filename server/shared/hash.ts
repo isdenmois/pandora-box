@@ -1,4 +1,4 @@
-import { pbkdf2Sync, randomBytes, randomUUID } from 'node:crypto'
+import { pbkdf2Sync, randomBytes } from 'node:crypto'
 
 function hash(salt: string, password: string) {
   return pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex')

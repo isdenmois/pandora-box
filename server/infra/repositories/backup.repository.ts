@@ -27,7 +27,7 @@ export const backupRepository = {
           const table = toBackup[t]
 
           await tx.delete(table)
-          await tx.insert(table).values(data[t] as any)
+          await tx.insert(table).values(data[t] as (typeof table.$inferInsert)[])
         }
       }
 
