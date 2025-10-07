@@ -10,7 +10,7 @@ export const useHome = defineStore('home', () => {
 
   const forMe = ref(false)
   const filter = (item: Movie | Series) => {
-    return forMe.value ? item.userId === 'me' : item.userId !== 'me'
+    return forMe.value === item.private
   }
 
   return {
