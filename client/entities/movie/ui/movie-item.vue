@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Movie } from '@/shared/api'
 import { Item } from '@/shared/ui'
-import { computed } from 'vue'
 
 interface Props {
   movie: Movie

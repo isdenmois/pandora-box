@@ -1,9 +1,9 @@
-import { useMovies } from '@/entities/movie'
-import { useSeries } from '@/entities/series'
-import type { Movie, Series } from '@/shared/api'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { readonly } from 'vue'
+import { useMovies } from '@/entities/movie'
+import { useSeries } from '@/entities/series'
+import type { Movie, Series } from '@/shared/api'
 
 import { useHome } from '../home-filters'
 

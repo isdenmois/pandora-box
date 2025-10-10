@@ -1,6 +1,6 @@
+import { defineStore } from 'pinia'
 import { computed, shallowRef } from 'vue'
 import type { User } from '../../api'
-import { defineStore } from 'pinia'
 
 export const useAuth = defineStore('auth', () => {
   const user = shallowRef<User | null | undefined>(undefined)

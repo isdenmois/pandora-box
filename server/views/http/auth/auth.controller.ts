@@ -1,7 +1,7 @@
 import { Elysia, status } from 'elysia'
-import { toString } from '@/shared'
-import { sessionRepository } from '@/infra'
 import { auth } from '@/app'
+import { sessionRepository } from '@/infra'
+import { toString } from '@/shared'
 import { authCookie, getSession } from '@/views/auth'
 import { loginBody } from './auth.contract'
 

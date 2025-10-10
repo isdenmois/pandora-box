@@ -1,6 +1,6 @@
-import { Page } from 'playwright/test'
-import { mockApi, mockRest } from '../utils'
+import { type Page } from 'playwright/test'
 import { Movie } from '../fixtures'
+import { mockApi, mockRest } from '../utils'
 
 export const MovieMock = {
   mockAll(page: Page, data = []) {

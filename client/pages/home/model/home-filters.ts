@@ -1,9 +1,9 @@
+import { defineStore } from 'pinia'
+import { computed, readonly, ref } from 'vue'
 import { useMovies } from '@/entities/movie'
 import { useSeries } from '@/entities/series'
 import type { Movie, Series } from '@/shared/api'
 import { compare } from '@/shared/lib'
-import { defineStore } from 'pinia'
-import { computed, readonly, ref } from 'vue'
 
 const byRating = compare<Movie | Series>((m) => -(m.rating || 0))
 const byTitle = compare<Movie | Series>((m) => m.title)

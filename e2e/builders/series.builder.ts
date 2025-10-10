@@ -1,5 +1,5 @@
-import { Page } from 'playwright/test'
-import { Series } from '../fixtures'
+import { type Page } from 'playwright/test'
+import { type Series } from '../fixtures'
 import { SeriesMock } from '../mocks'
 
 export class SeriesBuilder {

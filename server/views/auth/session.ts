@@ -1,6 +1,6 @@
+import { sessionUC } from '@/app'
 import { SESSION_ROTATE_IN, Session } from '@/domain'
 import { sessionRepository } from '@/infra'
-import { sessionUC } from '@/app'
 import { authCookie, Cookies } from './auth-cookie'
 
 export async function getSession(cookies: Cookies) {

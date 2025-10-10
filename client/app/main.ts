@@ -1,7 +1,7 @@
 import 'uno.css'
 import '@unocss/reset/eric-meyer.css'
-import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { createApp } from 'vue'
 
 import App from './app.vue'
 import router from './router'

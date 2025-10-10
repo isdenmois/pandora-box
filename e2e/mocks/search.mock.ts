@@ -1,5 +1,5 @@
-import { Page } from 'playwright/test'
-import { SearchItem, SearchItemDetails } from '../fixtures'
+import { type Page } from 'playwright/test'
+import { type SearchItem, SearchItemDetails } from '../fixtures'
 import { mockApi } from '../utils'
 
 export const SearchMock = {

@@ -1,5 +1,5 @@
+import type { SearchItem, SearchItemDetails } from '@/server/entities'
 import { http } from './http'
-import type { SearchItem, SearchItemDetails } from '../../../server/domain/search-provider'
 
 const v1 = http.url('/v1/search')
 

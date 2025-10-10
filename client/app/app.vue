@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import { onMounted } from 'vue'
 import { LoginPage } from '@/pages/login'
 import { useAuth, auth } from '@/shared/lib'
 import { Navbar, Spinner } from '@/shared/ui'

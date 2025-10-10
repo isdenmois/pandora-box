@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { api, type SearchItem } from '@/shared/api'
-import { Dialog, Item, Spinner } from '@/shared/ui'
-import { vFocusOnMount } from '@/shared/lib'
 import { useRouter } from 'vue-router'
+import { api, type SearchItem } from '@/shared/api'
+import { vFocusOnMount } from '@/shared/lib'
+import { Dialog, Item, Spinner } from '@/shared/ui'
 
 const router = useRouter()
 

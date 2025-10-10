@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { getMessage } from '../get-message'
 import { WretchError } from 'wretch/resolver'
+import { getMessage } from '../get-message'
 
 describe('getMessage', () => {
   it('should return the message from an error object', () => {

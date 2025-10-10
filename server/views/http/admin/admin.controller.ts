@@ -1,8 +1,8 @@
+import Elysia, { status, StatusMap } from 'elysia'
 import { admin } from '@/app'
 import { backupRepository } from '@/infra'
 import { toString } from '@/shared'
 import { adminGuard } from '@/views/auth'
-import Elysia, { status, StatusMap } from 'elysia'
 import { BackupRestoreBody, RegisterUserBody } from './admin.contract'
 
 export const adminController = new Elysia({

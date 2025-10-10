@@ -1,5 +1,5 @@
-import { http } from './http'
 import type { Movie } from '../../../server/domain/entities'
+import { http } from './http'
 
 export type { Movie }
 

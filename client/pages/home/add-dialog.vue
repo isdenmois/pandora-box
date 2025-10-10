@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import * as v from 'valibot'
 import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import * as v from 'valibot'
 import { flatten, useForm } from 'vue-standard-schema'
 import { useMovies } from '@/entities/movie'
 import { useSeries } from '@/entities/series'

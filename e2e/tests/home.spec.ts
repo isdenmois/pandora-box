@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test'
+import { SearchBuilder, SeriesBuilder } from '../builders'
+import { MovieBuilder } from '../builders/movie.builder'
+import { searchFixture } from '../fixtures'
 import { UserMock } from '../mocks'
 import { AddDialogPageObject, HomePageObject, SearchDialogPageObject } from '../page-objects'
-import { SearchBuilder, SeriesBuilder } from '../builders'
-import { searchFixture } from '../fixtures'
-import { MovieBuilder } from '../builders/movie.builder'
 
 test('home page', async ({ page }) => {
   const homePageObject = new HomePageObject(page)

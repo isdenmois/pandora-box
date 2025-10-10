@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onBeforeMount } from 'vue'
-import { useSeries, SeriesItem } from '@/entities/series'
 import { useMovies, MovieItem } from '@/entities/movie'
+import { useSeries, SeriesItem } from '@/entities/series'
 import { Spinner } from '@/shared/ui'
 import { useHome } from './model'
 

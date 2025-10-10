@@ -1,6 +1,6 @@
 import Elysia from 'elysia'
-import { authGuard } from '@/views/auth'
 import { seriesRepository } from '@/infra'
+import { authGuard } from '@/views/auth'
 import { createSeriesBody } from './series.contract'
 
 export const seriesController = new Elysia({

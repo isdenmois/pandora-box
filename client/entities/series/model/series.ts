@@ -1,5 +1,5 @@
-import { readonly, shallowRef } from 'vue'
 import { defineStore } from 'pinia'
+import { readonly, shallowRef } from 'vue'
 import { api, type Series, type SeriesCreate } from '@/shared/api'
 
 export const useSeries = defineStore('series', () => {

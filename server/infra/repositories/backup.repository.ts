@@ -1,6 +1,6 @@
+import { sql } from 'drizzle-orm'
 import { toBackup } from '@/domain'
 import { db } from '../db'
-import { sql } from 'drizzle-orm'
 
 type TableName = keyof typeof toBackup
 type Backup = Record<TableName, unknown[]>

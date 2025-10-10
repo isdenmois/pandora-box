@@ -1,5 +1,5 @@
-import { readonly, shallowRef } from 'vue'
 import { defineStore } from 'pinia'
+import { readonly, shallowRef } from 'vue'
 import { api, type Movie, type MovieCreate } from '@/shared/api'
 
 export const useMovies = defineStore('movies', () => {

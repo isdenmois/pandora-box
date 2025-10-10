@@ -1,5 +1,5 @@
-import { Page } from 'playwright/test'
-import { adminUser, User } from '../fixtures'
+import { type Page } from 'playwright/test'
+import { adminUser, type User } from '../fixtures'
 import { mockApi } from '../utils'
 
 export const UserMock = {

@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { auth } from '../../auth'
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest'
 import { api } from '../../../api'
+import { auth } from '../../auth'
 import { useAuth } from '../auth-state'
 
 describe('auth', () => {

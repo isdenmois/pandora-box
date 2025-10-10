@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { api } from '@/shared/api'
 import { getMessage } from '@/shared/lib'
-import { ref } from 'vue'
 
 const message = ref('')
 const username = ref('')
