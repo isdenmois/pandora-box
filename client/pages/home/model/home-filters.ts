@@ -23,7 +23,7 @@ export const useHome = defineStore('home', () => {
   const sort = ref<Sort>('rating')
 
   const filter = (item: Movie | Series) => {
-    return forMe.value === item.private
+    return forMe.value === !!item.private
   }
 
   return {

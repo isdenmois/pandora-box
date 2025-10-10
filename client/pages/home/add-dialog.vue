@@ -1,6 +1,8 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import * as v from 'valibot'
+import { flatten, useForm } from 'vue-standard-schema'
 import { useMovies } from '@/entities/movie'
 import { useSeries } from '@/entities/series'
 import { api } from '@/shared/api'
@@ -12,33 +14,72 @@ const movies = useMovies()
 const series = useSeries()
 
 const isLoading = ref(true)
-const isCreating = ref(false)
 const error = ref(false)
-const title = ref('')
-const rating = ref('')
-const year = ref('')
-const poster = ref('')
-const type = ref<'movie' | 'series'>('movie')
-const season = ref('1')
-let language: string | null = null
-let genre: string | null = null
-const forMe = ref(false)
-const iAdded = ref(false)
-const reason = ref('')
 
 let extra: object = {}
+let language: string | null = null
+let genre: string | null = null
 
-const isValid = computed(() => !!title.value)
+const fields = reactive({
+  type: 'movie',
+  title: '',
+  rating: '',
+  year: '',
+  poster: '',
+  season: '1',
+  reason: '',
+  iAdded: false,
+  forMe: false,
+})
+
+const toNumber = (value: string) => (value ? +value : null)
+const toNullable = (value: string) => (value ? value : null)
+
+const { form, submit, submitting, errors } = useForm({
+  input: fields,
+  schema: v.object({
+    type: v.pipe(v.union([v.literal('movie'), v.literal('series')])),
+    title: v.pipe(v.string(), v.trim(), v.minLength(1, 'Title is required')),
+    rating: v.pipe(v.string(), v.trim(), v.transform(toNumber), v.nullable(v.number('Should be a valid number'))),
+    year: v.pipe(v.string(), v.trim(), v.transform(toNumber), v.nullable(v.number('Should be a valid year'))),
+    poster: v.pipe(v.string(), v.trim(), v.transform(toNullable)),
+    season: v.pipe(v.string(), v.trim(), v.transform(toNumber), v.nullable(v.number())),
+    reason: v.pipe(v.string(), v.trim()),
+    iAdded: v.boolean(),
+    forMe: v.boolean(),
+  }),
+  formatErrors: flatten,
+  async submit({ type, season, iAdded, forMe, ...input }) {
+    const data = {
+      ...input,
+      extId: params.id,
+      provider: 'omdb',
+      language,
+      genre,
+      extra,
+      userId: iAdded ? 'me' : null,
+      private: forMe,
+    }
+    if (type === 'series') {
+      await series.create({ ...data, season })
+    } else if (type === 'movie') {
+      await movies.create(data)
+    }
+
+    router.replace('/')
+  },
+})
 
 onMounted(async () => {
   try {
     const data = await api.search.byId(params.id)
 
-    type.value = data.type
-    title.value = data.title
-    rating.value = data.rating ? String(data.rating) : ''
-    year.value = data.year ? String(data.year) : ''
-    poster.value = data.poster ?? ''
+    fields.type = data.type
+    fields.title = data.title
+    fields.rating = data.rating ? String(data.rating) : ''
+    fields.year = data.year ? String(data.year) : ''
+    fields.poster = data.poster ?? ''
+    fields.season = '1'
     language = data.language || null
     genre = data.genre || null
     extra = data.extra ?? {}
@@ -48,57 +89,6 @@ onMounted(async () => {
     isLoading.value = false
   }
 })
-
-const addSeries = async () =>
-  await series.create({
-    extId: params.id,
-    provider: 'omdb',
-    title: title.value.trim(),
-    rating: parseFloat(rating.value) || null,
-    year: parseInt(year.value) || null,
-    poster: poster.value.trim(),
-    season: 1,
-    language,
-    genre,
-    reason: reason.value,
-    userId: iAdded.value ? 'me' : null,
-    private: forMe.value,
-    extra,
-  })
-
-const addMovie = async () =>
-  movies.create({
-    extId: params.id,
-    provider: 'omdb',
-    title: title.value.trim(),
-    rating: parseFloat(rating.value) || null,
-    year: parseInt(year.value) || null,
-    poster: poster.value.trim(),
-    language,
-    genre,
-    reason: reason.value,
-    userId: iAdded.value ? 'me' : null,
-    private: forMe.value,
-    extra,
-  })
-
-const add = async () => {
-  if (!isValid.value) return
-
-  isCreating.value = true
-
-  try {
-    if (type.value === 'series') {
-      await addSeries()
-    } else if (type.value === 'movie') {
-      await addMovie()
-    }
-
-    router.replace('/')
-  } finally {
-    isCreating.value = false
-  }
-}
 </script>
 
 <template>
@@ -108,13 +98,13 @@ const add = async () => {
     </div>
     <div v-else-if="error">error!</div>
     <div v-else>
-      <h1>Add "{{ title }}"</h1>
+      <h1>Add "{{ fields.title }}"</h1>
 
-      <form @submit.prevent="add">
+      <form ref="form" @submit.prevent="submit">
         <div>
           <label>
             Type
-            <select v-model="type" :disabled="isCreating">
+            <select v-model="fields.type" :disabled="submitting">
               <option value="movie">Movie</option>
               <option value="series">Series</option>
             </select>
@@ -124,60 +114,66 @@ const add = async () => {
         <div>
           <label>
             Title
-            <input type="text" name="title" placeholder="Title" v-model="title" :disabled="isCreating" />
+            <input type="text" name="title" placeholder="Title" v-model="fields.title" :disabled="submitting" />
           </label>
         </div>
 
         <div>
           <label>
             Rating
-            <input type="text" name="rating" placeholder="Rating" v-model="rating" :disabled="isCreating" />
+            <input type="text" name="rating" placeholder="Rating" v-model="fields.rating" :disabled="submitting" />
           </label>
+          <div v-for="error in errors?.nested?.rating" :key="error">{{ error }}</div>
         </div>
 
         <div>
           <label>
             Year
-            <input type="text" name="year" placeholder="Year" v-model="year" :disabled="isCreating" />
+            <input type="text" name="year" placeholder="Year" v-model="fields.year" :disabled="submitting" />
           </label>
+          <div v-for="error in errors?.nested?.year" :key="error">{{ error }}</div>
         </div>
 
         <div>
           <label>
             Poster
-            <input type="text" name="poster" placeholder="Poster" v-model="poster" :disabled="isCreating" />
+            <input type="text" name="poster" placeholder="Poster" v-model="fields.poster" :disabled="submitting" />
           </label>
+          <div v-for="error in errors?.nested?.poster" :key="error">{{ error }}</div>
         </div>
 
-        <div v-if="type === 'series'">
+        <div v-if="fields.type === 'series'">
           <label>
             Season
-            <input type="text" name="season" placeholder="Season" v-model="season" :disabled="isCreating" />
+            <input type="text" name="season" placeholder="Season" v-model="fields.season" :disabled="submitting" />
           </label>
+
+          <div v-for="error in errors?.nested?.season" :key="error">{{ error }}</div>
         </div>
 
         <div>
           <label>
             Why
-            <input type="text" name="why" placeholder="Why" v-model="reason" :disabled="isCreating" />
+            <input type="text" name="why" placeholder="Why" v-model="fields.reason" :disabled="submitting" />
           </label>
+          <div v-for="error in errors?.nested?.reason" :key="error">{{ error }}</div>
         </div>
 
         <div>
           <label>
             I Added
-            <input type="checkbox" v-model="iAdded" :disabled="isCreating" />
+            <input type="checkbox" v-model="fields.iAdded" :disabled="submitting" />
           </label>
         </div>
 
         <div>
           <label>
             For Me
-            <input type="checkbox" v-model="forMe" :disabled="isCreating" />
+            <input type="checkbox" v-model="fields.forMe" :disabled="submitting" />
           </label>
         </div>
 
-        <button type="submit" :disabled="!isValid || isCreating">Add</button>
+        <button type="submit" :disabled="submitting">Add</button>
       </form>
     </div>
   </Dialog>
