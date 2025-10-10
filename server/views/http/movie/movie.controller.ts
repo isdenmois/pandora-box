@@ -17,6 +17,7 @@ export const movieController = new Elysia({
     },
     { body: createMovieBody },
   )
+  .get(':id', ({ params: { id } }) => movieRepository.byId(id))
   .get('', () => {
     return movieRepository.getAll()
   })

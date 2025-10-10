@@ -17,6 +17,7 @@ export const seriesController = new Elysia({
     },
     { body: createSeriesBody },
   )
+  .get(':id', ({ params: { id } }) => seriesRepository.byId(id))
   .get('', () => {
     return seriesRepository.getAll()
   })

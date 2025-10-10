@@ -29,7 +29,9 @@ onBeforeMount(() => {
 
   <ul>
     <li v-for="item in home.series" :key="item.id" class="mt-4">
-      <SeriesItem :series="item" />
+      <RouterLink class="not-link" :to="`/details/series/${item.id}`">
+        <SeriesItem :series="item" />
+      </RouterLink>
     </li>
   </ul>
 
@@ -39,7 +41,9 @@ onBeforeMount(() => {
 
   <ul>
     <li v-for="movie in home.movies" :key="movie.id" class="mt-4">
-      <MovieItem :movie />
+      <RouterLink class="not-link" :to="`/details/movie/${movie.id}`">
+        <MovieItem :movie />
+      </RouterLink>
     </li>
   </ul>
 
