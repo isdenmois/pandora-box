@@ -19,5 +19,9 @@ const { type, id } = useRoute().params as Params
     <MovieDetails v-if="type === 'movie'" :id="id" />
 
     <SeriesDetails v-if="type === 'series'" :id="id" />
+
+    <RouterLink :to="`/edit/${type}/${id}`">
+      <button>Edit</button>
+    </RouterLink>
   </Dialog>
 </template>

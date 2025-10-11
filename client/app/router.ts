@@ -11,6 +11,7 @@ const router = createRouter({
         { path: '/search', component: () => import('@/pages/home/search-dialog.vue') },
         { path: '/add/:id', component: () => import('@/pages/home/add-dialog.vue') },
         { path: '/details/:type/:id', component: () => import('@/pages/home/details-dialog.vue') },
+        { path: '/edit/:type/:id', component: () => import('@/pages/home/edit-dialog.vue') },
       ],
     },
     { path: '/settings', component: () => import('@/pages/settings/settings-page.vue') },

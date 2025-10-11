@@ -3,8 +3,8 @@ import { series } from './series'
 import { session } from './session'
 import { user } from './user'
 
-export { type Movie } from './movie'
-export { type Series } from './series'
+export type { Movie, MovieCreate, MovieUpdate } from './movie'
+export type { Series, SeriesCreate, SeriesUpdate } from './series'
 export { type Session } from './session'
 export { type User } from './user'
 

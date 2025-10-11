@@ -18,3 +18,6 @@ export const series = sqliteTable('series', {
 })
 
 export type Series = typeof series.$inferSelect
+
+export type SeriesCreate = Omit<Series, 'id'>
+export type SeriesUpdate = Pick<Series, 'title'>

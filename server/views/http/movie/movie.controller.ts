@@ -1,7 +1,7 @@
 import Elysia from 'elysia'
 import { movieRepository } from '@/infra'
 import { authGuard } from '@/views/auth'
-import { createMovieBody } from './movie.contract'
+import { createMovieBody, updateMovieBody } from './movie.contract'
 
 export const movieController = new Elysia({
   prefix: '/v1/movie',
@@ -18,6 +18,7 @@ export const movieController = new Elysia({
     { body: createMovieBody },
   )
   .get(':id', ({ params: { id } }) => movieRepository.byId(id))
+  .put(':id', ({ params: { id }, body }) => movieRepository.update(id, body), { body: updateMovieBody })
   .get('', () => {
     return movieRepository.getAll()
   })

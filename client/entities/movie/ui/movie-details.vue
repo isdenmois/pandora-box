@@ -1,48 +1,28 @@
-<script lang="ts">
-import { onMounted, ref } from 'vue'
-import { api, type Movie } from '@/shared/api'
-import { Spinner } from '@/shared/ui'
+<script setup lang="ts">
+import { useMovies } from '../model'
 
 interface Props {
   id: string
 }
-</script>
 
-<script setup lang="ts">
 const { id } = defineProps<Props>()
 
-const isLoading = ref(true)
-const error = ref(false)
-const data = ref<Movie | null>(null)
-
-onMounted(async () => {
-  try {
-    data.value = await api.movie.byId(id)
-    isLoading.value = false
-  } catch {
-    error.value = true
-  }
-})
+const movies = useMovies()
+const data = await movies.byId(id)
 </script>
 
 <template>
-  <div v-if="isLoading || !data">
-    <Spinner :size="32" />
-  </div>
-  <div v-else-if="error">Error!</div>
-  <div v-else>
-    <h1>{{ data.title }}</h1>
+  <h1>{{ data.title }}</h1>
 
-    <img v-if="data.poster" class="h-40" :src="data.poster" />
+  <img v-if="data.poster" class="h-40" :src="data.poster" />
 
-    <div v-if="data.year">Year: {{ data.year }}</div>
+  <div v-if="data.year">Year: {{ data.year }}</div>
 
-    <div v-if="data.rating">Rating: {{ data.rating }}</div>
+  <div v-if="data.rating">Rating: {{ data.rating }}</div>
 
-    <div v-if="data.reason">Reason: {{ data.reason }}</div>
+  <div v-if="data.reason">Reason: {{ data.reason }}</div>
 
-    <div v-if="data.genre">Genre: {{ data.genre }}</div>
+  <div v-if="data.genre">Genre: {{ data.genre }}</div>
 
-    <div v-if="data.language">Language: {{ data.language }}</div>
-  </div>
+  <div v-if="data.language">Language: {{ data.language }}</div>
 </template>

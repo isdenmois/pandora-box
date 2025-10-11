@@ -14,3 +14,12 @@ export const createMovieBody = t.Object({
   private: t.Boolean(),
   extra: t.Any(),
 })
+
+export const updateMovieBody = t.Object({
+  title: t.String({ minLength: 1 }),
+  poster: t.Nullable(t.String({ minLength: 1 })),
+  year: t.Nullable(t.Integer({ minimum: 1 })),
+  rating: t.Nullable(t.Number()),
+  reason: t.Nullable(t.String()),
+  private: t.Boolean(),
+})

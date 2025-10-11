@@ -1,7 +1,7 @@
 import Elysia from 'elysia'
 import { seriesRepository } from '@/infra'
 import { authGuard } from '@/views/auth'
-import { createSeriesBody } from './series.contract'
+import { createSeriesBody, updateSeriesBody } from './series.contract'
 
 export const seriesController = new Elysia({
   prefix: '/v1/series',
@@ -18,6 +18,7 @@ export const seriesController = new Elysia({
     { body: createSeriesBody },
   )
   .get(':id', ({ params: { id } }) => seriesRepository.byId(id))
+  .put(':id', ({ params: { id }, body }) => seriesRepository.update(id, body), { body: updateSeriesBody })
   .get('', () => {
     return seriesRepository.getAll()
   })

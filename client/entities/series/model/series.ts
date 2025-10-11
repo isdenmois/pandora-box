@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
-import { readonly, shallowRef } from 'vue'
-import { api, type Series, type SeriesCreate } from '@/shared/api'
+import { readonly, ref, shallowRef } from 'vue'
+import { api, type Series, type SeriesCreate, type SeriesUpdate } from '@/shared/api'
 
 export const useSeries = defineStore('series', () => {
-  const all = shallowRef<Series[]>([])
+  const all = ref<Series[]>([])
   const isLoading = shallowRef(false)
 
   return {
@@ -22,6 +22,30 @@ export const useSeries = defineStore('series', () => {
       const series = await api.series.create(data)
 
       all.value = [...all.value, series]
+    },
+
+    async byId(id: string) {
+      const existed = all.value.find((item) => item.id === id)
+
+      if (existed) {
+        return existed
+      }
+
+      const item = await api.series.byId(id)
+
+      all.value.push(item)
+
+      return item
+    },
+
+    async update(id: string, data: SeriesUpdate) {
+      const existed = all.value.find((item) => item.id === id)
+
+      if (existed) {
+        Object.assign(existed, data)
+      }
+
+      await api.series.update(id, data)
     },
   }
 })

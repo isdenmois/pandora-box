@@ -6,6 +6,7 @@ import { flatten, useForm } from 'vue-standard-schema'
 import { useMovies } from '@/entities/movie'
 import { useSeries } from '@/entities/series'
 import { api } from '@/shared/api'
+import { toNullable, toNumber } from '@/shared/lib'
 import { Dialog, Spinner } from '@/shared/ui'
 
 const router = useRouter()
@@ -32,9 +33,6 @@ const fields = reactive({
   forMe: false,
 })
 
-const toNumber = (value: string) => (value ? +value : null)
-const toNullable = (value: string) => (value ? value : null)
-
 const { form, submit, submitting, errors } = useForm({
   input: fields,
   schema: v.object({
@@ -42,7 +40,7 @@ const { form, submit, submitting, errors } = useForm({
     title: v.pipe(v.string(), v.trim(), v.minLength(1, 'Title is required')),
     rating: v.pipe(v.string(), v.trim(), v.transform(toNumber), v.nullable(v.number('Should be a valid number'))),
     year: v.pipe(v.string(), v.trim(), v.transform(toNumber), v.nullable(v.number('Should be a valid year'))),
-    poster: v.pipe(v.string(), v.trim(), v.transform(toNullable)),
+    poster: v.nullable(v.pipe(v.string(), v.trim(), v.transform(toNullable))),
     season: v.pipe(v.string(), v.trim(), v.transform(toNumber), v.nullable(v.number())),
     reason: v.pipe(v.string(), v.trim()),
     iAdded: v.boolean(),

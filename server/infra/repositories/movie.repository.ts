@@ -1,12 +1,10 @@
 import { randomUUID } from 'node:crypto'
 import { eq } from 'drizzle-orm'
-import { table, Movie } from '@/domain'
+import { table, Movie, MovieUpdate, MovieCreate } from '@/domain'
 import { db } from '../db'
 
-type CreateMovie = Omit<Movie, 'id'>
-
 export const movieRepository = {
-  async create(data: CreateMovie): Promise<Movie> {
+  async create(data: MovieCreate): Promise<Movie> {
     const id = randomUUID()
 
     await db.insert(table.movie).values({ ...data, id })
@@ -23,5 +21,9 @@ export const movieRepository = {
     })
 
     return movie || null
+  },
+
+  async update(id: string, data: MovieUpdate) {
+    await db.update(table.movie).set(data).where(eq(table.movie.id, id))
   },
 }

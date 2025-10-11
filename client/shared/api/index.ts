@@ -1,11 +1,14 @@
 import { admin } from './admin-api'
 import { auth } from './auth-api'
-import { movie, type Movie, type MovieCreate } from './movie-api'
+import { movie } from './movie-api'
 import { search, type SearchItem, type SearchItemDetails } from './search-api'
-import { series, type Series, type SeriesCreate } from './series-api'
+import { series } from './series-api'
 import { user, type User } from './user-api'
 
-export type { Movie, MovieCreate, SearchItem, SearchItemDetails, Series, SeriesCreate, User }
+export type { SearchItem, SearchItemDetails, User }
+
+export type * from './movie-api'
+export type * from './series-api'
 
 export const api = {
   auth,

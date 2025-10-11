@@ -17,3 +17,6 @@ export const movie = sqliteTable('movie', {
 })
 
 export type Movie = typeof movie.$inferSelect
+
+export type MovieCreate = Omit<Movie, 'id'>
+export type MovieUpdate = Pick<Movie, 'title' | 'poster' | 'year' | 'rating' | 'reason' | 'private'>

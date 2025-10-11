@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import Spinner from './spinner.vue'
 
 interface Props {
   parent?: string
@@ -19,7 +20,13 @@ const goBack = () => {
     <div class="backdrop absolute inset-0" v-on:click="goBack"></div>
 
     <div class="content p-4 z-1 overflow-y-auto">
-      <slot />
+      <Suspense>
+        <slot />
+
+        <template #fallback>
+          <Spinner :size="32" />
+        </template>
+      </Suspense>
     </div>
   </div>
 </template>
