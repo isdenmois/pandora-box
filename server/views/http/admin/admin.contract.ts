@@ -6,3 +6,8 @@ export const RegisterUserBody = t.Object({
 })
 
 export const BackupRestoreBody = t.Any({})
+
+export const ImportBody = t.Object({
+  series: t.Array(t.Any()),
+  movies: t.Array(t.Any()),
+})

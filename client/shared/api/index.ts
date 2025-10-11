@@ -7,6 +7,7 @@ import { user, type User } from './user-api'
 
 export type { SearchItem, SearchItemDetails, User }
 
+export type * from './admin-api'
 export type * from './movie-api'
 export type * from './series-api'
 

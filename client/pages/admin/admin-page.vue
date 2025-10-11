@@ -7,5 +7,7 @@
 
   <RouterLink to="/admin/backup">Backup</RouterLink>
 
+  <RouterLink to="/admin/import">Import</RouterLink>
+
   <router-view />
 </template>
