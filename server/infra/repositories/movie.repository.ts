@@ -9,7 +9,7 @@ export const movieRepository = {
 
     await db.insert(table.movie).values({ ...data, id })
 
-    return { ...data, id }
+    return { ...data, seen: null, id }
   },
   async getAll(): Promise<Movie[]> {
     return await db.select().from(table.movie)
@@ -25,5 +25,41 @@ export const movieRepository = {
 
   async update(id: string, data: MovieUpdate) {
     await db.update(table.movie).set(data).where(eq(table.movie.id, id))
+  },
+
+  async getViews(userId: string) {
+    return await db.select().from(table.movieView).where(eq(table.movieView.userId, userId))
+  },
+
+  async markAsViewed(movieId: string, userId: string, date: string, rating: number) {
+    const id = randomUUID()
+    const data = {
+      id,
+      movieId,
+      userId,
+      date,
+      rating,
+    }
+
+    await db.insert(table.movieView).values(data)
+    await db.update(table.movie).set({ seen: date }).where(eq(table.movie.id, movieId))
+
+    return data
+  },
+
+  async removeView(viewId: string) {
+    const view = await db.query.movieView.findFirst({
+      where: eq(table.movieView.id, viewId),
+    })
+
+    if (view) {
+      await db.delete(table.movieView).where(eq(table.movieView.id, viewId))
+      await db.update(table.movie).set({ seen: null }).where(eq(table.movie.id, view.movieId))
+    }
+  },
+
+  async removeMovieView(movieId: string) {
+    await db.delete(table.movieView).where(eq(table.movieView.movieId, movieId))
+    await db.update(table.movie).set({ seen: null }).where(eq(table.movie.id, movieId))
   },
 }

@@ -25,3 +25,8 @@ export const updateSeriesBody = t.Object({
   reason: t.Nullable(t.String()),
   private: t.Boolean(),
 })
+
+export const markSeriesViewedBody = t.Object({
+  date: t.String({ minLength: 5 }),
+  rating: t.Number({ minimum: 0, maximum: 10 }),
+})

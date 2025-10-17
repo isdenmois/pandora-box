@@ -1,7 +1,7 @@
-import type { Series, SeriesCreate, SeriesUpdate } from '@/server/entities'
+import type { Series, SeriesCreate, SeriesView, SeriesUpdate } from '@/server/entities'
 import { http } from './http'
 
-export type { Series, SeriesCreate, SeriesUpdate }
+export type { Series, SeriesCreate, SeriesView, SeriesUpdate }
 
 const v1 = http.url('/v1/series')
 
@@ -14,4 +14,8 @@ export const series = {
       .url('/' + id)
       .put(data)
       .text(),
+  getViews: () => v1.get('/views').json<SeriesView[]>(),
+  markAsViewed: (seriesId: string, date: string, rating: number) =>
+    v1.url(`/${seriesId}/viewed`).post({ date, rating }).json<SeriesView>(),
+  removeSeriesView: (seriesId: string) => v1.url(`/${seriesId}/view`).delete().text(),
 }

@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer, blob, real } from 'drizzle-orm/sqlite-core'
+import { user } from './user'
 
 export const series = sqliteTable('series', {
   id: text().primaryKey(),
@@ -12,12 +13,26 @@ export const series = sqliteTable('series', {
   language: text(),
   genre: text(),
   reason: text(),
+  seen: text(),
   userId: text('user_id'),
   private: integer({ mode: 'boolean' }),
   extra: blob({ mode: 'json' }),
 })
 
-export type Series = typeof series.$inferSelect
+export const seriesView = sqliteTable('series_view', {
+  id: text().primaryKey(),
+  seriesId: text('series_id')
+    .references(() => series.id, { onDelete: 'cascade' })
+    .notNull(),
+  userId: text('user_id')
+    .references(() => user.id, { onDelete: 'cascade' })
+    .notNull(),
+  date: text().notNull(),
+  rating: integer().notNull(),
+})
 
-export type SeriesCreate = Omit<Series, 'id'>
+export type Series = typeof series.$inferSelect
+export type SeriesView = typeof series.$inferSelect
+
+export type SeriesCreate = Omit<Series, 'id' | 'seen'>
 export type SeriesUpdate = Pick<Series, 'title'>

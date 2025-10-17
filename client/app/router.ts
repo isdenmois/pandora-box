@@ -12,6 +12,7 @@ const router = createRouter({
         { path: '/add/:id', component: () => import('@/pages/home/add-dialog.vue') },
         { path: '/details/:type/:id', component: () => import('@/pages/home/details-dialog.vue') },
         { path: '/edit/:type/:id', component: () => import('@/pages/home/edit-dialog.vue') },
+        { path: '/seen/:type/:id', component: () => import('@/pages/home/mark-as-viewed-dialog.vue') },
       ],
     },
     { path: '/settings', component: () => import('@/pages/settings/settings-page.vue') },

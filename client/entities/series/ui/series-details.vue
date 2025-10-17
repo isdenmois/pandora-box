@@ -29,4 +29,10 @@ const data = await series.byId(id)
   <div v-if="data.genre">Genre: {{ data.genre }}</div>
 
   <div v-if="data.language">Language: {{ data.language }}</div>
+
+  <div v-if="data.seen">
+    Seen: {{ data.seen }}
+
+    <button v-if="data.seen" @click="series.removeSeriesView(id)">Not Seen</button>
+  </div>
 </template>

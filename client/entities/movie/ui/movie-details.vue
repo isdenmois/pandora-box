@@ -25,4 +25,10 @@ const data = await movies.byId(id)
   <div v-if="data.genre">Genre: {{ data.genre }}</div>
 
   <div v-if="data.language">Language: {{ data.language }}</div>
+
+  <div v-if="data.seen">
+    Seen: {{ data.seen }}
+
+    <button v-if="data.seen" @click="movies.removeMovieView(id)">Not Seen</button>
+  </div>
 </template>

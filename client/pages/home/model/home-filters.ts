@@ -21,14 +21,16 @@ export const useHome = defineStore('home', () => {
 
   const forMe = ref(false)
   const sort = ref<Sort>('rating')
+  const seen = ref(false)
 
   const filter = (item: Movie | Series) => {
-    return forMe.value === !!item.private
+    return forMe.value === !!item.private && seen.value === !!item.seen
   }
 
   return {
     forMe: readonly(forMe),
     sort: readonly(sort),
+    seen: readonly(seen),
     movies: computed(() => movies.all.filter(filter).sort(sorts[sort.value])),
     series: computed(() => series.all.filter(filter).sort(sorts[sort.value])),
     toggleForMe() {
@@ -36,6 +38,9 @@ export const useHome = defineStore('home', () => {
     },
     toggleSort() {
       sort.value = sort.value === 'rating' ? 'title' : 'rating'
+    },
+    toggleSeen() {
+      seen.value = !seen.value
     },
   }
 })

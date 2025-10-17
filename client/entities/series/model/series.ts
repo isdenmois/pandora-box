@@ -47,5 +47,25 @@ export const useSeries = defineStore('series', () => {
 
       await api.series.update(id, data)
     },
+
+    async markAsViewed(id: string, date: string, rating: number) {
+      const existed = all.value.find((item) => item.id === id)
+
+      if (existed) {
+        Object.assign(existed, { seen: date })
+      }
+
+      await api.series.markAsViewed(id, date, rating)
+    },
+
+    async removeSeriesView(id: string) {
+      const existed = all.value.find((item) => item.id === id)
+
+      if (existed) {
+        Object.assign(existed, { seen: null })
+      }
+
+      await api.series.removeSeriesView(id)
+    },
   }
 })

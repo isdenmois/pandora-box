@@ -20,6 +20,7 @@ onBeforeMount(() => {
 
   <div class="flex gap-4">
     <button class="secondary" :class="{ selected: home.forMe }" @click="home.toggleForMe">For Me</button>
+    <button class="secondary" :class="{ selected: home.seen }" @click="home.toggleSeen">Seen</button>
     <button @click="home.toggleSort">By {{ home.sort }}</button>
   </div>
 

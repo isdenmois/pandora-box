@@ -49,5 +49,25 @@ export const useMovies = defineStore('movies', () => {
 
       await api.movie.update(id, data)
     },
+
+    async markAsViewed(id: string, date: string, rating: number) {
+      const existed = all.value.find((movie) => movie.id === id)
+
+      if (existed) {
+        Object.assign(existed, { seen: date })
+      }
+
+      await api.movie.markAsViewed(id, date, rating)
+    },
+
+    async removeMovieView(id: string) {
+      const existed = all.value.find((movie) => movie.id === id)
+
+      if (existed) {
+        Object.assign(existed, { seen: null })
+      }
+
+      await api.movie.removeMovieView(id)
+    },
   }
 })

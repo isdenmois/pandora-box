@@ -20,8 +20,14 @@ const { type, id } = useRoute().params as Params
 
     <SeriesDetails v-if="type === 'series'" :id="id" />
 
-    <RouterLink :to="`/edit/${type}/${id}`">
-      <button>Edit</button>
-    </RouterLink>
+    <div class="mt-4 flex gap-4">
+      <RouterLink :to="`/edit/${type}/${id}`">
+        <button>Edit</button>
+      </RouterLink>
+
+      <RouterLink :to="`/seen/${type}/${id}`">
+        <button>Seen</button>
+      </RouterLink>
+    </div>
   </Dialog>
 </template>

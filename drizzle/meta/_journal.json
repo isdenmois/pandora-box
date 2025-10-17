@@ -22,6 +22,13 @@
       "when": 1759586950246,
       "tag": "0002_slippery_spectrum",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1760722602386,
+      "tag": "0003_magenta_purifiers",
+      "breakpoints": true
     }
   ]
 }
