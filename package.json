@@ -55,9 +55,9 @@
   "dependencies": {
     "@elysiajs/cors": "1.4.0",
     "@elysiajs/openapi": "1.4.11",
-    "@elysiajs/static": "1.4.4",
+    "@elysiajs/static": "1.4.0",
     "@unocss/reset": "66.5.4",
-    "elysia": "1.4.12",
+    "elysia": "1.4.10",
     "pinia": "3.0.3",
     "unocss": "66.5.4",
     "valibot": "1.1.0",
