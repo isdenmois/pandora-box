@@ -37,7 +37,7 @@ const goBack = () => {
 }
 
 .content {
-  background-color: var(--card);
+  background-color: var(--surface0);
   min-width: var(--max-dialog-width);
   border-radius: 1rem;
   max-height: 80vh;

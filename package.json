@@ -67,7 +67,7 @@
     "wretch": "2.11.0"
   },
   "lint-staged": {
-    "*.(js|ts|vue|html|css|json|md|svg)": "prettier --write",
+    "*.(js|ts|vue|html|css|json|md)": "prettier --write",
     "*.(js|ts|vue)": "eslint --fix"
   }
 }

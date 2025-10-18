@@ -1,5 +1,22 @@
 :root {
-  --background: #eee;
+  --background: #19191c;
+  --border: #605e64;
+
+  --danger: #9c2121;
+  --danger2: #eb9e9e;
+
+  --primary1: #906cda;
+
+  --surface0: #25232a;
+  --surface1: #333038;
+  --surface2: #49464d;
+
+  --text-primary: #ffffff;
+  --text-secondary: #908e93;
+
+  --warning: #a87a2a;
+  --warning2: #ecd7b2;
+
   --accent: #313f4b;
   --card: #fff;
   --primary: #353c49;
@@ -27,7 +44,7 @@ html,
 }
 
 body {
-  color: var(--primary);
+  color: var(--text-primary);
   background-color: var(--background);
   font-family: 'Proxima Nova', sans-serif;
   -webkit-tap-highlight-color: transparent;
@@ -50,18 +67,10 @@ a.not-link:hover {
   opacity: 0.9;
 }
 
+.color-primary {
+  color: var(--text-primary);
+}
+
 .color-secondary {
-  color: var(--secondary);
-}
-
-a.nav-link {
-  color: var(--secondary);
-}
-
-a.nav-link[aria-current='page'] {
-  color: var(--accent);
-}
-
-.secondary {
-  color: var(--secondary);
+  color: var(--text-secondary);
 }

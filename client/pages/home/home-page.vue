@@ -16,15 +16,13 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <h1>Home</h1>
-
   <div class="flex gap-4">
     <button class="secondary" :class="{ selected: home.forMe }" @click="home.toggleForMe">For Me</button>
     <button class="secondary" :class="{ selected: home.seen }" @click="home.toggleSeen">Seen</button>
     <button @click="home.toggleSort">By {{ home.sort }}</button>
   </div>
 
-  <p class="mt-8">All Series</p>
+  <h1 class="mt-6">Series</h1>
 
   <Spinner v-if="series.isLoading && !home.series.length" :size="24" />
 
@@ -36,7 +34,7 @@ onBeforeMount(() => {
     </li>
   </ul>
 
-  <p class="mt-8">All Movies</p>
+  <h1 class="mt-8">Movies</h1>
 
   <Spinner v-if="movies.isLoading && !home.movies.length" :size="24" />
 

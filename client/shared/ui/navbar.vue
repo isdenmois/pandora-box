@@ -4,74 +4,81 @@ import { icons } from './icons'
 </script>
 
 <template>
-  <nav>
+  <nav class="navbar">
     <RouterLink class="nav-link not-link" to="/" replace>
       <div class="icon">
-        <Icon :size="40" :icon="icons.series" />
+        <Icon :size="32" :icon="icons.home" />
       </div>
 
-      <div>Wishlist</div>
+      <div class="mt-1">Home</div>
     </RouterLink>
 
     <RouterLink class="nav-link plus not-link" to="/search" data-testid="search-button">
       <div class="flex items-center justify-center icon">
-        <Icon :size="32" :icon="icons.plus" />
+        <Icon :size="40" :icon="icons.plus" />
       </div>
     </RouterLink>
 
     <RouterLink class="nav-link not-link" to="/settings" replace>
       <div class="icon">
-        <Icon :size="40" :icon="icons.settings" />
+        <Icon :size="32" :icon="icons.settings" />
       </div>
 
-      <div>Settings</div>
+      <div class="mt-1">Settings</div>
     </RouterLink>
   </nav>
 </template>
 
-<style scoped>
-nav {
-  padding: 0.5rem;
+<style>
+.navbar {
+  padding: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: var(--black);
   text-align: center;
-  gap: 1.5rem;
+  gap: 24px;
+  color: var(--text-secondary);
 }
 
-:global(.nav-link.plus .icon) {
-  background-color: var(--accent);
-  color: var(--card);
-  border-radius: 50%;
-  height: 4rem;
-  width: 4rem;
-}
-
-:global(body:not(#mobile) .nav-link.plus) {
-  position: absolute;
-  right: 1rem;
-  bottom: 5rem;
-}
-
-/* Mobile */
-:global(#mobile nav) {
+#mobile .navbar {
   position: fixed;
+  background-color: var(--surface1);
   bottom: 0;
   left: 0;
   right: 0;
   flex-direction: row;
-  font-size: 12px;
-  gap: 0;
+  font-size: 14px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: 0px -8px 8px #0002;
 }
 
-:global(#mobile .nav-link.plus .icon) {
-  width: 48px;
-  height: 48px;
+.nav-link[aria-current='page'] {
+  color: var(--text-primary);
 }
 
-:global(#mobile nav .nav-link:not(.plus)) {
+.nav-link.plus .icon {
+  color: var(--background);
+  background-color: var(--primary1);
+  border-radius: 50%;
+  height: 64px;
+  width: 64px;
+  box-shadow: 2px 6px 6px var(--background);
+}
+
+#mobile .nav-link.plus {
+  position: absolute;
+  bottom: 16px;
+}
+
+body:not(#mobile) .nav-link.plus {
+  position: fixed;
+  right: 1rem;
+  bottom: 5rem;
+}
+
+#mobile .navbar .nav-link:not(.plus) {
   flex: 1;
 }
 </style>

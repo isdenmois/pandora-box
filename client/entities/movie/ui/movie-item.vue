@@ -8,11 +8,15 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const description = computed(() =>
-  [props.movie.year, props.movie.language, props.movie.rating].filter(Boolean).join(' ⸱ '),
-)
+const description = computed(() => [props.movie.year, props.movie.language].filter(Boolean).join(' ⸱ '))
 </script>
 
 <template>
-  <Item :title="movie.title" :imgUrl="movie.poster" :description="description" :testId="`movie-${movie.id}`" />
+  <Item
+    :title="movie.title"
+    :imgUrl="movie.poster"
+    :description="description"
+    :rating="movie.rating"
+    :testId="`movie-${movie.id}`"
+  />
 </template>
