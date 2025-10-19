@@ -13,6 +13,7 @@ WORKDIR /app
 COPY --from=modules /app/node_modules node_modules/
 COPY . .
 RUN bun run server:build
+ENV VITE_SEARCH_URL=http://localhost
 RUN bun run client:build
 
 # run the app
