@@ -13,13 +13,14 @@ const result = ref<SearchItem[] | null>(null)
 
 const series = computed(() => result.value?.filter((item) => item.type === 'series') ?? [])
 const movies = computed(() => result.value?.filter((item) => item.type === 'movie') ?? [])
-const omdbId = /^tt\d+/
+const omdbId = /(tt\d\d\d\d+)/i
 
 const search = async () => {
   query.value = query.value.trim()
+  const matches = query.value.match(omdbId)
 
-  if (query.value.match(omdbId)) {
-    return router.push(`/add/${query.value}`)
+  if (matches) {
+    return router.push(`/add/${matches[1]}`)
   }
 
   isSearching.value = true
