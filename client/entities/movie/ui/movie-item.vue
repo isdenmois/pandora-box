@@ -16,7 +16,7 @@ const description = computed(() => [props.movie.year, props.movie.language].filt
     :title="movie.title"
     :imgUrl="movie.poster"
     :description="description"
-    :rating="movie.rating"
+    :rating="movie.seen ? movie.seenRating : movie.rating"
     :testId="`movie-${movie.id}`"
   />
 </template>

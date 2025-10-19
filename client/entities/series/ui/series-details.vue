@@ -35,7 +35,7 @@ const searchUrl = searchLink(data.season ? `${data.title} ${data.season}` : data
   <div v-if="data.language">Language: {{ data.language }}</div>
 
   <div v-if="data.seen">
-    Seen: {{ data.seen }}
+    <span>Seen: {{ data.seen }} {{ data.seenRating }}/10</span>
 
     <button v-if="data.seen" @click="series.removeSeriesView(id)">Not Seen</button>
   </div>

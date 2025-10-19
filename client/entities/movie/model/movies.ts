@@ -54,7 +54,7 @@ export const useMovies = defineStore('movies', () => {
       const existed = all.value.find((movie) => movie.id === id)
 
       if (existed) {
-        Object.assign(existed, { seen: date })
+        Object.assign(existed, { seen: date, seenRating: rating })
       }
 
       await api.movie.markAsViewed(id, date, rating)

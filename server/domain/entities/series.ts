@@ -14,6 +14,7 @@ export const series = sqliteTable('series', {
   genre: text(),
   reason: text(),
   seen: text(),
+  seenRating: integer(),
   userId: text('user_id'),
   private: integer({ mode: 'boolean' }),
   extra: blob({ mode: 'json' }),
@@ -34,5 +35,5 @@ export const seriesView = sqliteTable('series_view', {
 export type Series = typeof series.$inferSelect
 export type SeriesView = typeof series.$inferSelect
 
-export type SeriesCreate = Omit<Series, 'id' | 'seen'>
+export type SeriesCreate = Omit<Series, 'id' | 'seen' | 'seenRating'>
 export type SeriesUpdate = Pick<Series, 'title'>

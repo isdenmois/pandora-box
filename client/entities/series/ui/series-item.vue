@@ -18,7 +18,7 @@ const description = computed(() =>
     :title="series.title"
     :imgUrl="series.poster"
     :description="description"
-    :rating="series.rating"
+    :rating="series.seen ? series.seenRating : series.rating"
     :testId="`series-${series.id}`"
   />
 </template>

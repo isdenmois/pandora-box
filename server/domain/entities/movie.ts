@@ -13,6 +13,7 @@ export const movie = sqliteTable('movie', {
   genre: text(),
   reason: text(),
   seen: text(),
+  seenRating: integer(),
   userId: text('user_id'),
   private: integer({ mode: 'boolean' }),
   extra: blob({ mode: 'json' }),
@@ -33,5 +34,5 @@ export const movieView = sqliteTable('movie_view', {
 export type Movie = typeof movie.$inferSelect
 export type MovieView = typeof movieView.$inferSelect
 
-export type MovieCreate = Omit<Movie, 'id' | 'seen'>
+export type MovieCreate = Omit<Movie, 'id' | 'seen' | 'seenRating'>
 export type MovieUpdate = Pick<Movie, 'title' | 'poster' | 'year' | 'rating' | 'reason' | 'private'>

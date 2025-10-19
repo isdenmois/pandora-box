@@ -9,7 +9,7 @@ export const movieRepository = {
 
     await db.insert(table.movie).values({ ...data, id })
 
-    return { ...data, seen: null, id }
+    return { ...data, id, seen: null, seenRating: null }
   },
   async getAll(): Promise<Movie[]> {
     return await db.select().from(table.movie)
@@ -42,7 +42,7 @@ export const movieRepository = {
     }
 
     await db.insert(table.movieView).values(data)
-    await db.update(table.movie).set({ seen: date }).where(eq(table.movie.id, movieId))
+    await db.update(table.movie).set({ seen: date, seenRating: rating }).where(eq(table.movie.id, movieId))
 
     return data
   },

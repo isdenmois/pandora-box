@@ -52,7 +52,7 @@ export const useSeries = defineStore('series', () => {
       const existed = all.value.find((item) => item.id === id)
 
       if (existed) {
-        Object.assign(existed, { seen: date })
+        Object.assign(existed, { seen: date, seenRating: rating })
       }
 
       await api.series.markAsViewed(id, date, rating)

@@ -9,7 +9,7 @@ export const seriesRepository = {
 
     await db.insert(table.series).values({ ...data, id })
 
-    return { ...data, id, seen: null }
+    return { ...data, id, seen: null, seenRating: null }
   },
   async getAll(): Promise<Series[]> {
     return await db.select().from(table.series)
@@ -42,7 +42,7 @@ export const seriesRepository = {
     }
 
     await db.insert(table.seriesView).values(data)
-    await db.update(table.series).set({ seen: date }).where(eq(table.series.id, seriesId))
+    await db.update(table.series).set({ seen: date, seenRating: rating }).where(eq(table.series.id, seriesId))
 
     return data
   },

@@ -14,10 +14,11 @@ const emit = defineEmits(['submitted'])
 const series = useSeries()
 const data = await series.byId(id)
 const now = new Date()
+const today = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`
 
 const fields = reactive({
-  date: data.seen || `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`,
-  rating: '',
+  date: data.seen || today,
+  rating: data.seenRating || '',
 })
 
 const { form, submit, submitting, errors } = useForm({

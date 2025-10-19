@@ -31,7 +31,7 @@ const searchUrl = searchLink(data.title)
   <div v-if="data.language">Language: {{ data.language }}</div>
 
   <div v-if="data.seen">
-    Seen: {{ data.seen }}
+    <span>Seen: {{ data.seen }} {{ data.seenRating }}/10</span>
 
     <button v-if="data.seen" @click="movies.removeMovieView(id)">Not Seen</button>
   </div>
