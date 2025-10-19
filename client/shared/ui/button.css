@@ -1,21 +1,38 @@
 button {
   all: unset;
-  background-color: var(--accent);
-  color: var(--card);
+  color: var(--text-primary);
   font-size: 16px;
-  padding: 1rem 2rem;
   text-align: center;
+  display: flex;
+  align-items: center;
   cursor: pointer;
+}
+
+button.primary {
+  background-color: var(--surface2);
+  padding: 4px 12px;
+  border-radius: 8px;
 }
 
 button.secondary {
   background-color: var(--secondary);
+  padding: 4px 12px;
   color: var(--background);
+  border-radius: 8px;
 }
 
 button.selected {
   background-color: var(--success);
   color: var(--background);
+}
+
+button.group {
+  color: var(--text-secondary);
+}
+
+button.group .active {
+  color: var(--text-primary);
+  font-weight: bold;
 }
 
 button:not(:disabled) {

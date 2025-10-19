@@ -3,7 +3,7 @@ import { type Page } from 'playwright/test'
 export class HomePageObject {
   constructor(private readonly page: Page) {}
 
-  get header() {
+  get headers() {
     return this.page.getByRole('heading')
   }
 

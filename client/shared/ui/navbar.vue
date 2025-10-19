@@ -4,8 +4,8 @@ import { icons } from './icons'
 </script>
 
 <template>
-  <nav class="navbar">
-    <RouterLink class="nav-link not-link" to="/" replace>
+  <nav class="flex navbar z-1">
+    <RouterLink class="nav-link not-link sm:min-w-40 flex flex-col sm:flex-row sm:gap-3" to="/" replace>
       <div class="icon">
         <Icon :size="32" :icon="icons.home" />
       </div>
@@ -19,7 +19,7 @@ import { icons } from './icons'
       </div>
     </RouterLink>
 
-    <RouterLink class="nav-link not-link" to="/settings" replace>
+    <RouterLink class="nav-link not-link flex flex-col sm:flex-row sm:gap-3" to="/settings" replace>
       <div class="icon">
         <Icon :size="32" :icon="icons.settings" />
       </div>
@@ -31,19 +31,19 @@ import { icons } from './icons'
 
 <style>
 .navbar {
-  padding: 8px;
-  display: flex;
+  padding: 64px 8px 8px 40px;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: start;
+  justify-content: start;
   text-align: center;
   gap: 24px;
   color: var(--text-secondary);
+  background-color: var(--surface1);
 }
 
 #mobile .navbar {
+  padding: 8px;
   position: fixed;
-  background-color: var(--surface1);
   bottom: 0;
   left: 0;
   right: 0;
@@ -56,6 +56,7 @@ import { icons } from './icons'
 
 .nav-link[aria-current='page'] {
   color: var(--text-primary);
+  font-weight: bold;
 }
 
 .nav-link.plus .icon {
@@ -69,6 +70,8 @@ import { icons } from './icons'
 
 #mobile .nav-link.plus {
   position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   bottom: 16px;
 }
 

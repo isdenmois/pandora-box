@@ -22,15 +22,26 @@ export const useHome = defineStore('home', () => {
   const forMe = ref(false)
   const sort = ref<Sort>('rating')
   const seen = ref(false)
+  const search = ref('')
+  const searchValue = computed(() => search.value.trim().toLowerCase())
+
+  const filterBySearch = (item: Movie | Series) => {
+    if (searchValue.value) {
+      return item.title.toLowerCase().includes(searchValue.value)
+    }
+
+    return true
+  }
 
   const filter = (item: Movie | Series) => {
-    return forMe.value === !!item.private && seen.value === !!item.seen
+    return forMe.value === !!item.private && seen.value === !!item.seen && filterBySearch(item)
   }
 
   return {
     forMe: readonly(forMe),
     sort: readonly(sort),
     seen: readonly(seen),
+    search,
     movies: computed(() => movies.all.filter(filter).sort(sorts[sort.value])),
     series: computed(() => series.all.filter(filter).sort(sorts[sort.value])),
     toggleForMe() {

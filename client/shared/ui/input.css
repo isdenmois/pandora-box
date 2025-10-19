@@ -4,10 +4,11 @@ input:focus {
 }
 
 input[type='text'],
+input[type='number'],
 input[type='password'] {
   border: 0;
-  border-bottom: 1px solid var(--secondary);
-  color: var(--primary);
+  border-bottom: 1px solid var(--border);
+  color: var(--primary-text);
   background-color: transparent;
   padding: 0.5rem;
   font-size: 16px;
@@ -19,4 +20,23 @@ input[type='password'] {
   &:focus {
     border-bottom-color: var(--primary);
   }
+}
+
+label.search {
+  position: relative;
+}
+
+label.search svg {
+  position: absolute;
+  color: var(--text-secondary);
+  top: 8px;
+  left: 8px;
+}
+
+label.search input {
+  display: block;
+  border: 0;
+  padding: 10px 10px 10px 40px;
+  background-color: var(--surface1);
+  border-radius: 8px;
 }

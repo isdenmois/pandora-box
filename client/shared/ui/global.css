@@ -17,12 +17,6 @@
   --warning: #a87a2a;
   --warning2: #ecd7b2;
 
-  --accent: #313f4b;
-  --card: #fff;
-  --primary: #353c49;
-  --secondary: #a1a5aa;
-  --success: #353c49;
-
   --max-dialog-width: min(80vw, 600px);
 }
 
@@ -52,6 +46,13 @@ body {
 
 #app {
   min-height: 100dvh;
+  justify-content: center;
+  align-items: center;
+}
+
+#mobile #app {
+  justify-content: stretch;
+  align-items: stretch;
 }
 
 a[target='_blank'] {
@@ -73,4 +74,8 @@ a.not-link:hover {
 
 .color-secondary {
   color: var(--text-secondary);
+}
+
+.surface {
+  background-color: var(--surface0);
 }

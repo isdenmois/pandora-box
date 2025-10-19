@@ -13,14 +13,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="isLoggedIn" class="root flex flex-1 justify-center">
-    <Navbar />
-
-    <main class="flex flex-1 p-8">
-      <div class="p-4 pb-5 sm:pb-4 flex-1 overflow-y-auto">
+  <div v-if="isLoggedIn" class="root flex flex-1 sm:justify-center">
+    <main class="surface flex flex-1">
+      <div class="pb-24 sm:pb-4 flex-1 overflow-y-auto overflow-x-hidden">
         <RouterView />
       </div>
     </main>
+
+    <Navbar />
   </div>
 
   <LoginPage v-else-if="initialized" />
@@ -29,28 +29,30 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped>
+<style>
 .root {
-  background-color: var(--black);
-}
-
-.root main {
-  margin: 1.5rem 1.5rem 1.5rem 0;
-  background-color: var(--background);
-  border-radius: 2rem;
-  height: calc(100vh - 9rem);
+  flex-direction: row-reverse;
+  max-height: min(80rem, calc(100vh - 9rem));
   max-width: 80rem;
+  min-width: min(80rem, calc(100vw - 8rem));
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 /* Mobile */
-:global(#mobile .root) {
+#mobile .root {
   flex-direction: column;
-  max-height: 100dvh;
+  min-width: unset;
+  max-height: 100%;
+  max-width: 100%;
+  border-radius: 0;
+  overflow: unset;
 }
 
-:global(#mobile .root > main) {
+#mobile .root > main {
   margin: 0;
-  border-radius: 0;
   padding: 0;
+  max-height: 100dvh;
+  max-width: 100%;
 }
 </style>
