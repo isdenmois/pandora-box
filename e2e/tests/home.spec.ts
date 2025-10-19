@@ -57,7 +57,7 @@ test('home page', async ({ page }) => {
 
   await test.step('Search by id', async () => {
     // act
-    await searchDialogPageObject.input.fill('tt1 ')
+    await searchDialogPageObject.input.fill('tt111 ')
     await searchDialogPageObject.input.press('Enter')
 
     // assert
@@ -85,7 +85,7 @@ test('home page', async ({ page }) => {
   await test.step('Add movie', async () => {
     // arrange
     await homePageObject.searchButton.click()
-    await searchDialogPageObject.input.fill('tt2 ')
+    await searchDialogPageObject.input.fill('tt222 ')
     await searchDialogPageObject.input.press('Enter')
 
     // act

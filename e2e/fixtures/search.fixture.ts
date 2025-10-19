@@ -3,7 +3,7 @@ import type { SearchItem, SearchItemDetails } from '../../client/shared/api'
 export type { SearchItem, SearchItemDetails }
 
 const series: SearchItem = {
-  id: 'tt1',
+  id: 'tt111',
   title: 'Black Mirror',
   type: 'series',
   poster: null,
@@ -11,7 +11,7 @@ const series: SearchItem = {
 }
 
 const movie: SearchItem = {
-  id: 'tt2',
+  id: 'tt222',
   title: 'Black Magic',
   type: 'movie',
   poster: null,

@@ -12,10 +12,10 @@ export class SearchDialogPageObject {
   }
 
   get foundSeries() {
-    return this.dialog.getByTestId('search-series-tt1')
+    return this.dialog.getByTestId('search-series-tt111')
   }
 
   get foundMovie() {
-    return this.dialog.getByTestId('search-movie-tt2')
+    return this.dialog.getByTestId('search-movie-tt222')
   }
 }
