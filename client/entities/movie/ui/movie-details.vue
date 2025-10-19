@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { searchLink } from '@/shared/lib'
 import { useMovies } from '../model'
 
 interface Props {
@@ -9,10 +10,13 @@ const { id } = defineProps<Props>()
 
 const movies = useMovies()
 const data = await movies.byId(id)
+const searchUrl = searchLink(data.title)
 </script>
 
 <template>
-  <h1>{{ data.title }}</h1>
+  <h1>
+    <a class="not-link" :href="searchUrl" target="_blank">{{ data.title }}</a>
+  </h1>
 
   <img v-if="data.poster" class="h-40" :src="data.poster" />
 
