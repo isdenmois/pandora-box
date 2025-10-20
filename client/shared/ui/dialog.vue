@@ -35,7 +35,7 @@ const goBack = () => {
 
 <style scoped>
 .backdrop {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
 }
 
 .content {
@@ -43,6 +43,7 @@ const goBack = () => {
   min-width: var(--max-dialog-width);
   border-radius: 1rem;
   max-height: 80vh;
+  box-shadow: 0px 8px 8px #0002;
 }
 
 :global(#mobile > .dialog > .content) {
@@ -50,5 +51,6 @@ const goBack = () => {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   align-self: end;
+  box-shadow: 0px -8px 8px #0002;
 }
 </style>

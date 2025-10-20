@@ -29,10 +29,22 @@ label.search svg {
   left: 8px;
 }
 
+label.field input,
 label.search input {
   display: block;
   border: 0;
-  padding: 10px 10px 10px 40px;
+  padding: 8px 12px;
   background-color: var(--surface1);
   border-radius: 8px;
+  width: 100%;
+}
+
+label.search input {
+  padding: 10px 10px 10px 40px;
+}
+
+label.field .label {
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: var(--text-secondary);
 }

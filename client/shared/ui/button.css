@@ -1,5 +1,6 @@
 button {
   all: unset;
+  box-sizing: border-box;
   color: var(--text-primary);
   font-size: 16px;
   text-align: center;
@@ -30,9 +31,24 @@ button.group {
   color: var(--text-secondary);
 }
 
+button.group.primary {
+  background-color: unset;
+  padding: 0;
+}
+
 button.group .active {
   color: var(--text-primary);
   font-weight: bold;
+}
+
+button.group.primary .active {
+  background-color: var(--surface2);
+  padding: 6px 16px;
+  border-radius: 8px;
+}
+
+button.icon {
+  padding: 4px;
 }
 
 button:not(:disabled) {
@@ -43,4 +59,9 @@ button:not(:disabled) {
   &:active {
     opacity: 0.5;
   }
+}
+
+button:disabled {
+  cursor: initial;
+  opacity: 0.5;
 }
