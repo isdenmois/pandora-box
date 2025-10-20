@@ -8,14 +8,16 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const season = computed(() => props.series.season || 1)
 const description = computed(() =>
-  [props.series.year, props.series.season ? `Season ${props.series.season}` : null].filter(Boolean).join(' ⸱ '),
+  [props.series.year, season.value ? `Season ${props.series.season}` : null].filter(Boolean).join(' ⸱ '),
 )
+const title = computed(() => (season.value > 1 ? `${props.series.title} S${season.value}` : props.series.title))
 </script>
 
 <template>
   <ItemAdaptive
-    :title="series.title"
+    :title="title"
     :imgUrl="series.poster"
     :description="description"
     :rating="series.seen ? series.seenRating : series.rating"

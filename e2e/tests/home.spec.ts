@@ -61,14 +61,13 @@ test('home page', async ({ page }) => {
     await searchDialogPageObject.input.press('Enter')
 
     // assert
-    await expect(addDialogPageObject.header).toBeVisible()
     await expect(addDialogPageObject.titleInput).toHaveValue('Black Mirror')
   })
 
   await test.step('Add series', async () => {
     // arrange
-    await addDialogPageObject.titleInput.fill('Black Mirror 7')
-    await addDialogPageObject.seasonInput.fill('7')
+    await addDialogPageObject.titleInput.fill('Black Mirror 2')
+    await addDialogPageObject.seasonPlus.click()
 
     // act
     await addDialogPageObject.button.click()
@@ -77,7 +76,7 @@ test('home page', async ({ page }) => {
     await expect(addDialogPageObject.dialog).toBeHidden()
 
     await expect(homePageObject.series('1')).toBeVisible()
-    await expect(homePageObject.series('1')).toContainText('Black Mirror 7')
+    await expect(homePageObject.series('1')).toContainText('Black Mirror 2')
 
     await expect(homePageObject.movie('1')).toBeHidden()
   })

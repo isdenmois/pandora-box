@@ -13,7 +13,13 @@ defineProps<Props>()
 
 <template>
   <div class="flex items-center gap-2">
-    <button type="button" class="primary icon" :disabled="!!disabled || model <= 1" @click="model--">
+    <button
+      type="button"
+      class="primary icon"
+      :disabled="!!disabled || model <= 1"
+      @click="model--"
+      data-testid="season-minus"
+    >
       <Icon :size="24" :icon="icons.minus" />
     </button>
 
@@ -22,7 +28,13 @@ defineProps<Props>()
       <span v-if="total && total > 0"> of {{ total }}</span>
     </div>
 
-    <button type="button" class="primary icon" :disabled="!!disabled || (!!total && model >= total)" @click="model++">
+    <button
+      type="button"
+      class="primary icon"
+      :disabled="!!disabled || (!!total && model >= total)"
+      @click="model++"
+      data-testid="season-plus"
+    >
       <Icon :size="24" :icon="icons.plus" />
     </button>
   </div>

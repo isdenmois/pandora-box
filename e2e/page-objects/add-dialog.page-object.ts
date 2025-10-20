@@ -15,11 +15,11 @@ export class AddDialogPageObject {
     return this.dialog.getByRole('textbox', { name: 'title' })
   }
 
-  get seasonInput() {
-    return this.dialog.getByRole('textbox', { name: 'season' })
+  get seasonPlus() {
+    return this.dialog.getByTestId('season-plus')
   }
 
   get button() {
-    return this.dialog.getByRole('button')
+    return this.dialog.getByRole('button', { name: 'Add' })
   }
 }

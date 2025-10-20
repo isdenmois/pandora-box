@@ -13,6 +13,7 @@ defineProps<Props>()
 <template>
   <div class="flex item overflow-hidden relative color-primary" :data-testid="testId">
     <img v-if="imgUrl" class="object-cover h-20 w-12 sm:h-60 sm:w-40" :src="imgUrl" :alt="title" />
+    <div v-else class="sm:h-60 sm:w-40"></div>
 
     <div class="hidden sm:block details-background"></div>
 
