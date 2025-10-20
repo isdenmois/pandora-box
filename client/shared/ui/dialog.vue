@@ -16,19 +16,21 @@ const goBack = () => {
 </script>
 
 <template>
-  <div class="inset-0 fixed flex items-center justify-center" :data-testid="`dialog-${id}`">
-    <div class="backdrop absolute inset-0" v-on:click="goBack"></div>
+  <Teleport to="body">
+    <div class="dialog inset-0 z-1 fixed flex items-center justify-center" :data-testid="`dialog-${id}`">
+      <div class="backdrop absolute inset-0" v-on:click="goBack"></div>
 
-    <div class="content p-4 z-1 overflow-y-auto">
-      <Suspense>
-        <slot />
+      <div class="content z-1 overflow-y-auto">
+        <Suspense>
+          <slot />
 
-        <template #fallback>
-          <Spinner :size="32" />
-        </template>
-      </Suspense>
+          <template #fallback>
+            <Spinner :size="32" />
+          </template>
+        </Suspense>
+      </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -41,5 +43,12 @@ const goBack = () => {
   min-width: var(--max-dialog-width);
   border-radius: 1rem;
   max-height: 80vh;
+}
+
+:global(#mobile > .dialog > .content) {
+  width: 100%;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  align-self: end;
 }
 </style>
