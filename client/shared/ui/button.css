@@ -11,8 +11,9 @@ button {
 
 button.primary {
   background-color: var(--surface2);
-  padding: 4px 12px;
+  padding: 10px 16px;
   border-radius: 8px;
+  justify-content: center;
 }
 
 button.secondary {
@@ -43,7 +44,7 @@ button.group .active {
 
 button.group.primary .active {
   background-color: var(--surface2);
-  padding: 6px 16px;
+  padding: 8px 16px;
   border-radius: 8px;
 }
 

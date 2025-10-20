@@ -34,7 +34,7 @@ const handleSubmit = async () => {
 
       <p v-if="message" class="mt-4 error">{{ message }}</p>
 
-      <button class="mt-8" type="submit" :disabled="!username || !password">Sign In</button>
+      <button class="primary mt-8" type="submit" :disabled="!username || !password">Sign In</button>
     </form>
   </main>
 </template>

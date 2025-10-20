@@ -136,7 +136,7 @@ onMounted(async () => {
         <div class="mt-4" @click="fields.iAdded = !fields.iAdded">
           <div class="color-secondary text-s">Who Added</div>
 
-          <button type="button" class="group primary mt-1 h-8 gap-3">
+          <button type="button" class="group primary mt-1 gap-3">
             <span :class="{ active: fields.iAdded }">Denis</span>
             <span :class="{ active: !fields.iAdded }">Daria</span>
           </button>
@@ -145,7 +145,7 @@ onMounted(async () => {
         <div class="mt-4" @click="fields.forMe = !fields.forMe">
           <div class="color-secondary text-s">List</div>
 
-          <button type="button" class="group primary mt-1 h-8 gap-3">
+          <button type="button" class="group primary mt-1 gap-3">
             <span :class="{ active: !fields.forMe }">Global</span>
             <span :class="{ active: fields.forMe }">For Me</span>
           </button>
@@ -180,7 +180,7 @@ onMounted(async () => {
           <MoreButton @click="showMore = true" />
         </div>
 
-        <button type="submit" class="primary w-full justify-center h-8" :disabled="submitting">Add</button>
+        <button type="submit" class="primary w-full justify-center" :disabled="submitting">Add</button>
       </form>
     </div>
   </Dialog>
