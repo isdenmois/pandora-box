@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Movie } from '@/shared/api'
-import { Item } from '@/shared/ui'
+import { ItemAdaptive } from '@/shared/ui'
 
 interface Props {
   movie: Movie
@@ -12,7 +12,7 @@ const description = computed(() => [props.movie.year, props.movie.language].filt
 </script>
 
 <template>
-  <Item
+  <ItemAdaptive
     :title="movie.title"
     :imgUrl="movie.poster"
     :description="description"

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Series } from '@/shared/api'
-import { Item } from '@/shared/ui'
+import { ItemAdaptive } from '@/shared/ui'
 
 interface Props {
   series: Series
@@ -14,7 +14,7 @@ const description = computed(() =>
 </script>
 
 <template>
-  <Item
+  <ItemAdaptive
     :title="series.title"
     :imgUrl="series.poster"
     :description="description"

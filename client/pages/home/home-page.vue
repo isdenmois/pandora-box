@@ -83,7 +83,7 @@ onBeforeMount(() => {
 
   <Spinner v-if="series.isLoading && !home.series.length" :size="24" />
 
-  <ul class="px-4 sm:pl-10">
+  <ul class="px-4 sm:pl-10 sm:flex gap-6 flex-wrap">
     <li v-for="item in home.series" :key="item.id" class="mt-4">
       <RouterLink class="not-link" :to="`/details/series/${item.id}`">
         <SeriesItem :series="item" />
@@ -95,7 +95,7 @@ onBeforeMount(() => {
 
   <Spinner v-if="movies.isLoading && !home.movies.length" :size="24" />
 
-  <ul class="px-4 sm:pl-10">
+  <ul class="px-4 sm:pl-10 sm:flex gap-6 flex-wrap">
     <li v-for="movie in home.movies" :key="movie.id" class="mt-4">
       <RouterLink class="not-link" :to="`/details/movie/${movie.id}`">
         <MovieItem :movie />
