@@ -29,6 +29,10 @@ label.search svg {
   left: 8px;
 }
 
+label.field {
+  display: block;
+}
+
 label.field input,
 label.search input {
   display: block;

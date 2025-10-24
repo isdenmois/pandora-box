@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { Icon, icons } from '@/shared/ui'
-const model = defineModel<number>({
-  default: 0,
-})
+import Icon from './icon.vue'
+import { icons } from './icons'
 
 interface Props {
   disabled?: boolean
   total?: number | null
 }
 defineProps<Props>()
+
+const model = defineModel<number>({
+  default: 0,
+})
 </script>
 
 <template>
@@ -28,13 +30,7 @@ defineProps<Props>()
       <span v-if="total && total > 0"> of {{ total }}</span>
     </div>
 
-    <button
-      type="button"
-      class="primary icon"
-      :disabled="!!disabled || (!!total && model >= total)"
-      @click="model++"
-      data-testid="season-plus"
-    >
+    <button type="button" class="primary icon" :disabled="!!disabled" @click="model++" data-testid="season-plus">
       <Icon :size="24" :icon="icons.plus" />
     </button>
   </div>

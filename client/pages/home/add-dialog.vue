@@ -4,10 +4,10 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { flatten, useForm } from 'vue-standard-schema'
 import { useMovies } from '@/entities/movie'
-import { useSeries, SeasonToggler } from '@/entities/series'
+import { useSeries } from '@/entities/series'
 import { api } from '@/shared/api'
 import { toNullable, toNumber } from '@/shared/lib'
-import { Dialog, Spinner, MoreButton } from '@/shared/ui'
+import { Dialog, SeasonToggler, Spinner, MoreButton } from '@/shared/ui'
 
 const router = useRouter()
 const params = useRoute().params as { id: string }

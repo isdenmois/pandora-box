@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { MovieDetails } from '@/entities/movie'
 import { SeriesDetails } from '@/entities/series'
 import { Dialog } from '@/shared/ui'
@@ -10,22 +10,15 @@ type Params = {
 }
 
 const { type, id } = useRoute().params as Params
+const router = useRouter()
+const edit = () => router.push(`/edit/${type}/${id}`)
+const seen = () => router.push(`/seen/${type}/${id}`)
 </script>
 
 <template>
   <Dialog id="details">
-    <MovieDetails v-if="type === 'movie'" :id="id" />
+    <MovieDetails v-if="type === 'movie'" :id="id" @edit="edit" @seen="seen" />
 
-    <SeriesDetails v-if="type === 'series'" :id="id" />
-
-    <div class="mt-4 flex gap-4">
-      <RouterLink class="not-link" :to="`/edit/${type}/${id}`">
-        <button>Edit</button>
-      </RouterLink>
-
-      <RouterLink class="not-link" :to="`/seen/${type}/${id}`">
-        <button>Seen</button>
-      </RouterLink>
-    </div>
+    <SeriesDetails v-if="type === 'series'" :id="id" @edit="edit" @seen="seen" />
   </Dialog>
 </template>

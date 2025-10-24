@@ -1,6 +1,7 @@
 export * from './auth'
 export * from './compare'
 export * from './convert'
+export * from './format'
 export * from './download-blob'
 export * from './focus-on-mount'
 export * from './get-message'
