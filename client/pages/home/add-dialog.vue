@@ -99,7 +99,7 @@ onMounted(async () => {
     </div>
     <div v-else-if="error">error!</div>
     <div v-else class="p-4">
-      <form ref="form" @submit.prevent="submit">
+      <form ref="form">
         <div class="flex gap-4">
           <img v-if="fields.poster" class="w-24 h-40 rounded-lg object-cover" :src="fields.poster" />
 
@@ -180,7 +180,7 @@ onMounted(async () => {
           <MoreButton @click="showMore = true" />
         </div>
 
-        <button type="submit" class="primary w-full justify-center" :disabled="submitting">Add</button>
+        <button type="button" class="primary w-full justify-center" :disabled="submitting" @click="submit">Add</button>
       </form>
     </div>
   </Dialog>
