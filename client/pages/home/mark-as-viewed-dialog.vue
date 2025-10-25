@@ -14,13 +14,14 @@ type Params = {
 const router = useRouter()
 const { type, id } = useRoute().params as Params
 
+const parent = `/details/${type}/${id}`
 const goToDetails = () => {
-  router.replace(`/details/${type}/${id}`)
+  router.replace(parent)
 }
 </script>
 
 <template>
-  <Dialog id="view">
+  <Dialog id="view" className="p-4" :parent="parent">
     <MovieMarkAsViewed v-if="type === 'movie'" :id="id" @submitted="goToDetails" />
 
     <SeriesMarkAsViewed v-if="type === 'series'" :id="id" @submitted="goToDetails" />

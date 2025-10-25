@@ -5,6 +5,7 @@ input:focus {
 
 input[type='text'],
 input[type='number'],
+input[type='date'],
 input[type='password'] {
   border: 0;
   border-bottom: 1px solid var(--border);

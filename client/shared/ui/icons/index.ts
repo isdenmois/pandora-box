@@ -7,6 +7,8 @@ import series from './series.svg'
 import settings from './settings.svg'
 import sortAsc from './sort-asc.svg'
 import sortDesc from './sort-desc.svg'
+import starFill from './star-fill.svg'
+import star from './star.svg'
 import unseen from './unseen.svg'
 
 export const icons = {
@@ -19,5 +21,7 @@ export const icons = {
   settings,
   sortAsc,
   sortDesc,
+  star,
+  starFill,
   unseen,
 }

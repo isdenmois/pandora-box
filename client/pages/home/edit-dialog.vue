@@ -14,8 +14,10 @@ type Props = {
 const { id, type } = useRoute().params as Props
 const router = useRouter()
 
+const parent = `/details/${type}/${id}`
+
 const goToDetails = () => {
-  router.replace(`/details/${type}/${id}`)
+  router.replace(parent)
 }
 const goToRoot = () => {
   router.replace('/')
@@ -23,7 +25,7 @@ const goToRoot = () => {
 </script>
 
 <template>
-  <Dialog id="edit">
+  <Dialog id="edit" :parent="parent">
     <MovieEdit v-if="type === 'movie'" :id="id" @submitted="goToDetails" @deleted="goToRoot" />
     <SeriesEdit v-if="type === 'series'" :id="id" @submitted="goToDetails" @deleted="goToRoot" />
   </Dialog>
