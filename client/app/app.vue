@@ -32,7 +32,7 @@ onMounted(() => {
 <style>
 .root {
   flex-direction: row-reverse;
-  max-height: min(80rem, calc(100vh - 9rem));
+  max-height: min(80rem, calc(100dvh - 9rem));
   max-width: 80rem;
   min-width: min(80rem, calc(100vw - 8rem));
   border-radius: 8px;
