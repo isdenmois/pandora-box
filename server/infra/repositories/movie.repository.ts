@@ -23,6 +23,10 @@ export const movieRepository = {
     return movie || null
   },
 
+  async delete(id: string) {
+    await db.delete(table.movie).where(eq(table.movie.id, id))
+  },
+
   async update(id: string, data: MovieUpdate) {
     await db.update(table.movie).set(data).where(eq(table.movie.id, id))
   },

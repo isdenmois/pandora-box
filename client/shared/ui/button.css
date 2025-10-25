@@ -28,6 +28,10 @@ button.selected {
   color: var(--background);
 }
 
+button.danger {
+  color: var(--danger2);
+}
+
 button.group {
   color: var(--text-secondary);
 }

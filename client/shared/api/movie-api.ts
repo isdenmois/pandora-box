@@ -9,6 +9,11 @@ export const movie = {
   create: (body: MovieCreate) => v1.post(body).json<Movie>(),
   getAll: () => v1.get().json<Movie[]>(),
   byId: (id: string) => v1.get('/' + id).json<Movie>(),
+  delete: (id: string) =>
+    v1
+      .url('/' + id)
+      .delete()
+      .text(),
   update: (id: string, data: MovieUpdate) =>
     v1
       .url('/' + id)

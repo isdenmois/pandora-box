@@ -3,15 +3,20 @@ import { useRouter } from 'vue-router'
 import Spinner from './spinner.vue'
 
 interface Props {
-  parent?: string
+  className?: string
+  parent?: string | null
   id: string
 }
 
-const { parent = '/', id } = defineProps<Props>()
 const router = useRouter()
+const { parent = '/', id } = defineProps<Props>()
+const emit = defineEmits(['goBack'])
 
 const goBack = () => {
-  router.replace(parent)
+  if (parent) {
+    router.replace(parent)
+  }
+  emit('goBack')
 }
 </script>
 
@@ -20,7 +25,7 @@ const goBack = () => {
     <div class="dialog inset-0 z-1 fixed flex items-center justify-center" :data-testid="`dialog-${id}`">
       <div class="backdrop absolute inset-0" v-on:click="goBack"></div>
 
-      <div class="content z-1 overflow-y-auto">
+      <div class="content z-1 overflow-y-auto" :class="className">
         <Suspense>
           <slot />
 

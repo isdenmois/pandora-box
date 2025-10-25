@@ -3,6 +3,7 @@ import * as v from 'valibot'
 import { reactive } from 'vue'
 import { flatten, useForm } from 'vue-standard-schema'
 import { toNullable, toNumber } from '@/shared/lib'
+import { useConfirm } from '@/shared/ui'
 import { useMovies } from '../model'
 
 interface Props {
@@ -10,7 +11,9 @@ interface Props {
 }
 
 const { id } = defineProps<Props>()
-const emit = defineEmits(['submitted'])
+const emit = defineEmits(['submitted', 'deleted'])
+const confirm = useConfirm()
+
 const movies = useMovies()
 
 const data = await movies.byId(id)
@@ -40,12 +43,25 @@ const { form, submit, submitting, errors } = useForm({
     emit('submitted')
   },
 })
+
+const toDelete = async () => {
+  const confirmed = await confirm({
+    title: 'Delete movie',
+    message: `Do you want to delete "${data.title}"?`,
+    danger: true,
+  })
+
+  if (confirmed) {
+    movies.delete(id)
+    emit('deleted')
+  }
+}
 </script>
 
 <template>
   <h1>{{ fields.title }}</h1>
 
-  <form ref="form" @submit.prevent="submit">
+  <form ref="form">
     <div>
       <label>
         Title
@@ -92,6 +108,8 @@ const { form, submit, submitting, errors } = useForm({
       </label>
     </div>
 
-    <button type="submit" :disabled="submitting">Save</button>
+    <button type="button" class="danger" :disabled="submitting" @click="toDelete">Remove</button>
+
+    <button type="button" :disabled="submitting" @click="submit">Save</button>
   </form>
 </template>

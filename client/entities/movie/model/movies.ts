@@ -40,6 +40,12 @@ export const useMovies = defineStore('movies', () => {
       return movie
     },
 
+    async delete(id: string) {
+      all.value = all.value.filter((movie) => movie.id !== id)
+
+      await api.movie.delete(id)
+    },
+
     async update(id: string, data: MovieUpdate) {
       const existed = all.value.find((movie) => movie.id === id)
 

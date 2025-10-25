@@ -23,6 +23,10 @@ export const seriesRepository = {
     return series || null
   },
 
+  async delete(id: string) {
+    await db.delete(table.series).where(eq(table.series.id, id))
+  },
+
   async update(id: string, data: SeriesUpdate) {
     await db.update(table.series).set(data).where(eq(table.series.id, id))
   },

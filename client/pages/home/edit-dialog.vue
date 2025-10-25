@@ -17,11 +17,14 @@ const router = useRouter()
 const goToDetails = () => {
   router.replace(`/details/${type}/${id}`)
 }
+const goToRoot = () => {
+  router.replace('/')
+}
 </script>
 
 <template>
   <Dialog id="edit">
-    <MovieEdit v-if="type === 'movie'" :id="id" @submitted="goToDetails" />
-    <SeriesEdit v-if="type === 'series'" :id="id" @submitted="goToDetails" />
+    <MovieEdit v-if="type === 'movie'" :id="id" @submitted="goToDetails" @deleted="goToRoot" />
+    <SeriesEdit v-if="type === 'series'" :id="id" @submitted="goToDetails" @deleted="goToRoot" />
   </Dialog>
 </template>

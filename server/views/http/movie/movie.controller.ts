@@ -24,6 +24,7 @@ export const movieController = new Elysia({
     ({ params: { id }, user, body: { date, rating } }) => movieRepository.markAsViewed(id, user.id, date, rating),
     { body: markMovieViewedBody },
   )
+  .delete(':id', ({ params: { id } }) => movieRepository.delete(id))
   .delete('/view/:id', ({ params: { id } }) => movieRepository.removeView(id))
   .delete('/:id/view', ({ params: { id } }) => movieRepository.removeMovieView(id))
   .get('', () => movieRepository.getAll())

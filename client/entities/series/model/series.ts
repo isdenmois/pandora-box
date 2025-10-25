@@ -38,6 +38,12 @@ export const useSeries = defineStore('series', () => {
       return item
     },
 
+    async delete(id: string) {
+      all.value = all.value.filter((item) => item.id !== id)
+
+      await api.series.delete(id)
+    },
+
     async update(id: string, data: SeriesUpdate) {
       const existed = all.value.find((item) => item.id === id)
 

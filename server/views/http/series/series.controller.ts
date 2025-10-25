@@ -24,6 +24,7 @@ export const seriesController = new Elysia({
     ({ params: { id }, user, body: { date, rating } }) => seriesRepository.markAsViewed(id, user.id, date, rating),
     { body: markSeriesViewedBody },
   )
+  .delete(':id', ({ params: { id } }) => seriesRepository.delete(id))
   .delete('/view/:id', ({ params: { id } }) => seriesRepository.removeView(id))
   .delete('/:id/view', ({ params: { id } }) => seriesRepository.removeSeriesView(id))
   .get('', () => seriesRepository.getAll())

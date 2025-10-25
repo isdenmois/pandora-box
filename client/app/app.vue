@@ -3,7 +3,7 @@ import { storeToRefs } from 'pinia'
 import { onMounted } from 'vue'
 import { LoginPage } from '@/pages/login'
 import { useAuth, auth } from '@/shared/lib'
-import { Navbar, Spinner } from '@/shared/ui'
+import { ConfirmDialog, Navbar, Spinner } from '@/shared/ui'
 
 const { isLoggedIn, initialized } = storeToRefs(useAuth())
 
@@ -27,6 +27,8 @@ onMounted(() => {
   <div v-else class="h-screen flex justify-center items-center">
     <Spinner :size="48" />
   </div>
+
+  <ConfirmDialog />
 </template>
 
 <style>

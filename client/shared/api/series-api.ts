@@ -9,6 +9,11 @@ export const series = {
   create: (body: SeriesCreate) => v1.post(body).json<Series>(),
   getAll: () => v1.get().json<Series[]>(),
   byId: (id: string) => v1.get('/' + id).json<Series>(),
+  delete: (id: string) =>
+    v1
+      .url('/' + id)
+      .delete()
+      .text(),
   update: (id: string, data: SeriesUpdate) =>
     v1
       .url('/' + id)
