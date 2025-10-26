@@ -50,12 +50,12 @@ const externalUrl = data.provider && data.extId ? getExternalUrl(data.provider, 
       <SeasonToggler v-model="season" :total="totalSeasons" @update:model-value="$emit('updateSeason', season)" />
     </label>
 
-    <label v-if="data.reason" class="reason field">
+    <label v-if="data.reason" class="field">
       <div class="label">Reason</div>
       {{ data.reason }}
     </label>
 
-    <label v-if="data.seen" class="seen field">
+    <label v-if="data.seen" class="field">
       <div class="label">Seen</div>
 
       <div class="flex gap-4">
@@ -63,27 +63,25 @@ const externalUrl = data.provider && data.extId ? getExternalUrl(data.provider, 
       </div>
     </label>
 
-    <div class="other flex flex-col gap-4">
-      <label class="field" @click="$emit('togglePrivate')">
-        <div class="label">List</div>
+    <label class="field" @click="$emit('togglePrivate')">
+      <div class="label">List</div>
 
-        <button type="button" class="group primary mt-1 gap-3">
-          <span :class="{ active: !data.private }">Global</span>
-          <span :class="{ active: data.private }">For Me</span>
-        </button>
-      </label>
+      <button type="button" class="group primary mt-1 gap-3">
+        <span :class="{ active: !data.private }">Global</span>
+        <span :class="{ active: data.private }">For Me</span>
+      </button>
+    </label>
 
-      <label class="field">
-        <div class="label">Who Added</div>
+    <label class="field col-span-2">
+      <div class="label">Who Added</div>
 
-        {{ data.userId === 'me' ? 'Me' : 'Not me' }}
-      </label>
+      {{ data.userId === 'me' ? 'Me' : 'Not me' }}
+    </label>
 
-      <div class="flex gap-4">
-        <button class="primary flex-1" @click="$emit('edit')">Edit</button>
-        <button v-if="!data.seen" class="primary flex-1" @click="$emit('seen')">Finished</button>
-        <button v-else class="primary flex-1" @click="$emit('removeView')">Not Seen</button>
-      </div>
+    <div class="flex gap-4 col-span-2">
+      <button class="primary flex-1" @click="$emit('edit')">Edit</button>
+      <button v-if="!data.seen" class="primary flex-1" @click="$emit('seen')">Finished</button>
+      <button v-else class="primary flex-1" @click="$emit('removeView')">Not Seen</button>
     </div>
   </div>
 </template>
@@ -94,45 +92,39 @@ const externalUrl = data.provider && data.extId ? getExternalUrl(data.provider, 
   column-gap: 20px;
   grid-template-columns: auto 1fr;
   grid-template-rows: auto;
+  grid-auto-flow: row dense;
   grid-template-areas:
     'poster title'
-    'poster season'
-    'poster reason'
-    'poster seen'
-    'other other';
+    'poster .'
+    'poster .'
+    'poster .'
+    'poster .';
 }
 
 :global(#mobile .home-details) {
   grid-template-areas:
     'title title'
-    'poster season'
-    'poster reason'
-    'seen seen'
-    'other other';
+    'poster .'
+    'poster .'
+    'poster .';
 }
 
 .poster {
   grid-area: poster;
 }
 
-.season {
-  grid-area: season;
-}
-
 .title {
   grid-area: title;
 }
 
-.reason {
-  grid-area: reason;
+.field {
+  grid-column: span 2;
 }
 
-.seen {
-  grid-area: seen;
-}
-
-.other {
-  grid-area: other;
+.field:nth-child(3),
+.field:nth-child(4),
+.field:nth-child(5) {
+  grid-column: span 1;
 }
 
 .rating {
