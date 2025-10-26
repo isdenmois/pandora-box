@@ -27,7 +27,7 @@ export const seriesRepository = {
     await db.delete(table.series).where(eq(table.series.id, id))
   },
 
-  async update(id: string, data: SeriesUpdate) {
+  async update(id: string, data: Partial<SeriesUpdate>) {
     await db.update(table.series).set(data).where(eq(table.series.id, id))
   },
 

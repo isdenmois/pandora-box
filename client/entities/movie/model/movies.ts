@@ -70,10 +70,20 @@ export const useMovies = defineStore('movies', () => {
       const existed = all.value.find((movie) => movie.id === id)
 
       if (existed) {
-        Object.assign(existed, { seen: null })
+        existed.seen = null
       }
 
       await api.movie.removeMovieView(id)
+    },
+
+    async togglePrivate(id: string) {
+      const existed = all.value.find((movie) => movie.id === id)
+
+      if (existed) {
+        existed.private = !existed.private
+
+        await api.movie.patch(id, { private: existed.private })
+      }
     },
   }
 })

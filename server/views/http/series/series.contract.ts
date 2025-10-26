@@ -26,6 +26,8 @@ export const updateSeriesBody = t.Object({
   private: t.Boolean(),
 })
 
+export const patchSeriesBody = t.Partial(updateSeriesBody)
+
 export const markSeriesViewedBody = t.Object({
   date: t.String({ minLength: 5 }),
   rating: t.Number({ minimum: 0, maximum: 10 }),

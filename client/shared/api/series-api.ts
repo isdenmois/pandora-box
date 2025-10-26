@@ -19,6 +19,11 @@ export const series = {
       .url('/' + id)
       .put(data)
       .text(),
+  patch: (id: string, data: Partial<SeriesUpdate>) =>
+    v1
+      .url('/' + id)
+      .patch(data)
+      .text(),
   getViews: () => v1.get('/views').json<SeriesView[]>(),
   markAsViewed: (seriesId: string, date: string, rating: number) =>
     v1.url(`/${seriesId}/viewed`).post({ date, rating }).json<SeriesView>(),

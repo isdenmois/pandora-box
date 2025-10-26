@@ -13,7 +13,7 @@ defineEmits(['edit', 'seen'])
 
 const movies = useMovies()
 const data = await movies.byId(id)
-const togglePrivate = () => {}
+const togglePrivate = () => movies.togglePrivate(id)
 </script>
 
 <template>

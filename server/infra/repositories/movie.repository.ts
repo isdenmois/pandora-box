@@ -27,7 +27,7 @@ export const movieRepository = {
     await db.delete(table.movie).where(eq(table.movie.id, id))
   },
 
-  async update(id: string, data: MovieUpdate) {
+  async update(id: string, data: Partial<MovieUpdate>) {
     await db.update(table.movie).set(data).where(eq(table.movie.id, id))
   },
 

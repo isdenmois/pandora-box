@@ -19,6 +19,11 @@ export const movie = {
       .url('/' + id)
       .put(data)
       .text(),
+  patch: (id: string, data: Partial<MovieUpdate>) =>
+    v1
+      .url('/' + id)
+      .patch(data)
+      .text(),
   getViews: () => v1.get('/views').json<MovieView[]>(),
   markAsViewed: (movieId: string, date: string, rating: number) =>
     v1.url(`/${movieId}/viewed`).post({ date, rating }).json<MovieView>(),

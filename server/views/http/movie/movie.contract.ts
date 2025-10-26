@@ -24,6 +24,8 @@ export const updateMovieBody = t.Object({
   private: t.Boolean(),
 })
 
+export const patchMovieBody = t.Partial(updateMovieBody)
+
 export const markMovieViewedBody = t.Object({
   date: t.String({ minLength: 5 }),
   rating: t.Number({ minimum: 0, maximum: 10 }),

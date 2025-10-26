@@ -1,7 +1,7 @@
 import Elysia from 'elysia'
 import { seriesRepository } from '@/infra'
 import { authGuard } from '@/views/auth'
-import { createSeriesBody, markSeriesViewedBody, updateSeriesBody } from './series.contract'
+import { createSeriesBody, markSeriesViewedBody, patchSeriesBody, updateSeriesBody } from './series.contract'
 
 export const seriesController = new Elysia({
   prefix: '/v1/series',
@@ -19,6 +19,7 @@ export const seriesController = new Elysia({
   )
   .get(':id', ({ params: { id } }) => seriesRepository.byId(id))
   .put(':id', ({ params: { id }, body }) => seriesRepository.update(id, body), { body: updateSeriesBody })
+  .patch(':id', ({ params: { id }, body }) => seriesRepository.update(id, body), { body: patchSeriesBody })
   .post(
     '/:id/viewed',
     ({ params: { id }, user, body: { date, rating } }) => seriesRepository.markAsViewed(id, user.id, date, rating),

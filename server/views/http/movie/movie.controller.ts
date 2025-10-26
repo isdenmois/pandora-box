@@ -1,7 +1,7 @@
 import Elysia from 'elysia'
 import { movieRepository } from '@/infra'
 import { authGuard } from '@/views/auth'
-import { createMovieBody, markMovieViewedBody, updateMovieBody } from './movie.contract'
+import { createMovieBody, markMovieViewedBody, patchMovieBody, updateMovieBody } from './movie.contract'
 
 export const movieController = new Elysia({
   prefix: '/v1/movie',
@@ -19,6 +19,7 @@ export const movieController = new Elysia({
   )
   .get(':id', ({ params: { id } }) => movieRepository.byId(id))
   .put(':id', ({ params: { id }, body }) => movieRepository.update(id, body), { body: updateMovieBody })
+  .patch(':id', ({ params: { id }, body }) => movieRepository.update(id, body), { body: patchMovieBody })
   .post(
     '/:id/viewed',
     ({ params: { id }, user, body: { date, rating } }) => movieRepository.markAsViewed(id, user.id, date, rating),

@@ -36,4 +36,4 @@ export type Series = typeof series.$inferSelect
 export type SeriesView = typeof series.$inferSelect
 
 export type SeriesCreate = Omit<Series, 'id' | 'seen' | 'seenRating'>
-export type SeriesUpdate = Pick<Series, 'title'>
+export type MovieUpdate = Pick<Series, 'title' | 'poster' | 'season' | 'year' | 'rating' | 'reason' | 'private'>

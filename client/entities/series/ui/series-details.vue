@@ -12,8 +12,10 @@ defineEmits(['edit', 'seen'])
 const series = useSeries()
 const data = await series.byId(id)
 
-const updateSeason = () => {}
-const togglePrivate = () => {}
+const updateSeason = (season: number) => {
+  series.setSeason(id, season)
+}
+const togglePrivate = () => series.togglePrivate(id)
 </script>
 
 <template>

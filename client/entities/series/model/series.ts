@@ -68,10 +68,30 @@ export const useSeries = defineStore('series', () => {
       const existed = all.value.find((item) => item.id === id)
 
       if (existed) {
-        Object.assign(existed, { seen: null })
+        existed.seen = null
       }
 
       await api.series.removeSeriesView(id)
+    },
+
+    async togglePrivate(id: string) {
+      const existed = all.value.find((item) => item.id === id)
+
+      if (existed) {
+        existed.private = !existed.private
+
+        await api.series.patch(id, { private: existed.private })
+      }
+    },
+
+    async setSeason(id: string, season: number) {
+      const existed = all.value.find((item) => item.id === id)
+
+      if (existed) {
+        existed.season = season
+      }
+
+      await api.series.patch(id, { season })
     },
   }
 })
