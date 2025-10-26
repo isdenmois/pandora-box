@@ -31,7 +31,7 @@ const externalUrl = data.provider && data.extId ? getExternalUrl(data.provider, 
       <div v-if="data.rating" class="rating absolute top-0 left-0 p-1">{{ data.rating }}</div>
     </div>
 
-    <div class="title flex">
+    <div class="title flex gap-2">
       <div class="flex-1">
         <h1>
           <a class="not-link" :href="searchUrl" target="_blank">{{ data.title }}</a>

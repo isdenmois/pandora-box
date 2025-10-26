@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Series } from '@/shared/api'
+import { isMobile } from '@/shared/lib'
 import { ItemAdaptive } from '@/shared/ui'
 
 interface Props {
@@ -12,7 +13,9 @@ const season = computed(() => props.series.season || 1)
 const description = computed(() =>
   [props.series.year, season.value ? `Season ${props.series.season}` : null].filter(Boolean).join(' ⸱ '),
 )
-const title = computed(() => (season.value > 1 ? `${props.series.title} S${season.value}` : props.series.title))
+const title = computed(() =>
+  !isMobile.value && season.value > 1 ? `${props.series.title} S${season.value}` : props.series.title,
+)
 </script>
 
 <template>
