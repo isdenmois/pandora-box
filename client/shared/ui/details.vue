@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { formatDate, searchLink } from '@/shared/lib'
+import { formatDate, isMobile, getExternalUrl, searchLink } from '@/shared/lib'
 import type { Movie, Series } from '../api'
+import Icon from './icon.vue'
+import { icons } from './icons'
 import SeasonToggler from './season-toggler.vue'
 
 interface Props {
@@ -18,22 +20,29 @@ const searchUrl = computed(() =>
 
 const totalSeasons = computed(() => ('totalSeasons' in data.extra ? +(data.extra.totalSeasons as number) : null))
 const season = ref('season' in data ? data.season || 1 : 1)
+const externalUrl = data.provider && data.extId ? getExternalUrl(data.provider, data.extId) : null
 </script>
 
 <template>
-  <div class="home-details p-6 sm:p-8">
+  <div class="home-details px-6 py-4 sm:p-8">
     <div v-if="data.poster" class="poster relative">
       <img class="h-40 sm:h-60 sm:w-40 rounded-lg" :src="data.poster" />
 
       <div v-if="data.rating" class="rating absolute top-0 left-0 p-1">{{ data.rating }}</div>
     </div>
 
-    <div class="title">
-      <h1>
-        <a class="not-link" :href="searchUrl" target="_blank">{{ data.title }}</a>
-      </h1>
+    <div class="title flex">
+      <div class="flex-1">
+        <h1>
+          <a class="not-link" :href="searchUrl" target="_blank">{{ data.title }}</a>
+        </h1>
 
-      <div v-if="data.genre" class="color-secondary text-s hidden sm:block">{{ data.genre }}</div>
+        <div v-if="data.genre" class="color-secondary text-s hidden sm:block">{{ data.genre }}</div>
+      </div>
+
+      <a v-if="externalUrl" class="mr-[-0.5rem] sm:mt-[-1rem] sm:mr-[-1rem]" target="_blank" :href="externalUrl">
+        <Icon :size="isMobile ? 24 : 32" :icon="icons.globe" />
+      </a>
     </div>
 
     <label v-if="'season' in data" class="season field">
@@ -95,7 +104,7 @@ const season = ref('season' in data ? data.season || 1 : 1)
 
 :global(#mobile .home-details) {
   grid-template-areas:
-    'poster title'
+    'title title'
     'poster season'
     'poster reason'
     'seen seen'
