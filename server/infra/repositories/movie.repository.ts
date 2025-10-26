@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { eq } from 'drizzle-orm'
+import { eq, or, isNull } from 'drizzle-orm'
 import { table, Movie, MovieUpdate, MovieCreate } from '@/domain'
 import { db } from '../db'
 
@@ -11,8 +11,12 @@ export const movieRepository = {
 
     return { ...data, id, seen: null, seenRating: null }
   },
-  async getAll(): Promise<Movie[]> {
-    return await db.select().from(table.movie)
+
+  async getAll(userId: string): Promise<Movie[]> {
+    return await db
+      .select()
+      .from(table.movie)
+      .where(or(eq(table.movie.userId, userId), isNull(table.movie.userId), eq(table.movie.private, false)))
   },
 
   async byId(id: string): Promise<Movie | null> {

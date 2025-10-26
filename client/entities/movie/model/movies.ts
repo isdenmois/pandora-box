@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { readonly, ref, shallowRef } from 'vue'
 import type { MovieUpdate } from '@/server/*'
 import { api, type Movie, type MovieCreate } from '@/shared/api'
+import { useAuth } from '@/shared/lib'
 
 export const useMovies = defineStore('movies', () => {
   const all = ref<Movie[]>([])
@@ -80,9 +81,10 @@ export const useMovies = defineStore('movies', () => {
       const existed = all.value.find((movie) => movie.id === id)
 
       if (existed) {
+        const { user } = useAuth()
         existed.private = !existed.private
 
-        await api.movie.patch(id, { private: existed.private })
+        await api.movie.patch(id, { private: existed.private, userId: user?.id || null })
       }
     },
   }

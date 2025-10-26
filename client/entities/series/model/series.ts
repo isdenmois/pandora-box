@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { readonly, ref, shallowRef } from 'vue'
 import { api, type Series, type SeriesCreate, type SeriesUpdate } from '@/shared/api'
+import { useAuth } from '@/shared/lib'
 
 export const useSeries = defineStore('series', () => {
   const all = ref<Series[]>([])
@@ -78,9 +79,10 @@ export const useSeries = defineStore('series', () => {
       const existed = all.value.find((item) => item.id === id)
 
       if (existed) {
+        const { user } = useAuth()
         existed.private = !existed.private
 
-        await api.series.patch(id, { private: existed.private })
+        await api.series.patch(id, { private: existed.private, userId: user?.id || null })
       }
     },
 

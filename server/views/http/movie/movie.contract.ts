@@ -21,6 +21,7 @@ export const updateMovieBody = t.Object({
   year: t.Nullable(t.Integer({ minimum: 1 })),
   rating: t.Nullable(t.Number()),
   reason: t.Nullable(t.String()),
+  userId: t.Nullable(t.String()),
   private: t.Boolean(),
 })
 

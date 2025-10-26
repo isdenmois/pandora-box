@@ -1,6 +1,7 @@
 import { http } from './http'
 
 export interface User {
+  id: string
   username: string
   role: string
 }

@@ -10,13 +10,7 @@ export const seriesController = new Elysia({
   },
 })
   .use(authGuard)
-  .post(
-    '',
-    async ({ body }) => {
-      return await seriesRepository.create(body)
-    },
-    { body: createSeriesBody },
-  )
+  .post('', async ({ body }) => await seriesRepository.create(body), { body: createSeriesBody })
   .get(':id', ({ params: { id } }) => seriesRepository.byId(id))
   .put(':id', ({ params: { id }, body }) => seriesRepository.update(id, body), { body: updateSeriesBody })
   .patch(':id', ({ params: { id }, body }) => seriesRepository.update(id, body), { body: patchSeriesBody })
@@ -28,5 +22,5 @@ export const seriesController = new Elysia({
   .delete(':id', ({ params: { id } }) => seriesRepository.delete(id))
   .delete('/view/:id', ({ params: { id } }) => seriesRepository.removeView(id))
   .delete('/:id/view', ({ params: { id } }) => seriesRepository.removeSeriesView(id))
-  .get('', () => seriesRepository.getAll())
+  .get('', ({ user }) => seriesRepository.getAll(user.id))
   .get('views', ({ user }) => seriesRepository.getViews(user.id))

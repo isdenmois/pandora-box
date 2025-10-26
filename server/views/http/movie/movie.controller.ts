@@ -10,13 +10,7 @@ export const movieController = new Elysia({
   },
 })
   .use(authGuard)
-  .post(
-    '',
-    async ({ body }) => {
-      return await movieRepository.create(body)
-    },
-    { body: createMovieBody },
-  )
+  .post('', async ({ body }) => await movieRepository.create(body), { body: createMovieBody })
   .get(':id', ({ params: { id } }) => movieRepository.byId(id))
   .put(':id', ({ params: { id }, body }) => movieRepository.update(id, body), { body: updateMovieBody })
   .patch(':id', ({ params: { id }, body }) => movieRepository.update(id, body), { body: patchMovieBody })
@@ -28,5 +22,5 @@ export const movieController = new Elysia({
   .delete(':id', ({ params: { id } }) => movieRepository.delete(id))
   .delete('/view/:id', ({ params: { id } }) => movieRepository.removeView(id))
   .delete('/:id/view', ({ params: { id } }) => movieRepository.removeMovieView(id))
-  .get('', () => movieRepository.getAll())
+  .get('', ({ user }) => movieRepository.getAll(user.id))
   .get('views', ({ user }) => movieRepository.getViews(user.id))

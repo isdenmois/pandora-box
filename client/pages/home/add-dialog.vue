@@ -6,13 +6,14 @@ import { flatten, useForm } from 'vue-standard-schema'
 import { useMovies } from '@/entities/movie'
 import { useSeries } from '@/entities/series'
 import { api } from '@/shared/api'
-import { toNullable, toNumber } from '@/shared/lib'
+import { toNullable, toNumber, useAuth } from '@/shared/lib'
 import { Dialog, SeasonToggler, Spinner, MoreButton } from '@/shared/ui'
 
 const router = useRouter()
 const params = useRoute().params as { id: string }
 const movies = useMovies()
 const series = useSeries()
+const auth = useAuth()
 
 const isLoading = ref(true)
 const error = ref(false)
@@ -31,7 +32,7 @@ const fields = reactive({
   poster: '',
   season: 1,
   reason: '',
-  iAdded: false,
+  iAdded: true,
   forMe: false,
 })
 
@@ -57,7 +58,7 @@ const { form, submit, submitting, errors } = useForm({
       language,
       genre,
       extra,
-      userId: iAdded ? 'me' : null,
+      userId: iAdded ? auth.user?.id || null : null,
       private: forMe,
     }
     if (type === 'series') {
@@ -137,8 +138,8 @@ onMounted(async () => {
           <div class="color-secondary text-s">Who Added</div>
 
           <button type="button" class="group primary mt-1 gap-3">
-            <span :class="{ active: fields.iAdded }">Denis</span>
-            <span :class="{ active: !fields.iAdded }">Daria</span>
+            <span :class="{ active: fields.iAdded }">Me</span>
+            <span :class="{ active: !fields.iAdded }">Not Me</span>
           </button>
         </div>
 

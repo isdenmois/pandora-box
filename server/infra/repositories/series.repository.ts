@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { eq } from 'drizzle-orm'
+import { eq, or, isNull } from 'drizzle-orm'
 import { table, Series, SeriesCreate, SeriesUpdate } from '@/domain'
 import { db } from '../db'
 
@@ -11,8 +11,12 @@ export const seriesRepository = {
 
     return { ...data, id, seen: null, seenRating: null }
   },
-  async getAll(): Promise<Series[]> {
-    return await db.select().from(table.series)
+
+  async getAll(userId: string): Promise<Series[]> {
+    return await db
+      .select()
+      .from(table.series)
+      .where(or(eq(table.series.userId, userId), isNull(table.series.userId), eq(table.series.private, false)))
   },
 
   async byId(id: string): Promise<Series | null> {
