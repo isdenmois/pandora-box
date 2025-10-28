@@ -26,7 +26,7 @@ const externalUrl = data.provider && data.extId ? getExternalUrl(data.provider, 
 <template>
   <div class="home-details px-6 py-4 sm:p-8">
     <div v-if="data.poster" class="poster relative">
-      <img class="h-40 sm:h-60 sm:w-40 rounded-lg" :src="data.poster" />
+      <img class="object-cover h-44 w-30 sm:h-60 sm:w-40 rounded-lg" :src="data.poster" />
 
       <div v-if="data.rating" class="rating absolute top-0 left-0 p-1">{{ data.rating }}</div>
     </div>

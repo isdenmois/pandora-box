@@ -25,7 +25,7 @@ const goToRoot = () => {
 </script>
 
 <template>
-  <Dialog id="edit" :parent="parent">
+  <Dialog id="edit" class-name="px-6 py-4 sm:p-8" :parent="parent">
     <MovieEdit v-if="type === 'movie'" :id="id" @submitted="goToDetails" @deleted="goToRoot" />
     <SeriesEdit v-if="type === 'series'" :id="id" @submitted="goToDetails" @deleted="goToRoot" />
   </Dialog>

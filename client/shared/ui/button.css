@@ -23,6 +23,10 @@ button.secondary {
   border-radius: 8px;
 }
 
+button.flat {
+  padding: 10px 16px;
+}
+
 button.selected {
   background-color: var(--success);
   color: var(--background);

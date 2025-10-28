@@ -52,7 +52,7 @@ export const useSeries = defineStore('series', () => {
         Object.assign(existed, data)
       }
 
-      await api.series.update(id, data)
+      await api.series.patch(id, data)
     },
 
     async markAsViewed(id: string, date: string, rating: number) {
