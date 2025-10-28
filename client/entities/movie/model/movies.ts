@@ -54,7 +54,7 @@ export const useMovies = defineStore('movies', () => {
         Object.assign(existed, data)
       }
 
-      await api.movie.update(id, data)
+      await api.movie.patch(id, data)
     },
 
     async markAsViewed(id: string, date: string, rating: number) {
