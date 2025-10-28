@@ -24,10 +24,13 @@ interface ImportData {
   series: SeriesImport[]
 }
 
-const importSeries = async (item: SeriesImport) => {
+const importSeries = async (userId: string, item: SeriesImport) => {
   const found = await db.query.series.findFirst({
     where: () => eq(table.series.extId, item.extId),
   })
+
+  const isPrivate = item.private ?? found?.private ?? false
+  const uid = item.private || item.userId ? userId : null
 
   if (found) {
     return await db
@@ -35,13 +38,15 @@ const importSeries = async (item: SeriesImport) => {
       .set({
         reason: item.reason || found.reason,
         season: item.season ?? found.season,
-        private: item.private ?? found.private,
-        userId: item.userId ?? found.userId,
+        private: isPrivate,
+        userId: uid,
       })
       .where(eq(table.series.id, found.id))
   }
 
   const series = await searchRepository.getById('omdb', item.extId)
+
+  await sleep(5)
 
   if (!series) {
     return
@@ -58,31 +63,34 @@ const importSeries = async (item: SeriesImport) => {
     language: series.language || null,
     genre: series.genre || null,
     reason: item.reason || null,
-    userId: item.userId || null,
-    private: item.private ?? false,
+    userId: uid,
+    private: isPrivate,
     extra: series.extra ?? {},
   })
-
-  await sleep(5)
 }
 
-const importMovie = async (item: MovieImport) => {
+const importMovie = async (userId: string, item: MovieImport) => {
   const found = await db.query.movie.findFirst({
     where: () => eq(table.movie.extId, item.extId),
   })
+
+  const isPrivate = item.private ?? found?.private ?? false
+  const uid = item.private || item.userId ? userId : null
 
   if (found) {
     return await db
       .update(table.movie)
       .set({
         reason: item.reason || found.reason,
-        private: item.private ?? found.private,
-        userId: item.userId ?? found.userId,
+        private: isPrivate,
+        userId: uid,
       })
       .where(eq(table.movie.id, found.id))
   }
 
   const movie = await searchRepository.getById('omdb', item.extId)
+
+  await sleep(5)
 
   if (!movie) {
     return
@@ -98,12 +106,10 @@ const importMovie = async (item: MovieImport) => {
     language: movie.language || null,
     genre: movie.genre || null,
     reason: item.reason || null,
-    userId: item.userId || null,
-    private: item.private ?? false,
+    userId: uid,
+    private: isPrivate,
     extra: movie.extra ?? {},
   })
-
-  await sleep(5)
 }
 
 const status = {
@@ -119,7 +125,7 @@ const status = {
 }
 
 export const importRepository = {
-  async import(data: ImportData) {
+  async import(userId: string, data: ImportData) {
     if (status.inProgress) {
       return { ok: true }
     }
@@ -138,7 +144,7 @@ export const importRepository = {
 
     for (const item of movies) {
       try {
-        await importMovie(item)
+        await importMovie(userId, item)
       } catch (e) {
         console.log(e)
       } finally {
@@ -148,7 +154,7 @@ export const importRepository = {
 
     for (const item of series) {
       try {
-        await importSeries(item)
+        await importSeries(userId, item)
       } catch (e) {
         console.log(e)
       } finally {

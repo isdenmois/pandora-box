@@ -32,5 +32,5 @@ export const adminController = new Elysia({
   )
   .get('/backup', () => backupRepository.create())
   .post('/backup', ({ body }) => backupRepository.restore(body), { body: BackupRestoreBody })
-  .post('/import', ({ body }) => importRepository.import(body), { body: ImportBody })
+  .post('/import', ({ user, body }) => importRepository.import(user.id, body), { body: ImportBody })
   .get('/import', () => importRepository.status())
