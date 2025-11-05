@@ -15,6 +15,9 @@ const movies = useMovies()
 const data = await movies.byId(id)
 
 const save = async (input: MovieUpdate) => {
+  if ('season' in input) {
+    delete input.season
+  }
   await movies.update(id, input)
 
   emit('submitted')
