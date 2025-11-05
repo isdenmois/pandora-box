@@ -28,7 +28,7 @@
     "@types/jsdom": "27.0.0",
     "@unocss/preset-wind4": "66.5.4",
     "@vitejs/plugin-vue": "6.0.1",
-    "@vitest/browser": "3.2.4",
+    "@vitest/browser": "4.0.7",
     "@vitest/eslint-plugin": "1.4.1",
     "@vue/eslint-config-prettier": "10.2.0",
     "@vue/eslint-config-typescript": "14.6.0",
@@ -53,11 +53,9 @@
     "vitest": "4.0.7"
   },
   "dependencies": {
-    "@elysiajs/cors": "1.4.0",
     "@elysiajs/openapi": "1.4.11",
-    "@elysiajs/static": "1.4.0",
-    "@vueuse/core": "13.9.0",
-    "elysia": "1.4.10",
+    "@vueuse/core": "14.0.0",
+    "elysia": "1.4.15",
     "pinia": "3.0.4",
     "unocss": "66.5.4",
     "valibot": "1.1.0",

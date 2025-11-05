@@ -1,0 +1,17 @@
+services:
+  api:
+    build: .
+    volumes:
+      - ./data:/data
+    environment:
+      DATABASE_URL: /data/local.db
+      OMDB_URL: ${OMDB_URL}
+  webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    ports:
+      - '3000:3000'
+    environment:
+      API_SERVER: http://api:3000
+      PORT: 3000
