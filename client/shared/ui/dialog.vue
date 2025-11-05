@@ -13,7 +13,9 @@ const { parent = '/', id } = defineProps<Props>()
 const emit = defineEmits(['goBack'])
 
 const goBack = () => {
-  if (parent) {
+  if (history.state.back) {
+    router.back()
+  } else if (parent) {
     router.replace(parent)
   }
   emit('goBack')
