@@ -15,7 +15,6 @@ const data = await series.byId(id)
 const updateSeason = (season: number) => {
   series.setSeason(id, season)
 }
-const togglePrivate = () => series.togglePrivate(id)
 </script>
 
 <template>
@@ -25,7 +24,6 @@ const togglePrivate = () => series.togglePrivate(id)
     @seen="$emit('seen')"
     @update-season="updateSeason"
     @remove-view="series.removeSeriesView(id)"
-    @toggle-private="togglePrivate"
   >
     <slot />
   </Details>

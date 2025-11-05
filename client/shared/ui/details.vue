@@ -12,7 +12,7 @@ interface Props {
 
 const { data } = defineProps<Props>()
 
-defineEmits(['updateSeason', 'togglePrivate', 'removeView', 'seen', 'edit'])
+defineEmits(['updateSeason', 'removeView', 'seen', 'edit'])
 
 const searchUrl = computed(() =>
   searchLink('season' in data && data.season ? `${data.title} ${data.season}` : data.title),
@@ -59,7 +59,7 @@ const externalUrl = data.provider && data.extId ? getExternalUrl(data.provider, 
       </div>
     </label>
 
-    <label class="field" @click="$emit('togglePrivate')">
+    <label class="field">
       <div class="label">List</div>
 
       <button type="button" class="group primary mt-1 gap-3">

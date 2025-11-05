@@ -13,15 +13,8 @@ defineEmits(['edit', 'seen'])
 
 const movies = useMovies()
 const data = await movies.byId(id)
-const togglePrivate = () => movies.togglePrivate(id)
 </script>
 
 <template>
-  <Details
-    :data="data"
-    @edit="$emit('edit')"
-    @seen="$emit('seen')"
-    @remove-view="movies.removeMovieView(id)"
-    @toggle-private="togglePrivate"
-  />
+  <Details :data="data" @edit="$emit('edit')" @seen="$emit('seen')" @remove-view="movies.removeMovieView(id)" />
 </template>
