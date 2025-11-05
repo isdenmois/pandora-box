@@ -33,6 +33,11 @@ export default defineConfig({
     vueDevTools(),
     UnoCSS({
       presets: [presetUno({ preflight: false })],
+      theme: {
+        breakpoints: {
+          zf: '380px',
+        },
+      },
     }),
   ],
 })

@@ -35,8 +35,8 @@ onBeforeMount(() => {
 <template>
   <div class="surface p-4 sm:pl-10 sm:pt-6 flex gap-6 sticky top-0 z-1">
     <button class="group gap-3" @click="home.toggleForMe">
-      <span :class="{ active: !home.forMe }">Global</span>
-      <span :class="{ active: home.forMe }">For Me</span>
+      <span :class="{ active: !home.forMe, 'max-zf:hidden': home.forMe }">Global</span>
+      <span :class="{ active: home.forMe, 'max-zf:hidden': !home.forMe }">For Me</span>
     </button>
 
     <button class="color-secondary" @click="home.toggleSort">
