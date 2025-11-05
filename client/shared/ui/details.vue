@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { formatDate, isMobile, getExternalUrl, searchLink } from '@/shared/lib'
+import { formatDate, isMobile, isOmdb, isOmdbString, getExternalUrl, searchLink, useAuth } from '@/shared/lib'
 import type { Movie, Series } from '../api'
 import Icon from './icon.vue'
 import { icons } from './icons'
@@ -18,7 +18,8 @@ const searchUrl = computed(() =>
   searchLink('season' in data && data.season ? `${data.title} ${data.season}` : data.title),
 )
 
-const totalSeasons = computed(() => ('totalSeasons' in data.extra ? +(data.extra.totalSeasons as number) : null))
+const { user } = useAuth()
+const totalSeasons = computed(() => (isOmdb(data) && data.extra.totalSeasons ? +data.extra.totalSeasons : null))
 const season = ref('season' in data ? data.season || 1 : 1)
 const externalUrl = data.provider && data.extId ? getExternalUrl(data.provider, data.extId) : null
 </script>
@@ -50,11 +51,6 @@ const externalUrl = data.provider && data.extId ? getExternalUrl(data.provider, 
       <SeasonToggler v-model="season" :total="totalSeasons" @update:model-value="$emit('updateSeason', season)" />
     </label>
 
-    <label v-if="data.reason" class="field">
-      <div class="label">Reason</div>
-      {{ data.reason }}
-    </label>
-
     <label v-if="data.seen" class="field">
       <div class="label">Seen</div>
 
@@ -72,11 +68,42 @@ const externalUrl = data.provider && data.extId ? getExternalUrl(data.provider, 
       </button>
     </label>
 
-    <label class="field col-span-2">
+    <label v-if="data.reason" class="field">
+      <div class="label">Reason</div>
+      {{ data.reason }}
+    </label>
+
+    <label class="field">
       <div class="label">Who Added</div>
 
-      {{ data.userId === 'me' ? 'Me' : 'Not me' }}
+      {{ data.userId === user?.id ? 'Me' : 'Not me' }}
     </label>
+
+    <label v-if="data.year" class="field">
+      <div class="label">Year</div>
+
+      {{ data.year }}
+    </label>
+
+    <template v-if="isOmdb(data)">
+      <label v-if="isOmdbString(data.extra.Runtime)" class="field col-span-2">
+        <div class="label">Runtime</div>
+
+        {{ data.extra.Runtime }}
+      </label>
+
+      <label v-if="isOmdbString(data.extra.Actors)" class="field col-span-2">
+        <div class="label">Actors</div>
+
+        {{ data.extra.Actors }}
+      </label>
+
+      <label v-if="isOmdbString(data.extra.Director)" class="field col-span-2">
+        <div class="label">Director</div>
+
+        {{ data.extra.Director }}
+      </label>
+    </template>
 
     <div class="flex gap-4 col-span-2">
       <button class="primary flex-1" @click="$emit('edit')">Edit</button>
