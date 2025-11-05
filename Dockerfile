@@ -1,5 +1,5 @@
 # install node_modules
-FROM oven/bun:1.3.0-alpine AS modules
+FROM oven/bun:1.3.1-alpine AS modules
 WORKDIR /app
 COPY package.json .
 COPY bun.lock .
@@ -8,7 +8,7 @@ COPY bun.lock .
 RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile
 
 # build the files
-FROM oven/bun:1.3.0-alpine AS builder
+FROM oven/bun:1.3.1-alpine AS builder
 WORKDIR /app
 COPY --from=modules /app/node_modules node_modules/
 COPY . .
@@ -18,7 +18,7 @@ ENV VITE_SEARCH_URL=$VITE_SEARCH_URL
 RUN bun run client:build
 
 # run the app
-FROM oven/bun:1.3.0-alpine
+FROM oven/bun:1.3.1-alpine
 WORKDIR /app
 
 ENV PORT=3000
