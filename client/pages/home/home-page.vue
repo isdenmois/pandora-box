@@ -10,6 +10,9 @@ const home = useHome()
 const series = useSeries()
 const movies = useMovies()
 
+const seriesVisible = ref(true)
+const moviesVisible = ref(true)
+
 const searchVisible = ref(false)
 const searchElement = ref<HTMLInputElement | null>(null)
 const openSearch = () => {
@@ -79,11 +82,11 @@ onBeforeMount(() => {
     </form>
   </div>
 
-  <h1 class="mt-2 px-4 sm:pl-10">Series</h1>
+  <h1 class="mt-2 px-4 sm:pl-10 cursor-pointer" @click="seriesVisible = !seriesVisible">Series</h1>
 
   <Spinner v-if="series.isLoading && !home.series.length" :size="24" />
 
-  <ul class="px-4 sm:pl-10 sm:flex gap-6 flex-wrap">
+  <ul v-if="seriesVisible" class="px-4 sm:pl-10 sm:flex gap-6 flex-wrap">
     <li v-for="item in home.series" :key="item.id" class="mt-4">
       <RouterLink class="not-link" :to="`/details/series/${item.id}`">
         <SeriesItem :series="item" />
@@ -91,11 +94,11 @@ onBeforeMount(() => {
     </li>
   </ul>
 
-  <h1 class="mt-8 px-4 sm:pl-10">Movies</h1>
+  <h1 class="mt-8 px-4 sm:pl-10 cursor-pointer" @click="moviesVisible = !moviesVisible">Movies</h1>
 
   <Spinner v-if="movies.isLoading && !home.movies.length" :size="24" />
 
-  <ul class="px-4 sm:pl-10 sm:flex gap-6 flex-wrap">
+  <ul v-if="moviesVisible" class="px-4 sm:pl-10 sm:flex gap-6 flex-wrap">
     <li v-for="movie in home.movies" :key="movie.id" class="mt-4">
       <RouterLink class="not-link" :to="`/details/movie/${movie.id}`">
         <MovieItem :movie />
