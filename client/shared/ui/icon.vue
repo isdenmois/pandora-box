@@ -12,7 +12,7 @@ const href = computed(() => `${icon}#icon`)
 </script>
 
 <template>
-  <svg class="flex-shrink-0" :height="size" :width="size">
+  <svg class="inline-block flex-shrink-0" :height="size" :width="size">
     <use :xlink:href="href"></use>
   </svg>
 </template>

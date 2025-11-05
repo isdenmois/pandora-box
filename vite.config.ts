@@ -1,6 +1,6 @@
 import { fileURLToPath, URL } from 'node:url'
+import presetWind4 from '@unocss/preset-wind4'
 import vue from '@vitejs/plugin-vue'
-import { presetUno } from 'unocss'
 import UnoCSS from 'unocss/vite'
 import { defineConfig } from 'vite'
 import vueDevTools from 'vite-plugin-vue-devtools'
@@ -32,12 +32,20 @@ export default defineConfig({
     vue(),
     vueDevTools(),
     UnoCSS({
-      presets: [presetUno({ preflight: false })],
-      theme: {
-        breakpoints: {
+      presets: [
+        presetWind4({
+          preflights: {
+            reset: true,
+          },
+        }),
+      ],
+      extendTheme: (theme) => ({
+        ...theme,
+        breakpoint: {
+          ...theme.breakpoint,
           zf: '380px',
         },
-      },
+      }),
     }),
   ],
 })

@@ -1,5 +1,4 @@
 import 'uno.css'
-import '@unocss/reset/eric-meyer.css'
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 

@@ -20,10 +20,6 @@
   --max-dialog-width: min(80vw, 600px);
 }
 
-* {
-  box-sizing: border-box;
-}
-
 #mobile {
   --max-dialog-width: 80vw;
 }
