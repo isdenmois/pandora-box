@@ -64,7 +64,7 @@
     "vue": "3.5.22",
     "vue-router": "4.6.3",
     "vue-standard-schema": "4.0.1",
-    "wretch": "2.11.0"
+    "wretch": "3.0.2"
   },
   "lint-staged": {
     "*.(js|ts|vue|html|css|json|md)": "prettier --write",
