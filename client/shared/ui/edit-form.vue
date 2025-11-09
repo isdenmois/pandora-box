@@ -29,7 +29,7 @@ const { form, submit, submitting, errors } = useForm({
   schema: v.object({
     title: v.pipe(v.string(), v.trim(), v.minLength(1, 'Title is required')),
     season: v.number(),
-    reason: v.pipe(v.string(), v.trim()),
+    reason: v.nullable(v.pipe(v.string(), v.trim())),
     private: v.pipe(v.boolean()),
     scheduled: v.nullable(v.number()),
   }),
