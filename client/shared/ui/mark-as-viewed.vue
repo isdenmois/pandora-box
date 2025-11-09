@@ -3,6 +3,7 @@ import * as v from 'valibot'
 import { reactive } from 'vue'
 import { flatten, useForm } from 'vue-standard-schema'
 import type { Series, Movie } from '../api'
+import { dateToString } from '../lib'
 import RatingInput from './rating-input.vue'
 
 interface Props {
@@ -20,7 +21,7 @@ const { data } = defineProps<Props>()
 const emit = defineEmits(['save'])
 
 const now = new Date()
-const today = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`
+const today = dateToString(now)
 
 const fields = reactive({
   date: data.seen || today,

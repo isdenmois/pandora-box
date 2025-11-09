@@ -7,7 +7,7 @@ import { useMovies } from '@/entities/movie'
 import { useSeries } from '@/entities/series'
 import { api } from '@/shared/api'
 import { toNullable, toNumber, useAuth } from '@/shared/lib'
-import { Dialog, SeasonToggler, Spinner, MoreButton } from '@/shared/ui'
+import { Dialog, SeasonToggler, ScheduleToggler, Spinner, MoreButton } from '@/shared/ui'
 
 const router = useRouter()
 const params = useRoute().params as { id: string }
@@ -34,6 +34,7 @@ const fields = reactive({
   reason: '',
   iAdded: true,
   forMe: false,
+  scheduled: null,
 })
 
 const { form, submit, submitting, errors } = useForm({
@@ -48,6 +49,7 @@ const { form, submit, submitting, errors } = useForm({
     reason: v.pipe(v.string(), v.trim()),
     iAdded: v.boolean(),
     forMe: v.boolean(),
+    scheduled: v.nullable(v.number()),
   }),
   formatErrors: flatten,
   async submit({ type, season, iAdded, forMe, ...input }) {
@@ -132,6 +134,14 @@ onMounted(async () => {
             <input type="text" name="why" placeholder="Reason" v-model="fields.reason" :disabled="submitting" />
           </label>
           <div v-for="error in errors?.nested?.reason" :key="error">{{ error }}</div>
+        </div>
+
+        <div class="mt-4">
+          <label class="field">
+            <div class="label">Scheduled</div>
+
+            <ScheduleToggler v-model="fields.scheduled" />
+          </label>
         </div>
 
         <div class="mt-4" @click="fields.iAdded = !fields.iAdded">

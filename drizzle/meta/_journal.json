@@ -43,6 +43,13 @@
       "when": 1761470544951,
       "tag": "0005_misty_captain_cross",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1762697033985,
+      "tag": "0006_pink_magdalene",
+      "breakpoints": true
     }
   ]
 }

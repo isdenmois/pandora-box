@@ -73,6 +73,12 @@ const externalUrl = data.provider && data.extId ? getExternalUrl(data.provider, 
       {{ data.reason }}
     </label>
 
+    <label v-if="data.scheduled" class="field">
+      <div class="label">Scheduled</div>
+      <span v-if="data.scheduled === -1">Yes</span>
+      <span v-if="data.scheduled > 0">{{ formatDate(data.scheduled) }}</span>
+    </label>
+
     <label class="field">
       <div class="label">Who Added</div>
 

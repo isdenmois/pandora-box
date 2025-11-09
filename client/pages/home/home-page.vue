@@ -106,6 +106,22 @@ onBeforeMount(() => {
     </li>
   </ul>
 
+  <template v-if="home.scheduled.length">
+    <h1 class="mt-8 px-4 sm:pl-10">Scheduled</h1>
+
+    <ul class="px-4 sm:pl-10 sm:flex gap-6 flex-wrap">
+      <li v-for="item in home.scheduled" :key="item.id" class="mt-4">
+        <RouterLink v-if="'season' in item" class="not-link" :to="`/details/series/${item.id}`">
+          <SeriesItem :series="item" />
+        </RouterLink>
+
+        <RouterLink v-else class="not-link" :to="`/details/movie/${item.id}`">
+          <MovieItem :movie="item" />
+        </RouterLink>
+      </li>
+    </ul>
+  </template>
+
   <router-view />
 </template>
 

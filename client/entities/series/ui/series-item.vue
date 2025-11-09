@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Series } from '@/shared/api'
-import { isMobile } from '@/shared/lib'
+import { formatDate, isMobile } from '@/shared/lib'
 import { ItemAdaptive } from '@/shared/ui'
 
 interface Props {
@@ -16,6 +16,9 @@ const description = computed(() =>
 const title = computed(() =>
   !isMobile.value && season.value > 1 ? `${props.series.title} S${season.value}` : props.series.title,
 )
+const scheduled = computed(() =>
+  props.series.scheduled && props.series.scheduled > 0 ? formatDate(props.series.scheduled) : null,
+)
 </script>
 
 <template>
@@ -24,6 +27,7 @@ const title = computed(() =>
     :imgUrl="series.poster"
     :description="description"
     :rating="series.seen ? series.seenRating : series.rating"
+    :details="scheduled"
     :testId="`series-${series.id}`"
   />
 </template>

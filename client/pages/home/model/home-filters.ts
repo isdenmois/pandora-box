@@ -7,6 +7,9 @@ import { compare } from '@/shared/lib'
 
 const byRating = compare<Movie | Series>((m) => -(m.rating || 0))
 const byTitle = compare<Movie | Series>((m) => m.title)
+const bySchedule = compare<Movie | Series>((m) =>
+  m.scheduled && m.scheduled! > 0 ? m.scheduled : Number.MAX_SAFE_INTEGER,
+)
 
 const sorts = {
   title: byTitle,
@@ -24,7 +27,11 @@ export const useHome = defineStore('home', () => {
   const seen = ref(false)
   const search = ref('')
   const searchValue = computed(() => search.value.trim().toLowerCase())
+  const now = Date.now()
 
+  const filterByFilters = (item: Movie | Series) => {
+    return forMe.value === !!item.private && seen.value === !!item.seen
+  }
   const filterBySearch = (item: Movie | Series) => {
     if (searchValue.value) {
       return item.title.toLowerCase().includes(searchValue.value)
@@ -32,9 +39,15 @@ export const useHome = defineStore('home', () => {
 
     return true
   }
+  const filterBySchedule = (item: Movie | Series) => {
+    return item.scheduled === null || (item.scheduled > 0 && item.scheduled < now)
+  }
 
   const filter = (item: Movie | Series) => {
-    return forMe.value === !!item.private && seen.value === !!item.seen && filterBySearch(item)
+    return filterByFilters(item) && filterBySearch(item) && filterBySchedule(item)
+  }
+  const filterScheduled = (item: Movie | Series) => {
+    return filterByFilters(item) && filterBySearch(item) && !filterBySchedule(item)
   }
 
   return {
@@ -44,6 +57,9 @@ export const useHome = defineStore('home', () => {
     search,
     movies: computed(() => movies.all.filter(filter).sort(sorts[sort.value])),
     series: computed(() => series.all.filter(filter).sort(sorts[sort.value])),
+    scheduled: computed(() =>
+      (movies.all as Array<Movie | Series>).concat(series.all).filter(filterScheduled).sort(bySchedule),
+    ),
     toggleForMe() {
       forMe.value = !forMe.value
     },

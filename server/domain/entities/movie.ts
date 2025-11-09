@@ -18,6 +18,7 @@ export const movie = sqliteTable(
     seenRating: integer(),
     userId: text('user_id'),
     private: integer({ mode: 'boolean' }),
+    scheduled: integer({ mode: 'number' }),
     extra: blob({ mode: 'json' }),
   },
   (table) => [index('movie_user_id_idx').on(table.userId, table.private)],

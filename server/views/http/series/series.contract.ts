@@ -13,6 +13,7 @@ export const createSeriesBody = t.Object({
   reason: t.Nullable(t.String()),
   userId: t.Nullable(t.String()),
   private: t.Boolean(),
+  scheduled: t.Nullable(t.Integer()),
   extra: t.Any(),
 })
 
@@ -25,6 +26,7 @@ export const updateSeriesBody = t.Object({
   reason: t.Nullable(t.String()),
   userId: t.Nullable(t.String()),
   private: t.Boolean(),
+  scheduled: t.Nullable(t.Integer()),
 })
 
 export const patchSeriesBody = t.Partial(updateSeriesBody)

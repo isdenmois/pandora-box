@@ -3,6 +3,7 @@ interface Props {
   title: string
   description?: string | null
   rating?: string | number | null
+  details?: string | number | null
   imgUrl?: string | null
   testId?: string
 }
@@ -12,12 +13,13 @@ defineProps<Props>()
 
 <template>
   <div class="flex item overflow-hidden relative color-primary" :data-testid="testId">
-    <img v-if="imgUrl" class="object-cover h-20 w-12 sm:h-60 sm:w-40" :src="imgUrl" :alt="title" />
+    <img v-if="imgUrl" class="object-cover w-14 sm:h-60 sm:w-40" :src="imgUrl" :alt="title" />
     <div v-else class="sm:h-60 sm:w-40"></div>
 
     <div class="hidden sm:block details-background"></div>
 
     <div class="p-4 sm:p-2 sm:absolute sm:left-0 sm:right-0 sm:bottom-0">
+      <div v-if="details" class="max-sm:absolute bottom-1 right-1 text-xs sm:text-center">{{ details }}</div>
       <div class="text-m sm:text-l sm:text-center sm:line-clamp-3 sm:overflow-hidden sm:font-bold">{{ title }}</div>
 
       <div v-if="description" class="text-s mt-2 sm:hidden">{{ description }}</div>
