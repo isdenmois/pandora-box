@@ -11,8 +11,9 @@ const bySeason = compare<Movie | Series>(
   (m) => -(m.rating || 0),
 )
 const byTitle = compare<Movie | Series>((m) => m.title)
-const bySchedule = compare<Movie | Series>((m) =>
-  m.scheduled && m.scheduled! > 0 ? m.scheduled : Number.MAX_SAFE_INTEGER,
+const bySchedule = compare<Movie | Series>(
+  (m) => (m.scheduled && m.scheduled! > 0 ? m.scheduled : Number.MAX_SAFE_INTEGER),
+  (m) => m.title,
 )
 const bySeen = compare<Movie | Series>((m) => m.seen || '', null, -1)
 
