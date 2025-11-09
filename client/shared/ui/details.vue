@@ -21,7 +21,9 @@ const searchUrl = computed(() =>
 const { user } = useAuth()
 const totalSeasons = computed(() => (isOmdb(data) && data.extra.totalSeasons ? +data.extra.totalSeasons : null))
 const season = ref('season' in data ? data.season || 1 : 1)
-const externalUrl = data.provider && data.extId ? getExternalUrl(data.provider, data.extId) : null
+const externalUrl = computed(() =>
+  data.provider && data.extId ? getExternalUrl(data.provider, data.extId, 'season' in data ? data.season : null) : null,
+)
 </script>
 
 <template>
