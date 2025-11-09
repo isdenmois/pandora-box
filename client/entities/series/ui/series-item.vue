@@ -16,9 +16,18 @@ const description = computed(() =>
 const title = computed(() =>
   !isMobile.value && season.value > 1 ? `${props.series.title} S${season.value}` : props.series.title,
 )
-const scheduled = computed(() =>
-  props.series.scheduled && props.series.scheduled > 0 ? formatDate(props.series.scheduled) : null,
-)
+const details = computed(() => {
+  const { seen, scheduled } = props.series
+
+  if (seen) {
+    return formatDate(seen)
+  }
+  if (scheduled && scheduled > 0) {
+    return formatDate(scheduled)
+  }
+
+  return null
+})
 </script>
 
 <template>
@@ -27,7 +36,7 @@ const scheduled = computed(() =>
     :imgUrl="series.poster"
     :description="description"
     :rating="series.seen ? series.seenRating : series.rating"
-    :details="scheduled"
+    :details="details"
     :testId="`series-${series.id}`"
   />
 </template>

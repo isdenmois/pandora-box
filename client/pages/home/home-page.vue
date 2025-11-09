@@ -42,8 +42,8 @@ onBeforeMount(() => {
       <span :class="{ active: home.forMe, 'max-zf:hidden': !home.forMe }">For Me</span>
     </button>
 
-    <button class="color-secondary" @click="home.toggleSort">
-      <template v-if="home.sort === 'rating'">
+    <button v-if="!home.seen" class="color-secondary" @click="home.toggleSort">
+      <template v-if="home.sort === 'rating' || home.sort === 'season'">
         <Icon :size="24" :icon="icons.sortDesc" />
       </template>
       <template v-else-if="home.sort === 'title'">

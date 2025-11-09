@@ -10,9 +10,18 @@ interface Props {
 
 const props = defineProps<Props>()
 const description = computed(() => [props.movie.year, props.movie.language].filter(Boolean).join(' ⸱ '))
-const scheduled = computed(() =>
-  props.movie.scheduled && props.movie.scheduled > 0 ? formatDate(props.movie.scheduled) : null,
-)
+const details = computed(() => {
+  const { seen, scheduled } = props.movie
+
+  if (seen) {
+    return formatDate(seen)
+  }
+  if (scheduled && scheduled > 0) {
+    return formatDate(scheduled)
+  }
+
+  return null
+})
 </script>
 
 <template>
@@ -21,7 +30,7 @@ const scheduled = computed(() =>
     :imgUrl="movie.poster"
     :description="description"
     :rating="movie.seen ? movie.seenRating : movie.rating"
-    :details="scheduled"
+    :details="details"
     :testId="`movie-${movie.id}`"
   />
 </template>

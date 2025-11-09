@@ -111,7 +111,7 @@ const externalUrl = data.provider && data.extId ? getExternalUrl(data.provider, 
       </label>
     </template>
 
-    <div class="flex gap-4 col-span-2">
+    <div class="flex gap-4 col-span-2 sticky bottom-4">
       <button class="primary flex-1" @click="$emit('edit')">Edit</button>
       <button v-if="!data.seen" class="primary flex-1" @click="$emit('seen')">Finished</button>
       <button v-else class="primary flex-1" @click="$emit('removeView')">Not Seen</button>
