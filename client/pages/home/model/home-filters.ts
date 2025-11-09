@@ -7,6 +7,7 @@ import { compare } from '@/shared/lib'
 
 const byRating = compare<Movie | Series>((m) => -(m.rating || 0))
 const bySeason = compare<Movie | Series>(
+  (m) => (m.scheduled ? m.scheduled : Number.MAX_SAFE_INTEGER),
   (m) => ('season' in m && m.season ? -m.season : 0),
   (m) => -(m.rating || 0),
 )
@@ -15,7 +16,7 @@ const bySchedule = compare<Movie | Series>(
   (m) => (m.scheduled && m.scheduled! > 0 ? m.scheduled : Number.MAX_SAFE_INTEGER),
   (m) => m.title,
 )
-const bySeen = compare<Movie | Series>((m) => m.seen || '', null, -1)
+const bySeen = compare<Movie | Series>((m) => m.seen || '', null, null, -1)
 
 const sorts = {
   season: bySeason,
