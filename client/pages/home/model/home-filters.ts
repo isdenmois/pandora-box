@@ -7,7 +7,7 @@ import { compare } from '@/shared/lib'
 
 const byRating = compare<Movie | Series>((m) => -(m.rating || 0))
 const bySeason = compare<Movie | Series>(
-  (m) => -(('season' in m && m.season) || 0),
+  (m) => ('season' in m && m.season ? -m.season : 0),
   (m) => -(m.rating || 0),
 )
 const byTitle = compare<Movie | Series>((m) => m.title)
@@ -46,7 +46,7 @@ export const useHome = defineStore('home', () => {
     return true
   }
   const filterBySchedule = (item: Movie | Series) => {
-    return item.scheduled === null || (item.scheduled > 0 && item.scheduled < now)
+    return !item.scheduled || (item.scheduled > 0 && item.scheduled < now)
   }
 
   const filter = (item: Movie | Series) => {

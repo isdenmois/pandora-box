@@ -108,7 +108,7 @@ describe('useHome store', () => {
       const store = useHome()
 
       // assert
-      expect(store.sort).toBe('rating')
+      expect(store.sort).toBe('season')
       expect(store.movies).toEqual([c, a, d, b])
     })
 
