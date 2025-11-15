@@ -5,14 +5,16 @@ import type { Movie, Series } from '../api'
 import Icon from './icon.vue'
 import { icons } from './icons'
 import SeasonToggler from './season-toggler.vue'
+import Spinner from './spinner.vue'
 
 interface Props {
   data: Movie | Series
+  refreshing?: boolean
 }
 
 const { data } = defineProps<Props>()
 
-defineEmits(['updateSeason', 'removeView', 'seen', 'edit'])
+const emit = defineEmits(['updateSeason', 'removeView', 'seen', 'edit', 'refresh'])
 
 const searchUrl = computed(() =>
   searchLink('season' in data && data.season ? `${data.title} ${data.season}` : data.title),
@@ -24,6 +26,8 @@ const season = ref('season' in data ? data.season || 1 : 1)
 const externalUrl = computed(() =>
   data.provider && data.extId ? getExternalUrl(data.provider, data.extId, 'season' in data ? data.season : null) : null,
 )
+const iconSize = computed(() => (isMobile.value ? 24 : 32))
+const canRefresh = computed(() => data.provider === 'omdb')
 </script>
 
 <template>
@@ -43,8 +47,14 @@ const externalUrl = computed(() =>
         <div v-if="data.genre" class="color-secondary text-s hidden sm:block">{{ data.genre }}</div>
       </div>
 
+      <div v-if="canRefresh && !refreshing" class="cursor-pointer" @click="emit('refresh')">
+        <Icon :size="iconSize" :icon="icons.rotate" />
+      </div>
+
+      <Spinner v-if="refreshing" :size="iconSize" />
+
       <a v-if="externalUrl" class="mr-[-0.5rem] sm:mt-[-1rem] sm:mr-[-1rem]" target="_blank" :href="externalUrl">
-        <Icon :size="isMobile ? 24 : 32" :icon="icons.globe" />
+        <Icon :size="iconSize" :icon="icons.globe" />
       </a>
     </div>
 

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { readonly, ref, shallowRef } from 'vue'
 import { api, type Series, type SeriesCreate, type SeriesUpdate } from '@/shared/api'
-import { useAuth } from '@/shared/lib'
+import { isOmdb, isOmdbString, useAuth } from '@/shared/lib'
 
 export const useSeries = defineStore('series', () => {
   const all = ref<Series[]>([])
@@ -94,6 +94,41 @@ export const useSeries = defineStore('series', () => {
       }
 
       await api.series.patch(id, { season })
+    },
+
+    async refreshData(id: string) {
+      const existed = all.value.find((item) => item.id === id)
+
+      if (!existed?.extId || !isOmdb(existed)) {
+        return
+      }
+
+      const data = await api.search.byId(existed.extId, 'omdb')
+      const extra = { ...existed.extra }
+
+      if (isOmdb(data)) {
+        if (data.extra.Actors && isOmdbString(data.extra.Actors)) {
+          extra.Actors = data.extra.Actors
+        }
+        if (data.extra.Runtime && isOmdbString(data.extra.Runtime)) {
+          extra.Runtime = data.extra.Runtime
+        }
+        if (data.extra.totalSeasons && isOmdbString(data.extra.totalSeasons)) {
+          extra.totalSeasons = data.extra.totalSeasons
+        }
+      }
+      const toRefresh = {
+        title: data.title || existed.title,
+        rating: data.rating || existed.rating,
+        year: data.year || existed.year,
+        poster: data.poster || existed.poster,
+        genre: data.genre || existed.genre,
+        extra,
+      }
+
+      Object.assign(existed, toRefresh)
+
+      await api.series.patch(id, toRefresh)
     },
   }
 })

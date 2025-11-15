@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useAsyncState } from '@vueuse/core'
 import { Details } from '@/shared/ui'
 import { useSeries } from '../model'
 
@@ -12,6 +13,10 @@ defineEmits(['edit', 'seen'])
 const series = useSeries()
 const data = await series.byId(id)
 
+const { execute: refresh, isLoading: isRefreshing } = useAsyncState(() => series.refreshData(id), null, {
+  immediate: false,
+})
+
 const updateSeason = (season: number) => {
   series.setSeason(id, season)
 }
@@ -20,9 +25,11 @@ const updateSeason = (season: number) => {
 <template>
   <Details
     :data="data"
+    :refreshing="isRefreshing"
     @edit="$emit('edit')"
     @seen="$emit('seen')"
     @update-season="updateSeason"
+    @refresh="refresh"
     @remove-view="series.removeSeriesView(id)"
   >
     <slot />
