@@ -9,6 +9,7 @@ const router = createRouter({
       component: () => import('@/pages/home/home-page.vue'),
       children: [
         { path: '/search', component: () => import('@/pages/home/search-dialog.vue') },
+        { path: '/add/manual', component: () => import('@/pages/home/add-manual-dialog.vue') },
         { path: '/add/:id', component: () => import('@/pages/home/add-dialog.vue') },
         { path: '/details/:type/:id', component: () => import('@/pages/home/details-dialog.vue') },
         { path: '/edit/:type/:id', component: () => import('@/pages/home/edit-dialog.vue') },

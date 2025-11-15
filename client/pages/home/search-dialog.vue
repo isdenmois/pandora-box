@@ -38,8 +38,8 @@ const search = async () => {
 
 <template>
   <Dialog id="search">
-    <form class="sticky z-1 top-0 w-full p-4" @submit.prevent="search">
-      <label class="search">
+    <form class="sticky z-1 top-0 w-full p-4 flex items-center gap-2" @submit.prevent="search">
+      <label class="search flex-1">
         <Icon :size="24" :icon="icons.search" />
         <input
           class="w-full"
@@ -51,6 +51,10 @@ const search = async () => {
           v-focus-on-mount
         />
       </label>
+
+      <RouterLink to="/add/manual">
+        <Icon :size="32" :icon="icons.plusSquared" />
+      </RouterLink>
     </form>
 
     <div v-if="isSearching" class="mb-4 text-center color-secondary">

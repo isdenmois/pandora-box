@@ -1,6 +1,7 @@
 import globe from './globe.svg'
 import home from './home.svg'
 import minus from './minus.svg'
+import plusSquared from './plus-squared.svg'
 import plus from './plus.svg'
 import rotate from './rotate.svg'
 import search from './search.svg'
@@ -18,6 +19,7 @@ export const icons = {
   home,
   minus,
   plus,
+  plusSquared,
   rotate,
   search,
   seen,

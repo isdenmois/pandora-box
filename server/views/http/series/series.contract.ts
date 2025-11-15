@@ -1,8 +1,8 @@
 import { t } from 'elysia'
 
 export const createSeriesBody = t.Object({
-  extId: t.String(),
-  provider: t.UnionEnum(['omdb']),
+  extId: t.Nullable(t.String()),
+  provider: t.UnionEnum(['omdb', 'manual']),
   title: t.String({ minLength: 1 }),
   poster: t.Nullable(t.String({ minLength: 1 })),
   year: t.Nullable(t.Integer({ minimum: 1 })),
