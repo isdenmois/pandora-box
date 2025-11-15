@@ -9,7 +9,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const description = computed(() => [props.movie.year, props.movie.language].filter(Boolean).join(' ⸱ '))
+const description = computed(() => [props.movie.year, props.movie.genre].filter(Boolean).join(' ⸱ '))
 const details = computed(() => {
   const { seen, scheduled } = props.movie
 
