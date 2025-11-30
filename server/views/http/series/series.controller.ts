@@ -16,7 +16,8 @@ export const seriesController = new Elysia({
   .patch(':id', ({ params: { id }, body }) => seriesRepository.update(id, body), { body: patchSeriesBody })
   .post(
     '/:id/viewed',
-    ({ params: { id }, user, body: { date, rating } }) => seriesRepository.markAsViewed(id, user.id, date, rating),
+    ({ params: { id }, user, body: { date, rating, comment } }) =>
+      seriesRepository.markAsViewed(id, user.id, date, rating, comment),
     { body: markSeriesViewedBody },
   )
   .delete(':id', ({ params: { id } }) => seriesRepository.delete(id))

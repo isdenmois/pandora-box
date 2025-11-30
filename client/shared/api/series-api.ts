@@ -25,7 +25,7 @@ export const series = {
       .patch(data)
       .text(),
   getViews: () => v1.get('/views').json<SeriesView[]>(),
-  markAsViewed: (seriesId: string, date: string, rating: number) =>
-    v1.url(`/${seriesId}/viewed`).post({ date, rating }).json<SeriesView>(),
+  markAsViewed: (seriesId: string, date: string, rating: number, comment: string) =>
+    v1.url(`/${seriesId}/viewed`).post({ date, rating, comment }).json<SeriesView>(),
   removeSeriesView: (seriesId: string) => v1.url(`/${seriesId}/view`).delete().text(),
 }

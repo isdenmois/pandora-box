@@ -12,8 +12,8 @@ const emit = defineEmits(['submitted'])
 const series = useSeries()
 const data = await series.byId(id)
 
-async function submit({ date, rating }: SeenData) {
-  series.markAsViewed(id, date, rating)
+async function submit({ date, rating, comment }: SeenData) {
+  series.markAsViewed(id, date, rating, comment)
 
   emit('submitted')
 }

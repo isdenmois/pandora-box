@@ -16,6 +16,7 @@ export const movie = sqliteTable(
     reason: text(),
     seen: text(),
     seenRating: integer(),
+    seenComment: text(),
     userId: text('user_id'),
     private: integer({ mode: 'boolean' }),
     scheduled: integer({ mode: 'number' }),
@@ -40,5 +41,5 @@ export const movieView = sqliteTable('movie_view', {
 export type Movie = typeof movie.$inferSelect
 export type MovieView = typeof movieView.$inferSelect
 
-export type MovieCreate = Omit<Movie, 'id' | 'seen' | 'seenRating'>
+export type MovieCreate = Omit<Movie, 'id' | 'seen' | 'seenRating' | 'seenComment'>
 export type MovieUpdate = Pick<Movie, 'title' | 'poster' | 'year' | 'rating' | 'reason' | 'userId' | 'private'>

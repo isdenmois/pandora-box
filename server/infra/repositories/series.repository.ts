@@ -9,7 +9,7 @@ export const seriesRepository = {
 
     await db.insert(table.series).values({ ...data, id })
 
-    return { ...data, id, seen: null, seenRating: null }
+    return { ...data, id, seasonHistory: null, seen: null, seenRating: null, seenComment: null }
   },
 
   async getAll(userId: string): Promise<Series[]> {
@@ -39,7 +39,7 @@ export const seriesRepository = {
     return await db.select().from(table.seriesView).where(eq(table.seriesView.userId, userId))
   },
 
-  async markAsViewed(seriesId: string, userId: string, date: string, rating: number) {
+  async markAsViewed(seriesId: string, userId: string, date: string, rating: number, comment: string) {
     const id = randomUUID()
     const data = {
       id,
@@ -50,7 +50,10 @@ export const seriesRepository = {
     }
 
     await db.insert(table.seriesView).values(data)
-    await db.update(table.series).set({ seen: date, seenRating: rating }).where(eq(table.series.id, seriesId))
+    await db
+      .update(table.series)
+      .set({ seen: date, seenRating: rating, seenComment: comment })
+      .where(eq(table.series.id, seriesId))
 
     return data
   },

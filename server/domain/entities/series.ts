@@ -11,12 +11,14 @@ export const series = sqliteTable(
     poster: text(),
     year: integer(),
     season: integer(),
+    seasonHistory: blob({ mode: 'json' }).$type<Record<string, string>>(),
     rating: real(),
     language: text(),
     genre: text(),
     reason: text(),
     seen: text(),
     seenRating: integer(),
+    seenComment: text(),
     userId: text('user_id'),
     private: integer({ mode: 'boolean' }),
     scheduled: integer({ mode: 'number' }),
@@ -41,8 +43,8 @@ export const seriesView = sqliteTable('series_view', {
 export type Series = typeof series.$inferSelect
 export type SeriesView = typeof series.$inferSelect
 
-export type SeriesCreate = Omit<Series, 'id' | 'seen' | 'seenRating'>
+export type SeriesCreate = Omit<Series, 'id' | 'seasonHistory' | 'seen' | 'seenRating' | 'seenComment'>
 export type SeriesUpdate = Pick<
   Series,
-  'title' | 'poster' | 'season' | 'year' | 'rating' | 'reason' | 'userId' | 'private'
+  'title' | 'poster' | 'season' | 'seasonHistory' | 'year' | 'rating' | 'reason' | 'userId' | 'private'
 >

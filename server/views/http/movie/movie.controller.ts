@@ -16,7 +16,8 @@ export const movieController = new Elysia({
   .patch(':id', ({ params: { id }, body }) => movieRepository.update(id, body), { body: patchMovieBody })
   .post(
     '/:id/viewed',
-    ({ params: { id }, user, body: { date, rating } }) => movieRepository.markAsViewed(id, user.id, date, rating),
+    ({ params: { id }, user, body: { date, rating, comment } }) =>
+      movieRepository.markAsViewed(id, user.id, date, rating, comment),
     { body: markMovieViewedBody },
   )
   .delete(':id', ({ params: { id } }) => movieRepository.delete(id))

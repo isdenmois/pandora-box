@@ -55,14 +55,14 @@ export const useSeries = defineStore('series', () => {
       await api.series.patch(id, data)
     },
 
-    async markAsViewed(id: string, date: string, rating: number) {
+    async markAsViewed(id: string, date: string, rating: number, comment: string) {
       const existed = all.value.find((item) => item.id === id)
 
       if (existed) {
-        Object.assign(existed, { seen: date, seenRating: rating })
+        Object.assign(existed, { seen: date, seenRating: rating, seenComment: comment })
       }
 
-      await api.series.markAsViewed(id, date, rating)
+      await api.series.markAsViewed(id, date, rating, comment)
     },
 
     async removeSeriesView(id: string) {
@@ -88,12 +88,17 @@ export const useSeries = defineStore('series', () => {
 
     async setSeason(id: string, season: number) {
       const existed = all.value.find((item) => item.id === id)
+      let seasonHistory: Record<string, string> | undefined = undefined
 
       if (existed) {
+        seasonHistory = Object.fromEntries(Object.entries(existed.seasonHistory || {}).filter(([s]) => +s < season))
+        seasonHistory[existed.season || '1'] = new Date().toISOString().split('T')[0]!
+
         existed.season = season
+        existed.seasonHistory = seasonHistory
       }
 
-      await api.series.patch(id, { season })
+      await api.series.patch(id, { season, seasonHistory })
     },
 
     async refreshData(id: string) {

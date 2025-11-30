@@ -9,7 +9,7 @@ export const movieRepository = {
 
     await db.insert(table.movie).values({ ...data, id })
 
-    return { ...data, id, seen: null, seenRating: null }
+    return { ...data, id, seen: null, seenRating: null, seenComment: null }
   },
 
   async getAll(userId: string): Promise<Movie[]> {
@@ -39,7 +39,7 @@ export const movieRepository = {
     return await db.select().from(table.movieView).where(eq(table.movieView.userId, userId))
   },
 
-  async markAsViewed(movieId: string, userId: string, date: string, rating: number) {
+  async markAsViewed(movieId: string, userId: string, date: string, rating: number, comment: string) {
     const id = randomUUID()
     const data = {
       id,
@@ -50,7 +50,10 @@ export const movieRepository = {
     }
 
     await db.insert(table.movieView).values(data)
-    await db.update(table.movie).set({ seen: date, seenRating: rating }).where(eq(table.movie.id, movieId))
+    await db
+      .update(table.movie)
+      .set({ seen: date, seenRating: rating, seenComment: comment })
+      .where(eq(table.movie.id, movieId))
 
     return data
   },

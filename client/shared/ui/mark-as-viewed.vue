@@ -13,6 +13,7 @@ interface Props {
 export interface SeenData {
   date: string
   rating: number
+  comment: string
 }
 </script>
 
@@ -26,6 +27,7 @@ const today = dateToString(now)
 const fields = reactive({
   date: data.seen || today,
   rating: data.seenRating || 0,
+  comment: data.seenComment || '',
 })
 
 const { form, submit, submitting, errors } = useForm({
@@ -33,10 +35,11 @@ const { form, submit, submitting, errors } = useForm({
   schema: v.object({
     date: v.pipe(v.string(), v.trim(), v.minLength(5, 'Date is required')),
     rating: v.pipe(v.number('Fill please')),
+    comment: v.pipe(v.string(), v.trim()),
   }),
   formatErrors: flatten,
-  async submit({ date, rating }) {
-    emit('save', { date, rating })
+  async submit({ date, rating, comment }) {
+    emit('save', { date, rating, comment })
   },
 })
 </script>
@@ -60,6 +63,12 @@ const { form, submit, submitting, errors } = useForm({
           <div class="label">Date</div>
           <input type="date" name="date" v-model="fields.date" :disabled="submitting" />
         </label>
+        <div v-for="error in errors?.nested?.date" :key="error">{{ error }}</div>
+
+        <div class="field">
+          <label>Comment</label>
+          <input type="text" name="comment" placeholder="Comment" v-model="fields.comment" :disabled="submitting" />
+        </div>
         <div v-for="error in errors?.nested?.date" :key="error">{{ error }}</div>
       </div>
     </div>

@@ -23,6 +23,7 @@ export const updateSeriesBody = t.Object({
   poster: t.Nullable(t.String({ minLength: 1 })),
   year: t.Nullable(t.Integer({ minimum: 1 })),
   season: t.Integer({ minimum: 1 }),
+  seasonHistory: t.Optional(t.Nullable(t.Any())),
   rating: t.Nullable(t.Number()),
   reason: t.Nullable(t.String()),
   userId: t.Nullable(t.String()),
@@ -36,4 +37,5 @@ export const patchSeriesBody = t.Partial(updateSeriesBody)
 export const markSeriesViewedBody = t.Object({
   date: t.String({ minLength: 5 }),
   rating: t.Number({ minimum: 0, maximum: 10 }),
+  comment: t.String({}),
 })

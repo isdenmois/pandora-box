@@ -12,8 +12,8 @@ const emit = defineEmits(['submitted'])
 const movies = useMovies()
 const data = await movies.byId(id)
 
-async function submit({ date, rating }: SeenData) {
-  movies.markAsViewed(id, date, rating)
+async function submit({ date, rating, comment }: SeenData) {
+  movies.markAsViewed(id, date, rating, comment)
 
   emit('submitted')
 }

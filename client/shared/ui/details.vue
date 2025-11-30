@@ -65,13 +65,14 @@ const canRefresh = computed(() => data.provider === 'omdb')
       <SeasonToggler v-model="season" :total="totalSeasons" @update:model-value="$emit('updateSeason', season)" />
     </label>
 
-    <label v-if="data.seen" class="field">
-      <div class="label">Seen</div>
+    <div v-if="data.seen" class="field" @click="emit('seen')">
+      <label>Seen</label>
 
-      <div class="flex gap-4">
+      <div>
         <div>{{ formatDate(data.seen) }}: {{ data.seenRating }}/10</div>
+        <div v-if="data.seenComment">{{ data.seenComment }}</div>
       </div>
-    </label>
+    </div>
 
     <label class="field">
       <div class="label">List</div>
@@ -103,6 +104,14 @@ const canRefresh = computed(() => data.provider === 'omdb')
       <div class="label">Year</div>
 
       {{ data.year }}
+    </label>
+
+    <label v-if="'seasonHistory' in data && data.seasonHistory" class="field">
+      <label>Season History</label>
+
+      <div v-for="[season, date] of Object.entries(data.seasonHistory)" :key="season">
+        Season {{ season }}: {{ formatDate(date) }}
+      </div>
     </label>
 
     <template v-if="isOmdb(data)">
