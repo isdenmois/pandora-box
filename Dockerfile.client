@@ -18,6 +18,7 @@ ARG API_SERVER
 ENV API_SERVER=$API_SERVER
 ENV PORT=$PORT
 COPY client/nginx.conf /etc/nginx/templates/default.conf.template
+COPY --from=app-builder /app/public /usr/share/nginx/html
 COPY --from=app-builder /app/dist /usr/share/nginx/html
 
 # Expose the port and start Nginx
