@@ -1,4 +1,11 @@
 {
   "id": "ru.moisden.pandora",
-  "name": "Pandora Box"
+  "name": "Pandora Box",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ]
 }
