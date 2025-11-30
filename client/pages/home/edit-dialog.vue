@@ -2,6 +2,7 @@
 import { useRoute, useRouter } from 'vue-router'
 import { MovieEdit } from '@/entities/movie'
 import { SeriesEdit } from '@/entities/series'
+import { useTags } from '@/features/tags'
 import { Dialog } from '@/shared/ui'
 
 type Props = {
@@ -13,6 +14,7 @@ type Props = {
 <script setup lang="ts">
 const { id, type } = useRoute().params as Props
 const router = useRouter()
+const tags = useTags()
 
 const parent = `/details/${type}/${id}`
 
@@ -26,7 +28,7 @@ const goToRoot = () => {
 
 <template>
   <Dialog id="edit" class-name="px-6 py-4 sm:p-8" :parent="parent">
-    <MovieEdit v-if="type === 'movie'" :id="id" @submitted="goToDetails" @deleted="goToRoot" />
-    <SeriesEdit v-if="type === 'series'" :id="id" @submitted="goToDetails" @deleted="goToRoot" />
+    <MovieEdit v-if="type === 'movie'" :id="id" :tags="tags.tags" @submitted="goToDetails" @deleted="goToRoot" />
+    <SeriesEdit v-if="type === 'series'" :id="id" :tags="tags.tags" @submitted="goToDetails" @deleted="goToRoot" />
   </Dialog>
 </template>

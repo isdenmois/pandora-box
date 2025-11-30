@@ -13,6 +13,7 @@ export const createMovieBody = t.Object({
   userId: t.Nullable(t.String()),
   private: t.Boolean(),
   scheduled: t.Nullable(t.Integer()),
+  tags: t.Nullable(t.Array(t.String())),
   extra: t.Any(),
 })
 
@@ -25,6 +26,7 @@ export const updateMovieBody = t.Object({
   userId: t.Nullable(t.String()),
   private: t.Boolean(),
   scheduled: t.Nullable(t.Integer()),
+  tags: t.Nullable(t.Array(t.String())),
 })
 
 export const patchMovieBody = t.Partial(updateMovieBody)

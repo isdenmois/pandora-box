@@ -20,6 +20,7 @@ export const series = sqliteTable(
     userId: text('user_id'),
     private: integer({ mode: 'boolean' }),
     scheduled: integer({ mode: 'number' }),
+    tags: blob({ mode: 'json' }).$type<string[]>(),
     extra: blob({ mode: 'json' }),
   },
   (table) => [index('series_user_id_idx').on(table.userId, table.private)],

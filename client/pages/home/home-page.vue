@@ -82,7 +82,20 @@ onBeforeMount(() => {
     </form>
   </div>
 
-  <h1 class="mt-2 px-4 sm:pl-10 cursor-pointer" @click="seriesVisible = !seriesVisible">Series</h1>
+  <div v-if="home.tags.length > 0" class="flex flex-wrap gap-4 px-2 sm:pl-8 mt-2">
+    <button
+      v-for="tag of home.tags"
+      :key="tag"
+      :class="tag === home.tag ? 'primary' : 'secondary'"
+      @click="home.toggleTag(tag)"
+    >
+      {{ tag }}
+    </button>
+  </div>
+
+  <h1 v-if="home.series.length > 0" class="mt-4 px-4 sm:pl-10 cursor-pointer" @click="seriesVisible = !seriesVisible">
+    Series
+  </h1>
 
   <Spinner v-if="series.isLoading && !home.series.length" :size="24" />
 
@@ -94,7 +107,9 @@ onBeforeMount(() => {
     </li>
   </ul>
 
-  <h1 class="mt-8 px-4 sm:pl-10 cursor-pointer" @click="moviesVisible = !moviesVisible">Movies</h1>
+  <h1 v-if="home.movies.length > 0" class="mt-8 px-4 sm:pl-10 cursor-pointer" @click="moviesVisible = !moviesVisible">
+    Movies
+  </h1>
 
   <Spinner v-if="movies.isLoading && !home.movies.length" :size="24" />
 

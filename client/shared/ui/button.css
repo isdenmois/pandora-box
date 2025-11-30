@@ -17,10 +17,8 @@ button.primary {
 }
 
 button.secondary {
-  background-color: var(--secondary);
-  padding: 4px 12px;
-  color: var(--background);
-  border-radius: 8px;
+  padding: 10px 16px;
+  color: var(--text-secondary);
 }
 
 button.flat {

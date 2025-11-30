@@ -5,12 +5,14 @@ import { useRouter } from 'vue-router'
 import { flatten, useForm } from 'vue-standard-schema'
 import { useMovies } from '@/entities/movie'
 import { useSeries } from '@/entities/series'
+import { useTags } from '@/features/tags'
 import { toNullable, toNumber, useAuth } from '@/shared/lib'
-import { Dialog, SeasonToggler, ScheduleToggler } from '@/shared/ui'
+import { Dialog, SeasonToggler, ScheduleToggler, TagsInput } from '@/shared/ui'
 
 const router = useRouter()
 const movies = useMovies()
 const series = useSeries()
+const tags = useTags()
 const auth = useAuth()
 
 const fields = reactive({
@@ -24,6 +26,7 @@ const fields = reactive({
   iAdded: true,
   forMe: false,
   scheduled: null,
+  tags: [],
 })
 
 const { form, submit, submitting, errors } = useForm({
@@ -39,6 +42,7 @@ const { form, submit, submitting, errors } = useForm({
     iAdded: v.boolean(),
     forMe: v.boolean(),
     scheduled: v.nullable(v.number()),
+    tags: v.nullable(v.array(v.string())),
   }),
   formatErrors: flatten,
   async submit({ type, season, iAdded, forMe, ...input }) {
@@ -150,6 +154,11 @@ const { form, submit, submitting, errors } = useForm({
             <input type="text" name="poster" placeholder="Poster" v-model="fields.poster" :disabled="submitting" />
           </label>
           <div v-for="error in errors?.nested?.poster" :key="error">{{ error }}</div>
+        </div>
+
+        <div class="mt-4 field">
+          <label>Tags</label>
+          <TagsInput :tags="tags.tags" v-model="fields.tags" />
         </div>
 
         <button type="button" class="primary w-full justify-center" :disabled="submitting" @click="submit">Add</button>

@@ -6,9 +6,11 @@ import type { Movie, Series } from '../api'
 import { useConfirm } from './confirm'
 import ScheduleToggler from './schedule-toggler.vue'
 import SeasonToggler from './season-toggler.vue'
+import TagsInput from './tags-input.vue'
 
 interface Props {
   data: Movie | Series
+  tags: string[]
 }
 
 const { data } = defineProps<Props>()
@@ -22,6 +24,7 @@ const fields = reactive({
   reason: data.reason,
   private: data.private,
   scheduled: data.scheduled,
+  tags: data.tags || [],
 })
 
 const { form, submit, submitting, errors } = useForm({
@@ -32,6 +35,7 @@ const { form, submit, submitting, errors } = useForm({
     reason: v.nullable(v.pipe(v.string(), v.trim())),
     private: v.pipe(v.boolean()),
     scheduled: v.nullable(v.number()),
+    tags: v.nullable(v.array(v.string())),
   }),
   formatErrors: flatten,
   async submit(input) {
@@ -91,6 +95,12 @@ const toDelete = async () => {
 
       <ScheduleToggler v-model="fields.scheduled" />
     </label>
+
+    <div class="field">
+      <label>Tags</label>
+
+      <TagsInput :tags="tags" v-model="fields.tags" />
+    </div>
 
     <button type="button" class="flat danger" :disabled="submitting" @click="toDelete">Remove</button>
 

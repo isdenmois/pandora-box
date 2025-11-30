@@ -5,6 +5,7 @@ import { useMovies } from '../model'
 
 interface Props {
   id: string
+  tags: string[]
 }
 
 const { id } = defineProps<Props>()
@@ -31,5 +32,5 @@ const toDelete = async () => {
 </script>
 
 <template>
-  <EditForm :data="data" @save="save" @delete="toDelete" />
+  <EditForm :data="data" :tags="tags" @save="save" @delete="toDelete" />
 </template>

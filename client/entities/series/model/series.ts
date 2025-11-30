@@ -8,7 +8,7 @@ export const useSeries = defineStore('series', () => {
   const isLoading = shallowRef(false)
 
   return {
-    all: readonly(all),
+    all: all,
     isLoading: readonly(isLoading),
     async refresh() {
       isLoading.value = true

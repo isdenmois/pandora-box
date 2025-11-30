@@ -34,7 +34,9 @@ export const useHome = defineStore('home', () => {
   const sort = ref<Sort>('season')
   const seen = ref(false)
   const search = ref('')
+  const tag = ref<string | null>(null)
   const searchValue = computed(() => search.value.trim().toLowerCase())
+
   const now = Date.now()
 
   const filterByFilters = (item: Movie | Series) => {
@@ -50,6 +52,9 @@ export const useHome = defineStore('home', () => {
   const filterBySchedule = (item: Movie | Series) => {
     return !item.scheduled || (item.scheduled > 0 && item.scheduled < now)
   }
+  const filterByTag = (item: Movie | Series) => {
+    return !tag.value || item.tags?.includes(tag.value)
+  }
 
   const filter = (item: Movie | Series) => {
     return filterByFilters(item) && filterBySearch(item) && filterBySchedule(item)
@@ -59,16 +64,25 @@ export const useHome = defineStore('home', () => {
   }
   const sortBy = computed(() => (seen.value ? bySeen : sorts[sort.value]))
 
+  const movieList = computed(() => movies.all.filter(filter).sort(sortBy.value))
+  const seriesList = computed(() => series.all.filter(filter).sort(sortBy.value))
+  const scheduled = computed(() =>
+    (movies.all as Array<Movie | Series>).concat(series.all).filter(filterScheduled).sort(bySchedule),
+  )
+  const tags = computed(() =>
+    [...new Set([...movieList.value, ...seriesList.value, ...scheduled.value].flatMap((i) => i.tags || []))].sort(),
+  )
+
   return {
     forMe: readonly(forMe),
     sort: readonly(sort),
     seen: readonly(seen),
     search,
-    movies: computed(() => movies.all.filter(filter).sort(sortBy.value)),
-    series: computed(() => series.all.filter(filter).sort(sortBy.value)),
-    scheduled: computed(() =>
-      (movies.all as Array<Movie | Series>).concat(series.all).filter(filterScheduled).sort(bySchedule),
-    ),
+    tag,
+    movies: computed(() => movieList.value.filter(filterByTag)),
+    series: computed(() => seriesList.value.filter(filterByTag)),
+    scheduled: computed(() => scheduled.value.filter(filterByTag)),
+    tags,
     toggleForMe() {
       forMe.value = !forMe.value
     },
@@ -83,6 +97,13 @@ export const useHome = defineStore('home', () => {
     },
     toggleSeen() {
       seen.value = !seen.value
+    },
+    toggleTag(value: string) {
+      if (tag.value === value) {
+        tag.value = null
+      } else {
+        tag.value = value
+      }
     },
   }
 })

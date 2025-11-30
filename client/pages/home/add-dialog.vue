@@ -5,14 +5,16 @@ import { useRoute, useRouter } from 'vue-router'
 import { flatten, useForm } from 'vue-standard-schema'
 import { useMovies } from '@/entities/movie'
 import { useSeries } from '@/entities/series'
+import { useTags } from '@/features/tags'
 import { api } from '@/shared/api'
 import { toNullable, toNumber, useAuth } from '@/shared/lib'
-import { Dialog, SeasonToggler, ScheduleToggler, Spinner, MoreButton } from '@/shared/ui'
+import { Dialog, SeasonToggler, ScheduleToggler, Spinner, TagsInput, MoreButton } from '@/shared/ui'
 
 const router = useRouter()
 const params = useRoute().params as { id: string }
 const movies = useMovies()
 const series = useSeries()
+const tags = useTags()
 const auth = useAuth()
 
 const isLoading = ref(true)
@@ -35,6 +37,7 @@ const fields = reactive({
   iAdded: true,
   forMe: false,
   scheduled: null,
+  tags: [],
 })
 
 const { form, submit, submitting, errors } = useForm({
@@ -50,6 +53,7 @@ const { form, submit, submitting, errors } = useForm({
     iAdded: v.boolean(),
     forMe: v.boolean(),
     scheduled: v.nullable(v.number()),
+    tags: v.nullable(v.array(v.string())),
   }),
   formatErrors: flatten,
   async submit({ type, season, iAdded, forMe, ...input }) {
@@ -160,6 +164,11 @@ onMounted(async () => {
             <span :class="{ active: !fields.forMe }">Global</span>
             <span :class="{ active: fields.forMe }">For Me</span>
           </button>
+        </div>
+
+        <div class="mt-4 field">
+          <label>Tags</label>
+          <TagsInput :tags="tags.tags" v-model="fields.tags" />
         </div>
 
         <template v-if="showMore">
