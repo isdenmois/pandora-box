@@ -26,8 +26,7 @@ test('home page', async ({ page }) => {
     await page.goto('/')
 
     // assert
-    await expect(homePageObject.headers.first()).toContainText('Series')
-    await expect(homePageObject.headers.nth(1)).toContainText('Movies')
+    await expect(homePageObject.headers).toBeHidden()
     await expect(homePageObject.series('1')).toBeHidden()
     await expect(homePageObject.movie('1')).toBeHidden()
   })
