@@ -10,6 +10,7 @@ export default mergeConfig(
       setupFiles: ['./vitest.setup.ts'],
       exclude: [...configDefaults.exclude, 'e2e/**', 'server/**'],
       root: fileURLToPath(new URL('./', import.meta.url)),
+      pool: 'vmThreads',
     },
   }),
 )
