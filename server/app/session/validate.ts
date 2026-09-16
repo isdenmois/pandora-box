@@ -12,7 +12,7 @@ export async function validate(sessionId: string) {
   const sessionExpired = Date.now() >= session.expiresAt.getTime()
 
   if (sessionExpired) {
-    sessionRepository.delete(session.id)
+    await sessionRepository.delete(session.id)
     return { session: null, user: null }
   }
 

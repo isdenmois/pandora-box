@@ -10,7 +10,7 @@ export async function getSession(cookies: Cookies) {
     const { session, user } = await sessionUC.validate(sessionId)
 
     if (session && user) {
-      rotateSession(cookies, session)
+      await rotateSession(cookies, session)
 
       return { session, user }
     }
@@ -25,7 +25,7 @@ async function rotateSession(cookies: Cookies, session: Session) {
   if (renewSession) {
     const newSession = await sessionRepository.create(session.userId)
 
-    authCookie.setSession(cookies, session)
+    authCookie.setSession(cookies, newSession)
 
     await sessionRepository.delete(session.id)
 
