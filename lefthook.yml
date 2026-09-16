@@ -1,0 +1,16 @@
+pre-commit:
+  jobs:
+    - name: check
+      glob: "*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,vue,html,css,json,jsonc}"
+      run: biome check --write --no-errors-on-unmatched {staged_files}
+      stage_fixed: true
+
+pre-push:
+  parallel: true
+  jobs:
+    - name: test:server
+      run: npm run test:server
+    - name: test:client
+      run: npm run test:client
+    - name: test:pw
+      run: npm run test:pw

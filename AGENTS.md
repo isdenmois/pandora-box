@@ -20,13 +20,20 @@ bun run dev          # vite dev server (client) on :5173, proxies /api → :3000
 bun run server       # API server with --watch on :3000
 npm run lint         # biome check .   (npm, not bun, for scripts)
 npm run format       # biome check --write .
-npm run test:unit    # vitest --run (jsdom; tests colocated in __tests__/ dirs)
+npm run test:client  # vitest --run (jsdom; client tests colocated in __tests__/ dirs)
+npm run test:server  # vitest --run (node env; server tests)
+npm run test:unit    # test:client + test:server
 npm run test:pw      # playwright (chromium only; auto-starts dev server on :5173)
-npm run test         # unit + pw  (also the pre-push hook)
+npm run test         # unit + pw  (manual full run)
 npm run db:generate  # generate migration from schema  (needs DATABASE_URL)
 npm run db:migrate   # apply migrations (also runs automatically on server start)
 npm run db:studio    # drizzle studio
 ```
+
+Git hooks are managed by lefthook (`lefthook.yml`, installed via the `prepare` script):
+
+- pre-commit: `biome check --write` on staged files, fixes re-staged (`stage_fixed`).
+- pre-push: `test:server`, `test:client`, `test:pw` as parallel jobs.
 
 No `typecheck` script exists (no vue-tsc); TypeScript is checked by editors and bun's transpiler only.
 
@@ -34,7 +41,7 @@ No `typecheck` script exists (no vue-tsc); TypeScript is checked by editors and 
 
 - Client: `@/*` → `client/*`; **`@/server/*` → `server/domain/*`** — the client imports server domain types through this alias. Keep domain entities dependency-free so both sides can use them.
 - Server (relative to `server/`): `@/domain`, `@/infra`, `@/views`, `@/app` (see `server/tsconfig.json`).
-- Import order is enforced by Biome's `organizeImports` (`assist` in `biome.json`): `node:*`/bun, external, internal (`@/...` in FSD layer order: `@/app`, `@/features`, `@/entities`, `@/shared`), then relative. Alphabetized. Run `npm run lint` / `npm run format` before committing — a pre-commit hook runs lint-staged.
+- Import order is enforced by Biome's `organizeImports` (`assist` in `biome.json`): `node:*`/bun, external, internal (`@/...` in FSD layer order: `@/app`, `@/features`, `@/entities`, `@/shared`), then relative. Alphabetized. Run `npm run lint` / `npm run format` before committing — the pre-commit hook fixes and re-stages staged files.
 
 ## Server conventions
 
