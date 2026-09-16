@@ -2,7 +2,7 @@
 import * as v from 'valibot'
 import { reactive } from 'vue'
 import { flatten, useForm } from 'vue-standard-schema'
-import type { Series, Movie } from '../api'
+import type { Movie, Series } from '../api'
 import { dateToString } from '../lib'
 import RatingInput from './rating-input.vue'
 
@@ -49,7 +49,7 @@ const { form, submit, submitting, errors } = useForm({
     <h3 class="text-l">{{ data.title }}</h3>
 
     <div class="flex mt-2 gap-4">
-      <img v-if="data.poster" class="h-40 rounded-lg" :src="data.poster" />
+      <img v-if="data.poster" class="h-40 rounded-lg" :src="data.poster">
 
       <div class="flex flex-col mt-2 gap-4">
         <label class="field">
@@ -61,13 +61,13 @@ const { form, submit, submitting, errors } = useForm({
 
         <label class="field">
           <div class="label">Date</div>
-          <input type="date" name="date" v-model="fields.date" :disabled="submitting" />
+          <input type="date" name="date" v-model="fields.date" :disabled="submitting">
         </label>
         <div v-for="error in errors?.nested?.date" :key="error">{{ error }}</div>
 
         <div class="field">
           <label>Comment</label>
-          <input type="text" name="comment" placeholder="Comment" v-model="fields.comment" :disabled="submitting" />
+          <input type="text" name="comment" placeholder="Comment" v-model="fields.comment" :disabled="submitting">
         </div>
         <div v-for="error in errors?.nested?.date" :key="error">{{ error }}</div>
       </div>

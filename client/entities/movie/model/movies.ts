@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 import { readonly, ref, shallowRef } from 'vue'
-import type { MovieUpdate } from '@/server/*'
 import { api, type Movie, type MovieCreate } from '@/shared/api'
 import { isOmdb, isOmdbString, useAuth } from '@/shared/lib'
+import type { MovieUpdate } from '@/server/*'
 
 export const useMovies = defineStore('movies', () => {
   const all = ref<Movie[]>([])

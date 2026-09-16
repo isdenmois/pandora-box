@@ -35,6 +35,6 @@ const select = (value: number | null) => {
       @change="onDateChange"
       ref="input"
       v-show-picker-on-mount="changed"
-    />
+    >
   </div>
 </template>

@@ -88,7 +88,7 @@ export const useSeries = defineStore('series', () => {
 
     async setSeason(id: string, season: number) {
       const existed = all.value.find((item) => item.id === id)
-      let seasonHistory: Record<string, string> | undefined = undefined
+      let seasonHistory: Record<string, string> | undefined
 
       if (existed) {
         seasonHistory = Object.fromEntries(Object.entries(existed.seasonHistory || {}).filter(([s]) => +s < season))

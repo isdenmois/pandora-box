@@ -42,7 +42,7 @@ const allTags = computed(() => [...new Set([...tags, ...(model.value || [])].fil
   </div>
 
   <form class="flex gap-4 mt-2" @submit.prevent="addTag">
-    <input class="flex-1" placeholder="Add new tag" v-model="newTag" enterkeyhint="enter" />
+    <input class="flex-1" placeholder="Add new tag" v-model="newTag" enterkeyhint="enter">
     <button class="primary">+</button>
   </form>
 </template>

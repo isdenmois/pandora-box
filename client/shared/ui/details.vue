@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { formatDate, isMobile, isOmdb, isOmdbString, getExternalUrl, searchLink, useAuth } from '@/shared/lib'
+import { formatDate, getExternalUrl, isMobile, isOmdb, isOmdbString, searchLink, useAuth } from '@/shared/lib'
 import type { Movie, Series } from '../api'
 import Icon from './icon.vue'
 import { icons } from './icons'
@@ -33,7 +33,7 @@ const canRefresh = computed(() => data.provider === 'omdb')
 <template>
   <div class="home-details px-6 py-4 sm:p-8">
     <div v-if="data.poster" class="poster relative">
-      <img class="object-cover h-44 w-30 sm:h-60 sm:w-40 rounded-lg" :src="data.poster" />
+      <img class="object-cover h-44 w-30 sm:h-60 sm:w-40 rounded-lg" :src="data.poster">
 
       <div v-if="data.rating" class="rating absolute top-0 left-0 p-1">{{ data.rating }}</div>
     </div>
@@ -109,7 +109,7 @@ const canRefresh = computed(() => data.provider === 'omdb')
     <label v-if="'seasonHistory' in data && data.seasonHistory" class="field">
       <label>Season History</label>
 
-      <div v-for="[season, date] of Object.entries(data.seasonHistory)" :key="season">
+      <div v-for="[ season, date ] of Object.entries(data.seasonHistory)" :key="season">
         Season {{ season }}: {{ formatDate(date) }}
       </div>
     </label>

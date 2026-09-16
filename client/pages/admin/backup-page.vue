@@ -33,7 +33,7 @@ const restore = async () => {
   const file = files.value.item(0)
 
   const text = await file?.text()
-  let data
+  let data: Record<string, unknown>
 
   try {
     data = JSON.parse(text ?? '')
@@ -67,7 +67,7 @@ const restore = async () => {
   <form class="mt-8" @submit.prevent="restore">
     <label class="block">
       File
-      <input type="file" accept="application/json" @change="handleFileChange" />
+      <input type="file" accept="application/json" @change="handleFileChange">
     </label>
 
     <div v-if="error" class="mt-4">{{ error }}</div>

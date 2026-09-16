@@ -1,5 +1,5 @@
-import { type Page } from 'playwright/test'
-import { Movie } from '../fixtures'
+import type { Page } from 'playwright/test'
+import type { Movie } from '../fixtures'
 import { mockApi, mockRest } from '../utils'
 
 export const MovieMock = {

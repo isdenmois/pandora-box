@@ -1,5 +1,5 @@
-import { setActivePinia, createPinia } from 'pinia'
-import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest'
+import { createPinia, setActivePinia } from 'pinia'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { api, type Movie } from '@/shared/api'
 import { useMovies } from '../movies'
 

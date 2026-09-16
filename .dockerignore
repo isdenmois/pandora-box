@@ -5,8 +5,7 @@ Dockerfile
 .gitattributes
 README.md
 .npmrc
-.prettierrc
-.eslintrc.cjs
+biome.json
 .graphqlrc
 .editorconfig
 .vscode

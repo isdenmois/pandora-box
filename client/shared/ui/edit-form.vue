@@ -59,12 +59,12 @@ const toDelete = async () => {
 <template>
   <form class="edit-details" ref="form">
     <div v-if="data.poster" class="poster relative">
-      <img class="object-cover h-44 w-30 sm:h-60 sm:w-40 rounded-lg" :src="data.poster" />
+      <img class="object-cover h-44 w-30 sm:h-60 sm:w-40 rounded-lg" :src="data.poster">
     </div>
 
     <label class="field title">
       <div class="label">Title</div>
-      <input type="text" name="title" placeholder="Title" v-model="fields.title" :disabled="submitting" />
+      <input type="text" name="title" placeholder="Title" v-model="fields.title" :disabled="submitting">
 
       <div v-for="error in errors?.nested?.title" :key="error">{{ error }}</div>
     </label>
@@ -76,7 +76,7 @@ const toDelete = async () => {
 
     <label class="field">
       <div class="label">Reason</div>
-      <input type="text" name="reason" placeholder="Reason" v-model="fields.reason" :disabled="submitting" />
+      <input type="text" name="reason" placeholder="Reason" v-model="fields.reason" :disabled="submitting">
 
       <div v-for="error in errors?.nested?.reason" :key="error">{{ error }}</div>
     </label>

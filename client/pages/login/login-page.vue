@@ -29,8 +29,8 @@ const handleSubmit = async () => {
         autocapitalize="off"
         placeholder="Username"
         v-model="username"
-      />
-      <input class="mt-4" :class="{ error: message }" type="password" placeholder="Password" v-model="password" />
+      >
+      <input class="mt-4" :class="{ error: message }" type="password" placeholder="Password" v-model="password">
 
       <p v-if="message" class="mt-4 error">{{ message }}</p>
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { onMounted } from 'vue'
-import { LoginPage } from '@/pages/login'
-import { useAuth, auth } from '@/shared/lib'
+import { auth, useAuth } from '@/shared/lib'
 import { ConfirmDialog, Navbar, Spinner } from '@/shared/ui'
+import { LoginPage } from '@/pages/login'
 
 const { isLoggedIn, initialized } = storeToRefs(useAuth())
 

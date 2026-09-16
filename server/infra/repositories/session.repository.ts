@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { eq } from 'drizzle-orm'
-import { SESSION_EXPIRE_IN, Session, table } from '@/domain'
+import { SESSION_EXPIRE_IN, type Session, table } from '@/domain'
 import { db } from '../db'
 
 export const sessionRepository = {

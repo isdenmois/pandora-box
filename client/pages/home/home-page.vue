@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core'
 import { onBeforeMount, ref } from 'vue'
-import { useMovies, MovieItem } from '@/entities/movie'
-import { useSeries, SeriesItem } from '@/entities/series'
-import { Icon, Spinner, icons } from '@/shared/ui'
+import { MovieItem, useMovies } from '@/entities/movie'
+import { SeriesItem, useSeries } from '@/entities/series'
+import { Icon, icons, Spinner } from '@/shared/ui'
 import { useHome } from './model'
 
 const home = useHome()
@@ -77,7 +77,7 @@ onBeforeMount(() => {
       <label class="search">
         <Icon :size="24" :icon="icons.search" />
 
-        <input ref="searchElement" type="text" class="w-full" name="filter" v-model="home.search" />
+        <input ref="searchElement" type="text" class="w-full" name="filter" v-model="home.search">
       </label>
     </form>
   </div>

@@ -1,8 +1,8 @@
 <script lang="ts">
 import { useRoute, useRouter } from 'vue-router'
+import { useTags } from '@/features/tags'
 import { MovieEdit } from '@/entities/movie'
 import { SeriesEdit } from '@/entities/series'
-import { useTags } from '@/features/tags'
 import { Dialog } from '@/shared/ui'
 
 type Props = {

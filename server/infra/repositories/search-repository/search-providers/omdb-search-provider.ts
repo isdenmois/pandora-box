@@ -1,7 +1,7 @@
 import * as v from 'valibot'
 import Wretch from 'wretch'
 import QueryStringAddon from 'wretch/addons/queryString'
-import { SearchItem, SearchProvider } from '@/domain'
+import type { SearchItem, SearchProvider } from '@/domain'
 import { env } from '@/infra/env'
 
 const api = Wretch(env.OMDB_URL).addon(QueryStringAddon)
@@ -54,7 +54,7 @@ export const omdbSearchProvider: SearchProvider = {
             title: item.Title,
             type: item.Type as 'movie' | 'series',
             poster: item.Poster || null,
-            year: item.Year ? parseInt(item.Year) : null,
+            year: item.Year ? parseInt(item.Year, 10) : null,
           }) satisfies SearchItem,
       )
   },
@@ -67,10 +67,10 @@ export const omdbSearchProvider: SearchProvider = {
     }
 
     // TODO: use omit
-    delete extra['Metascore']
-    delete extra['Ratings']
-    delete extra['Response']
-    delete extra['Awards']
+    delete extra.Metascore
+    delete extra.Ratings
+    delete extra.Response
+    delete extra.Awards
 
     return {
       id: imdbID,
@@ -78,7 +78,7 @@ export const omdbSearchProvider: SearchProvider = {
       title: Title,
       type: Type,
       poster: Poster || null,
-      year: Year ? parseInt(Year) : null,
+      year: Year ? parseInt(Year, 10) : null,
       rating: imdbRating ? parseFloat(imdbRating) : null,
       genre: Genre || null,
       language: Language || null,

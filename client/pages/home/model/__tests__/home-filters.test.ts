@@ -4,7 +4,6 @@ import { readonly } from 'vue'
 import { useMovies } from '@/entities/movie'
 import { useSeries } from '@/entities/series'
 import type { Movie, Series } from '@/shared/api'
-
 import { useHome } from '../home-filters'
 
 vi.mock('@/entities/movie', () => {

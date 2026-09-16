@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAuth, auth as action } from '@/shared/lib'
+import { auth as action, useAuth } from '@/shared/lib'
 
 const { user } = useAuth()
 </script>

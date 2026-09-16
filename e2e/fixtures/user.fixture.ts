@@ -1,4 +1,4 @@
-import { type User } from '../../client/shared/api'
+import type { User } from '../../client/shared/api'
 
 export type { User }
 

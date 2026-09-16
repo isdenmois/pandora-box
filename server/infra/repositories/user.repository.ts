@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { eq } from 'drizzle-orm'
-import { table, User } from '@/domain'
+import { table, type User } from '@/domain'
 import { db } from '../db'
 
 export const userRepository = {

@@ -1,5 +1,5 @@
 import { http } from './http'
-import { type User } from './user-api'
+import type { User } from './user-api'
 
 const api = http.url('/auth')
 

@@ -12,7 +12,7 @@ defineProps<Props>()
 
 <template>
   <div class="flex item overflow-hidden relative color-primary" :data-testid="testId">
-    <img v-if="imgUrl" class="object-cover h-20 w-12" :src="imgUrl" :alt="title" />
+    <img v-if="imgUrl" class="object-cover h-20 w-12" :src="imgUrl" :alt="title">
 
     <div class="p-4">
       <div class="text-m">{{ title }}</div>

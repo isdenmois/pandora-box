@@ -1,7 +1,7 @@
 import { sessionUC } from '@/app'
-import { SESSION_ROTATE_IN, Session } from '@/domain'
+import { SESSION_ROTATE_IN, type Session } from '@/domain'
 import { sessionRepository } from '@/infra'
-import { authCookie, Cookies } from './auth-cookie'
+import { authCookie, type Cookies } from './auth-cookie'
 
 export async function getSession(cookies: Cookies) {
   const sessionId = authCookie.getSessionId(cookies)

@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia'
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { useAuth } from '../auth-state'
 
 describe('auth-state store', () => {

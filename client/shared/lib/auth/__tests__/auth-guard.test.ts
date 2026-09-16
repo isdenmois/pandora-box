@@ -1,5 +1,5 @@
-import { setActivePinia, createPinia } from 'pinia'
-import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest'
+import { createPinia, setActivePinia } from 'pinia'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { User } from '@/shared/api'
 import { authGuard } from '../auth-guard'
 import { useAuth } from '../auth-state'

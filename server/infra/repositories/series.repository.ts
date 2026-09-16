@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
-import { eq, or, isNull } from 'drizzle-orm'
-import { table, Series, SeriesCreate, SeriesUpdate } from '@/domain'
+import { eq, isNull, or } from 'drizzle-orm'
+import { type Series, type SeriesCreate, type SeriesUpdate, table } from '@/domain'
 import { db } from '../db'
 
 export const seriesRepository = {

@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import * as v from 'valibot'
-import { ref, reactive, onMounted } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { flatten, useForm } from 'vue-standard-schema'
+import { useTags } from '@/features/tags'
 import { useMovies } from '@/entities/movie'
 import { useSeries } from '@/entities/series'
-import { useTags } from '@/features/tags'
 import { api } from '@/shared/api'
 import { toNullable, toNumber, useAuth } from '@/shared/lib'
-import { Dialog, SeasonToggler, ScheduleToggler, Spinner, TagsInput, MoreButton } from '@/shared/ui'
+import { Dialog, MoreButton, ScheduleToggler, SeasonToggler, Spinner, TagsInput } from '@/shared/ui'
 
 const router = useRouter()
 const params = useRoute().params as { id: string }
@@ -108,18 +108,18 @@ onMounted(async () => {
     <div v-else class="p-4">
       <form ref="form">
         <div class="flex gap-4">
-          <img v-if="fields.poster" class="w-24 h-40 rounded-lg object-cover" :src="fields.poster" />
+          <img v-if="fields.poster" class="w-24 h-40 rounded-lg object-cover" :src="fields.poster">
 
           <div class="flex flex-1 flex-col gap-4">
             <button type="button" class="group gap-3">
-              <span :class="{ active: fields.type == 'movie' }" @click="fields.type = 'movie'">Movie</span>
-              <span :class="{ active: fields.type == 'series' }" @click="fields.type = 'series'">Series</span>
+              <span :class="{ active: fields.type === 'movie' }" @click="fields.type = 'movie'">Movie</span>
+              <span :class="{ active: fields.type === 'series' }" @click="fields.type = 'series'">Series</span>
             </button>
 
             <div>
               <label class="field">
                 <div class="label">Title</div>
-                <input type="text" name="title" placeholder="Title" v-model="fields.title" :disabled="submitting" />
+                <input type="text" name="title" placeholder="Title" v-model="fields.title" :disabled="submitting">
               </label>
             </div>
 
@@ -135,7 +135,7 @@ onMounted(async () => {
         <div class="mt-4">
           <label class="field">
             <div class="label">Reason</div>
-            <input type="text" name="why" placeholder="Reason" v-model="fields.reason" :disabled="submitting" />
+            <input type="text" name="why" placeholder="Reason" v-model="fields.reason" :disabled="submitting">
           </label>
           <div v-for="error in errors?.nested?.reason" :key="error">{{ error }}</div>
         </div>
@@ -175,7 +175,7 @@ onMounted(async () => {
           <div class="mt-4">
             <label class="field">
               <div class="label">Rating</div>
-              <input type="text" name="rating" placeholder="Rating" v-model="fields.rating" :disabled="submitting" />
+              <input type="text" name="rating" placeholder="Rating" v-model="fields.rating" :disabled="submitting">
             </label>
             <div v-for="error in errors?.nested?.rating" :key="error">{{ error }}</div>
           </div>
@@ -183,7 +183,7 @@ onMounted(async () => {
           <div class="mt-4">
             <label class="field">
               Year
-              <input type="text" name="year" placeholder="Year" v-model="fields.year" :disabled="submitting" />
+              <input type="text" name="year" placeholder="Year" v-model="fields.year" :disabled="submitting">
             </label>
             <div v-for="error in errors?.nested?.year" :key="error">{{ error }}</div>
           </div>
@@ -191,7 +191,7 @@ onMounted(async () => {
           <div class="mt-4 mb-4">
             <label class="field">
               Poster
-              <input type="text" name="poster" placeholder="Poster" v-model="fields.poster" :disabled="submitting" />
+              <input type="text" name="poster" placeholder="Poster" v-model="fields.poster" :disabled="submitting">
             </label>
             <div v-for="error in errors?.nested?.poster" :key="error">{{ error }}</div>
           </div>

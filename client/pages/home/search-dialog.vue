@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { api, type SearchItem } from '@/shared/api'
 import { vFocusOnMount } from '@/shared/lib'
-import { Dialog, Icon, icons, Item, Spinner } from '@/shared/ui'
+import { Dialog, Icon, Item, icons, Spinner } from '@/shared/ui'
 
 const router = useRouter()
 
@@ -49,7 +49,7 @@ const search = async () => {
           placeholder="Start search by title or id..."
           :disabled="isSearching"
           v-focus-on-mount
-        />
+        >
       </label>
 
       <RouterLink to="/add/manual">

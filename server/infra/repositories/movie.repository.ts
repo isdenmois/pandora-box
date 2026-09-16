@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
-import { eq, or, isNull } from 'drizzle-orm'
-import { table, Movie, MovieUpdate, MovieCreate } from '@/domain'
+import { eq, isNull, or } from 'drizzle-orm'
+import { type Movie, type MovieCreate, type MovieUpdate, table } from '@/domain'
 import { db } from '../db'
 
 export const movieRepository = {
