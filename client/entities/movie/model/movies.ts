@@ -47,8 +47,8 @@ export const useMovies = defineStore('movies', () => {
       await api.movie.delete(id)
     },
 
-    async update(id: string, data: MovieUpdate) {
-      const saved = await api.movie.patch(id, data)
+    async update(id: string, data: MovieUpdate, file?: File | null) {
+      const saved = file ? await api.movie.savePoster(id, data, file) : await api.movie.patch(id, data)
       const existed = all.value.find((movie) => movie.id === id)
 
       // The server owns `poster`/`posterSource`; taking its answer avoids showing a stale path.

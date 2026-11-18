@@ -1,0 +1,64 @@
+import type { Static, TSchema } from '@sinclair/typebox'
+import { Value } from '@sinclair/typebox/value'
+import { type Context, status } from 'elysia'
+import { type PosterFileStore, type PosterRecordStore, replacePoster } from '@/app'
+import { type ImageExtension, imageExtensionFromBytes } from '@/domain'
+import { hasEndMarker } from '@/infra/repositories/poster-fetcher'
+
+export interface PosterUploadOptions<Row, Fields> {
+  records: PosterRecordStore<Row, Fields>
+  files: PosterFileStore
+  parseFields: (raw: string) => Fields | null
+}
+
+type UploadContext = Context<{
+  params: { id: string }
+  body: { data: string; file: File }
+}>
+
+/** A `data` part that fails to parse or validate answers 422, like any other contract breach. */
+export function parseJsonPart<T extends TSchema>(schema: T) {
+  return (raw: string): Static<T> | null => {
+    try {
+      return Value.Parse(schema, JSON.parse(raw))
+    } catch {
+      return null
+    }
+  }
+}
+
+/** The extension comes from the bytes; a truncated image is rejected even if it sniffs as one. */
+function sniffImage(bytes: Uint8Array): ImageExtension | null {
+  const extension = imageExtensionFromBytes(bytes)
+
+  if (!extension || !hasEndMarker(bytes, extension)) {
+    return null
+  }
+
+  return extension
+}
+
+export function createPosterUploadHandler<Row, Fields>(options: PosterUploadOptions<Row, Fields>) {
+  return async ({ params: { id }, body }: UploadContext) => {
+    const fields = options.parseFields(body.data)
+
+    if (!fields) {
+      return status(422, { message: 'Invalid poster payload' })
+    }
+
+    const bytes = new Uint8Array(await body.file.arrayBuffer())
+    const extension = sniffImage(bytes)
+
+    if (!extension) {
+      return status(422, { message: 'Unsupported image type' })
+    }
+
+    const saved = await replacePoster(options.records, options.files, { id, fields, extension, bytes })
+
+    if (!saved) {
+      return status(404, { message: 'Not found' })
+    }
+
+    return saved
+  }
+}

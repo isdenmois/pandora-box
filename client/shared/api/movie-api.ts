@@ -11,8 +11,15 @@ export const movie = {
   byId: (id: string) => v1.get(`/${id}`).json<Movie>(),
   delete: (id: string) => v1.url(`/${id}`).delete().text(),
   // The server returns the stored row, which is how the localized `poster` path reaches the client.
-  update: (id: string, data: MovieUpdate) => v1.url(`/${id}`).put(data).json<Movie>(),
   patch: (id: string, data: Partial<MovieUpdate>) => v1.url(`/${id}`).patch(data).json<Movie>(),
+  /** Fields and a picked image file in one request; the file wins over `data.poster`. */
+  savePoster: (id: string, data: Partial<MovieUpdate>, file: File) => {
+    const body = new FormData()
+    body.append('data', JSON.stringify(data))
+    body.append('file', file)
+
+    return v1.url(`/${id}/poster`).patch(body).json<Movie>()
+  },
   getViews: () => v1.get('/views').json<MovieView[]>(),
   markAsViewed: (movieId: string, date: string, rating: number, comment: string) =>
     v1.url(`/${movieId}/viewed`).post({ date, rating, comment }).json<MovieView>(),

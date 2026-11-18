@@ -69,6 +69,29 @@ describe('useMovies poster sync', () => {
     expect(useMovies().all[0]?.posterSource).toBe('https://cdn/poster.png')
   })
 
+  it('sends a picked file through the multipart save', async () => {
+    // arrange
+    const revised = {
+      id: '1',
+      title: 'Test Movie',
+      poster: '/images/1.png',
+      posterSource: null,
+    } as Movie
+    const file = new File([new Uint8Array([1])], 'poster.png', { type: 'image/png' })
+
+    useMovies().all = [{ id: '1', title: 'Test Movie', poster: '/images/1.jpg' } as Movie]
+    const savePoster = vi.spyOn(api.movie, 'savePoster').mockResolvedValue(revised)
+
+    // act
+    await useMovies().update('1', { title: 'Test Movie' }, file)
+
+    // assert
+    expect(savePoster).toHaveBeenCalledWith('1', { title: 'Test Movie' }, file)
+    expect(useMovies().all[0]?.poster).toBe('/images/1.png')
+    // A manual poster has no source to download from again.
+    expect(useMovies().all[0]?.posterSource).toBeNull()
+  })
+
   it('asks the server to drop the file and keeps the path it renders', async () => {
     // arrange
     const revised = {

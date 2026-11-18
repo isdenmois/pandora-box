@@ -19,8 +19,8 @@ const data = await series.byId(id)
 const posterKey = ref(0)
 const redownloading = ref(false)
 
-const save = async (input: SeriesUpdate) => {
-  await series.update(id, input)
+const save = async (input: SeriesUpdate, file?: File | null) => {
+  await series.update(id, input, file)
 
   emit('submitted')
 }

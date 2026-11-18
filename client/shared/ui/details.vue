@@ -107,12 +107,6 @@ const canRefresh = computed(() => data.provider === 'omdb')
       {{ data.year }}
     </label>
 
-    <label v-if="data.posterSource" class="field">
-      <div class="label">Poster source</div>
-
-      <a class="not-link break-all" :href="data.posterSource" target="_blank">{{ data.posterSource }}</a>
-    </label>
-
     <label v-if="'seasonHistory' in data && data.seasonHistory" class="field">
       <label>Season History</label>
 

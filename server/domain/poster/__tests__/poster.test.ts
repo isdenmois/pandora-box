@@ -3,6 +3,7 @@ import {
   contentTypeForExtension,
   extensionFromContentType,
   extensionFromUrl,
+  imageExtensionFromBytes,
   isImageSource,
   isLocalPoster,
   normalizeExtension,
@@ -96,5 +97,24 @@ describe('parsePosterFileName', () => {
     expect(parsePosterFileName('movie-1.exe')).toBeNull()
     expect(parsePosterFileName('.jpg')).toBeNull()
     expect(parsePosterFileName('movie-1.jpg.tmp')).toBeNull()
+  })
+})
+
+describe('imageExtensionFromBytes', () => {
+  const ascii = (value: string) => new TextEncoder().encode(value)
+
+  it('recognises every format the server can store', () => {
+    expect(imageExtensionFromBytes(Uint8Array.from([0xff, 0xd8, 0xff, 0xe0]))).toBe('jpg')
+    expect(imageExtensionFromBytes(Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))).toBe('png')
+    expect(imageExtensionFromBytes(ascii('GIF89a'))).toBe('gif')
+    expect(imageExtensionFromBytes(Uint8Array.from([...ascii('RIFF'), 0, 0, 0, 0, ...ascii('WEBP')]))).toBe('webp')
+    expect(imageExtensionFromBytes(Uint8Array.from([0, 0, 0, 0x20, ...ascii('ftypavif')]))).toBe('avif')
+    expect(imageExtensionFromBytes(Uint8Array.from([0, 0, 0, 0x20, ...ascii('ftypavis')]))).toBe('avif')
+  })
+
+  it('rejects payloads that are not an image', () => {
+    expect(imageExtensionFromBytes(ascii('<html>'))).toBeNull()
+    expect(imageExtensionFromBytes(Uint8Array.from([0xff, 0xd8]))).toBeNull()
+    expect(imageExtensionFromBytes(new Uint8Array())).toBeNull()
   })
 })

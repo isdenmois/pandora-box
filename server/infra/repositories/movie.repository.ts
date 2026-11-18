@@ -48,11 +48,15 @@ export const movieRepository = {
     await db.update(table.movie).set({ poster: path }).where(eq(table.movie.id, id))
   },
 
-  async update(id: string, data: Partial<MovieUpdate>): Promise<Movie | null> {
+  async update(id: string, data: Partial<MovieUpdate>, filePoster?: string): Promise<Movie | null> {
     const { poster: posterInput, ...rest } = data
     const next: Record<string, unknown> = { ...rest }
 
-    if (posterInput !== undefined) {
+    if (filePoster) {
+      // An uploaded file owns the only copy, so there is no source to download it from again.
+      next.poster = filePoster
+      next.posterSource = null
+    } else if (posterInput !== undefined) {
       const stored = await this.byId(id)
 
       if (stored) {

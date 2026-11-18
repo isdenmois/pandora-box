@@ -60,6 +60,7 @@ describe('edit-dialog', () => {
       private: false,
       scheduled: null,
       tags: [],
+      poster: 'https://example.com/poster.jpg',
     })
     expect(router.replace).toHaveBeenCalledExactlyOnceWith('/details/movie/m1')
   })

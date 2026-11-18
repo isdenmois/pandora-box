@@ -45,8 +45,8 @@ export const useSeries = defineStore('series', () => {
       await api.series.delete(id)
     },
 
-    async update(id: string, data: SeriesUpdate) {
-      const saved = await api.series.patch(id, data)
+    async update(id: string, data: SeriesUpdate, file?: File | null) {
+      const saved = file ? await api.series.savePoster(id, data, file) : await api.series.patch(id, data)
       const existed = all.value.find((item) => item.id === id)
 
       // The server owns `poster`/`posterSource`; taking its answer avoids showing a stale path.

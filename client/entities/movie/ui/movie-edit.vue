@@ -19,11 +19,11 @@ const data = await movies.byId(id)
 const posterKey = ref(0)
 const redownloading = ref(false)
 
-const save = async (input: MovieUpdate) => {
+const save = async (input: MovieUpdate, file?: File | null) => {
   if ('season' in input) {
     delete input.season
   }
-  await movies.update(id, input)
+  await movies.update(id, input, file)
 
   emit('submitted')
 }

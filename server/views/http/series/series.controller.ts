@@ -1,7 +1,15 @@
 import Elysia from 'elysia'
-import { seriesRepository } from '@/infra'
+import { env, posterRepository, seriesRepository } from '@/infra'
 import { authGuard } from '@/views/auth'
-import { createSeriesBody, markSeriesViewedBody, patchSeriesBody, updateSeriesBody } from './series.contract'
+import { createPosterUploadHandler, parseJsonPart } from '../poster/poster-upload'
+import { posterUploadBody } from '../poster/poster-upload.contract'
+import { createSeriesBody, markSeriesViewedBody, patchSeriesBody } from './series.contract'
+
+const uploadPoster = createPosterUploadHandler({
+  records: seriesRepository,
+  files: posterRepository,
+  parseFields: parseJsonPart(patchSeriesBody),
+})
 
 export const seriesController = new Elysia({
   prefix: '/v1/series',
@@ -12,8 +20,8 @@ export const seriesController = new Elysia({
   .use(authGuard)
   .post('', async ({ body }) => await seriesRepository.create(body), { body: createSeriesBody })
   .get(':id', ({ params: { id } }) => seriesRepository.byId(id))
-  // Returns the updated row so the client learns the localized `poster` path after a save.
-  .put(':id', ({ params: { id }, body }) => seriesRepository.update(id, body), { body: updateSeriesBody })
+  // The edit form saves the fields and a picked image file in one request.
+  .patch('/:id/poster', uploadPoster, { body: posterUploadBody(env.IMAGE_MAX_BYTES) })
   .patch(':id', ({ params: { id }, body }) => seriesRepository.update(id, body), { body: patchSeriesBody })
   .post(
     '/:id/viewed',

@@ -1,5 +1,5 @@
 import userEvent from '@testing-library/user-event'
-import { render, screen } from '@testing-library/vue'
+import { fireEvent, render, screen } from '@testing-library/vue'
 import { flushPromises } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { confrimData } from '../confirm/use-confirm'
@@ -11,6 +11,9 @@ const user = userEvent.setup()
 describe('edit-form', () => {
   beforeEach(() => {
     confrimData.value = null
+    // jsdom has no blob URLs; the preview only needs a stable value.
+    URL.createObjectURL = vi.fn(() => 'blob:poster-preview')
+    URL.revokeObjectURL = vi.fn()
   })
 
   it('renders the initial field values from the data', () => {
@@ -21,6 +24,7 @@ describe('edit-form', () => {
     // assert
     expect(screen.getByPlaceholderText('Title')).toHaveValue('Some Movie')
     expect(screen.getByPlaceholderText('Reason')).toHaveValue('because')
+    expect(screen.getByPlaceholderText('Poster URL')).toHaveValue('https://example.com/poster.jpg')
   })
 
   it('shows a validation error and does not save when the title is empty', async () => {
@@ -51,14 +55,108 @@ describe('edit-form', () => {
     await flushPromises()
 
     // assert
-    expect(onSave).toHaveBeenCalledExactlyOnceWith({
-      title: 'New Title',
-      season: 0,
-      reason: 'because',
-      private: false,
-      scheduled: null,
-      tags: ['old'],
+    expect(onSave).toHaveBeenCalledExactlyOnceWith(
+      {
+        title: 'New Title',
+        season: 0,
+        reason: 'because',
+        private: false,
+        scheduled: null,
+        tags: ['old'],
+        poster: 'https://example.com/poster.jpg',
+      },
+      null,
+    )
+  })
+
+  it('emits the picked file and leaves the URL out of the payload', async () => {
+    // arrange
+    const onSave = vi.fn()
+    render(EditForm, { props: { data: makeMovie(), tags: [], onSave } })
+    const file = new File([new Uint8Array([1, 2, 3])], 'poster.png', { type: 'image/png' })
+
+    // act
+    await user.click(screen.getByRole('button', { name: 'Upload' }))
+    await user.upload(screen.getByLabelText('Poster file'), file)
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    await flushPromises()
+
+    // assert
+    // A file owns its own bytes; sending the URL alongside would make the server guess again.
+    expect(onSave).toHaveBeenCalledExactlyOnceWith(
+      {
+        title: 'Some Movie',
+        season: 0,
+        reason: 'because',
+        private: false,
+        scheduled: null,
+        tags: [],
+      },
+      file,
+    )
+  })
+
+  it('shows the picked file in the preview', async () => {
+    // arrange
+    render(EditForm, { props: { data: makeMovie(), tags: [] } })
+    const file = new File([new Uint8Array([1, 2, 3])], 'poster.png', { type: 'image/png' })
+
+    // act
+    await user.click(screen.getByRole('button', { name: 'Upload' }))
+    await user.upload(screen.getByLabelText('Poster file'), file)
+
+    // assert
+    expect(URL.createObjectURL).toHaveBeenCalledWith(file)
+  })
+
+  it('goes back to the URL tab and drops the picked file', async () => {
+    // arrange
+    const onSave = vi.fn()
+    render(EditForm, { props: { data: makeMovie(), tags: [], onSave } })
+    const file = new File([new Uint8Array([1, 2, 3])], 'poster.png', { type: 'image/png' })
+
+    // act
+    await user.click(screen.getByRole('button', { name: 'Upload' }))
+    await user.upload(screen.getByLabelText('Poster file'), file)
+    await user.click(screen.getByRole('button', { name: 'Use URL instead' }))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    await flushPromises()
+
+    // assert
+    expect(screen.getByPlaceholderText('Poster URL')).toHaveValue('https://example.com/poster.jpg')
+    expect(onSave).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ poster: 'https://example.com/poster.jpg' }),
+      null,
+    )
+  })
+
+  it('refuses a file whose type the server cannot store', async () => {
+    // arrange
+    render(EditForm, { props: { data: makeMovie(), tags: [] } })
+
+    // act
+    // `user.upload` honours `accept`; this path stands in for a browser or drop that does not.
+    await user.click(screen.getByRole('button', { name: 'Upload' }))
+    fireEvent.change(screen.getByLabelText('Poster file'), {
+      target: { files: [new File(['plain text'], 'poster.txt', { type: 'text/plain' })] },
     })
+
+    // assert
+    expect(await screen.findByText('Choose a JPEG, PNG, WebP, GIF or AVIF image')).toBeInTheDocument()
+  })
+
+  it('refuses a poster URL that is not http(s)', async () => {
+    // arrange
+    const onSave = vi.fn()
+    render(EditForm, { props: { data: makeMovie({ posterSource: null }), tags: [], onSave } })
+
+    // act
+    await user.type(screen.getByPlaceholderText('Poster URL'), 'ftp://example.com/poster.png')
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    // assert
+    expect(await screen.findByText('Enter an http(s) URL or pick a file')).toBeInTheDocument()
+    expect(onSave).not.toHaveBeenCalled()
   })
 
   it('toggles the list between global and for-me on click', async () => {

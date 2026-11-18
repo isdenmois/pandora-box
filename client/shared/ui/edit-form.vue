@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import * as v from 'valibot'
-import { reactive } from 'vue'
+import { onBeforeUnmount, reactive, ref, shallowRef } from 'vue'
 import { flatten, useForm } from 'vue-standard-schema'
 import type { Movie, Series } from '../api'
+import { POSTER_ACCEPT, posterFileError } from '../lib'
 import { useConfirm } from './confirm'
 import ImageWithFallback from './image-with-fallback.vue'
 import ScheduleToggler from './schedule-toggler.vue'
@@ -22,6 +23,63 @@ const emit = defineEmits(['save', 'delete', 'redownload'])
 const confirm = useConfirm()
 const isSeries = 'season' in data
 
+const mode = ref<'url' | 'file'>('url')
+const file = shallowRef<File | null>(null)
+const fileError = ref<string | null>(null)
+const preview = ref<string | null>(data.poster)
+const fileInput = ref<HTMLInputElement | null>(null)
+
+// The picked file has no server path yet, so the preview is a blob URL that must be released.
+let objectUrl: string | null = null
+
+const releasePreview = () => {
+  if (objectUrl) {
+    URL.revokeObjectURL(objectUrl)
+    objectUrl = null
+  }
+}
+
+const onFileChange = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  const selected = input.files?.[0]
+
+  if (!selected) {
+    return
+  }
+
+  const error = posterFileError(selected)
+
+  if (error) {
+    fileError.value = error
+    input.value = ''
+
+    return
+  }
+
+  fileError.value = null
+  releasePreview()
+  objectUrl = URL.createObjectURL(selected)
+  file.value = selected
+  preview.value = objectUrl
+  mode.value = 'file'
+}
+
+/** Drops the picked file and goes back to the URL tab; the stored poster is untouched. */
+const useUrl = () => {
+  releasePreview()
+  file.value = null
+  fileError.value = null
+  preview.value = data.poster
+  mode.value = 'url'
+
+  // The input keeps its own selection, which would otherwise reappear on the next switch.
+  if (fileInput.value) {
+    fileInput.value.value = ''
+  }
+}
+
+onBeforeUnmount(releasePreview)
+
 const fields = reactive({
   title: data.title,
   season: 'season' in data ? data.season || 0 : 0,
@@ -29,7 +87,22 @@ const fields = reactive({
   private: data.private,
   scheduled: data.scheduled,
   tags: data.tags || [],
+  poster: data.posterSource ?? '',
 })
+
+const isValidPoster = (value: string) => {
+  // A picked file wins, so whatever the URL field holds does not matter.
+  if (file.value) {
+    return true
+  }
+
+  // An emptied field cannot clear a poster (replace-only), but it is fine when there is none.
+  if (!value) {
+    return !data.posterSource
+  }
+
+  return /^https?:\/\//i.test(value)
+}
 
 const { form, submit, submitting, errors } = useForm({
   input: fields,
@@ -40,10 +113,14 @@ const { form, submit, submitting, errors } = useForm({
     private: v.pipe(v.boolean()),
     scheduled: v.nullable(v.number()),
     tags: v.nullable(v.array(v.string())),
+    poster: v.pipe(v.string(), v.trim(), v.check(isValidPoster, 'Enter an http(s) URL or pick a file')),
   }),
   formatErrors: flatten,
   async submit(input) {
-    emit('save', input)
+    const { poster, ...rest } = input
+
+    // The server maps `poster` to a source URL; a file is a separate part and must not be mixed in.
+    emit('save', file.value || !poster ? rest : { ...rest, poster }, file.value)
   },
 })
 
@@ -73,12 +150,64 @@ const toRedownload = async () => {
 
 <template>
   <form class="edit-details" ref="form">
-    <div v-if="data.poster" class="poster relative">
+    <div class="poster">
       <ImageWithFallback
+        v-if="preview"
         :key="posterKey"
         class="object-cover h-44 w-30 sm:h-60 sm:w-40 rounded-lg"
-        :src="data.poster"
+        :src="preview"
       />
+
+      <div class="field poster-field">
+        <div class="label">Poster</div>
+
+        <div class="tabs">
+          <button
+            type="button"
+            class="flat"
+            :class="{ active: mode === 'url' }"
+            :disabled="submitting || !!file"
+            @click="mode = 'url'"
+          >
+            URL
+          </button>
+          <button
+            type="button"
+            class="flat"
+            :class="{ active: mode === 'file' }"
+            :disabled="submitting"
+            @click="mode = 'file'"
+          >
+            Upload
+          </button>
+        </div>
+
+        <input
+          v-if="mode === 'url'"
+          type="text"
+          name="poster"
+          placeholder="Poster URL"
+          v-model="fields.poster"
+          :disabled="submitting"
+        >
+
+        <template v-else>
+          <input
+            ref="fileInput"
+            type="file"
+            name="posterFile"
+            aria-label="Poster file"
+            :accept="POSTER_ACCEPT"
+            :disabled="submitting"
+            @change="onFileChange"
+          >
+
+          <button v-if="file" type="button" class="flat" :disabled="submitting" @click="useUrl">Use URL instead</button>
+        </template>
+
+        <div v-for="error in errors?.nested?.poster" :key="error">{{ error }}</div>
+        <div v-if="fileError">{{ fileError }}</div>
+      </div>
     </div>
 
     <label class="field title">
@@ -161,6 +290,21 @@ const toRedownload = async () => {
 
 .poster {
   grid-area: poster;
+}
+
+.poster-field {
+  margin-top: 8px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.tabs .active {
+  background-color: var(--surface2);
+  border-radius: 8px;
 }
 
 button,
