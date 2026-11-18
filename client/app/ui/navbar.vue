@@ -28,7 +28,7 @@ import { Icon, icons } from '@/shared/ui'
   </nav>
 </template>
 
-<style>
+<style scoped>
 .navbar {
   padding: 64px 8px 8px 40px;
   flex-direction: column;

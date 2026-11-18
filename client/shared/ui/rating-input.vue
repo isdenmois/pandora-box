@@ -20,7 +20,7 @@ const datas = Array.from({ length: max }, (_, i) => i + 1)
     </div>
   </div>
 </template>
-<style>
+<style scoped>
 .star {
   color: var(--text-secondary);
   cursor: pointer;

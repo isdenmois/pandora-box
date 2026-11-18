@@ -47,7 +47,7 @@ onMounted(() => {
   <ConfirmDialog />
 </template>
 
-<style>
+<style scoped>
 .root {
   flex-direction: row-reverse;
   max-height: min(80rem, calc(100dvh - 9rem));
