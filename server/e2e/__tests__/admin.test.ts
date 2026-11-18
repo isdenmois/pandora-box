@@ -1,5 +1,10 @@
+import { randomUUID } from 'node:crypto'
+import { mkdir, readdir, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { env } from '@/infra'
 import { request, resetDatabase, seedSession } from '../support/api'
+import { PNG, uploadPosterForm } from '../support/poster'
 import { moviePayload, seriesPayload } from '../support/records'
 
 interface Backup {
@@ -10,6 +15,9 @@ interface Backup {
   seriesView: Record<string, unknown>[]
   session?: Record<string, unknown>[]
 }
+
+/** The files currently in the image dir; absent dir means no poster was ever written. */
+const storedFiles = () => readdir(env.IMAGE_DIR).catch(() => [] as string[])
 
 describe('server e2e: admin', () => {
   beforeEach(resetDatabase)
@@ -297,5 +305,46 @@ describe('server e2e: admin', () => {
       expect(empty.status).toBe(422)
       expect(ghost.status).toBe(422)
     })
+  })
+
+  it('sweeps poster files no row references and keeps live ones', async () => {
+    // arrange
+    const admin = await seedSession('root', { role: 'admin' })
+    const movie = await request<{ id: string }>({
+      method: 'POST',
+      path: '/v1/movie',
+      cookie: admin.cookie,
+      body: moviePayload(),
+    })
+    // A live file: the row references it after a manual upload.
+    await request({
+      method: 'PATCH',
+      path: `/v1/movie/${movie.body.id}/poster`,
+      cookie: admin.cookie,
+      form: uploadPosterForm({}),
+    })
+    // An orphan: an image file no row knows, and a fresh half-written temp file. The temp file
+    // belongs to a save in flight (it is younger than the sweep's 10-minute cutoff), so only the
+    // unknown image file may go.
+    const orphan = `${randomUUID()}.jpg`
+    const inFlight = `${randomUUID()}.${randomUUID()}.tmp`
+    await mkdir(env.IMAGE_DIR, { recursive: true })
+    await writeFile(join(env.IMAGE_DIR, orphan), PNG)
+    await writeFile(join(env.IMAGE_DIR, inFlight), PNG)
+
+    // act
+    const swept = await request<{ removed: number }>({
+      method: 'DELETE',
+      path: '/v1/admin/images/orphans',
+      cookie: admin.cookie,
+    })
+    const files = await storedFiles()
+
+    // assert
+    expect(swept.status).toBe(200)
+    expect(swept.body.removed).toBeGreaterThanOrEqual(1)
+    expect(files).toContain(`${movie.body.id}.png`)
+    expect(files).not.toContain(orphan)
+    expect(files).toContain(inFlight)
   })
 })

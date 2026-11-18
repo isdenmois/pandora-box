@@ -19,6 +19,9 @@ export default defineConfig({
       // Keep poster writes out of `data/images`; the OS owns the directory.
       IMAGE_DIR: join(tmpdir(), 'pandora-box-test-images'),
     },
+    // Every worker shares that one image dir, and the orphan sweep deletes files its own database
+    // does not know; a poster written by a parallel file would be swept mid-test.
+    fileParallelism: false,
   },
   resolve: {
     alias: {
