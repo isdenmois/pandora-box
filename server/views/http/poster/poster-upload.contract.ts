@@ -7,7 +7,11 @@ import { t } from 'elysia'
  */
 export const posterUploadBody = (maxBytes: number) =>
   t.Object({
-    /** JSON body for the record fields, so the update contract stays the single shape. */
-    data: t.String({ minLength: 1 }),
+    /**
+     * JSON body for the record fields, so the update contract stays the single shape.
+     * Elysia parses multipart values that start with `{` before validation, so the part can
+     * arrive either as raw JSON or as the already-parsed object.
+     */
+    data: t.Union([t.String({ minLength: 1 }), t.Record(t.String(), t.Unknown())]),
     file: t.File({ maxSize: maxBytes }),
   })

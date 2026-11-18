@@ -8,6 +8,8 @@ export default defineConfig({
     environment: 'node',
     include: ['server/**/__tests__/**/*.test.ts'],
     exclude: [...configDefaults.exclude],
+    // Vitest 5.1's default forks pool calls `child.channel.unref()`, which Bun does not implement.
+    pool: 'threads',
     // The server runs on Bun; `bun:sqlite` lets repository tests use a real migrated database.
     env: {
       DATABASE_URL: ':memory:',

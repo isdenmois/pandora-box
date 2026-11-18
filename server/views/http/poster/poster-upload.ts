@@ -8,7 +8,7 @@ import { hasEndMarker } from '@/infra/repositories/poster-fetcher'
 export interface PosterUploadOptions<Row, Fields> {
   records: PosterRecordStore<Row, Fields>
   files: PosterFileStore
-  parseFields: (raw: string) => Fields | null
+  parseFields: (raw: string | Record<string, unknown>) => Fields | null
   /** Private rows are invisible to everyone but their creator; answer 404 when this fails. */
   authorize?: (id: string, userId: string) => Promise<boolean>
   /** Field-level validation that the TypeBox contract cannot express, e.g. a recommender id. */
@@ -17,15 +17,16 @@ export interface PosterUploadOptions<Row, Fields> {
 
 type UploadContext = Context<{
   params: { id: string }
-  body: { data: string; file: File }
+  body: { data: string | Record<string, unknown>; file: File }
   user: { id: string }
 }>
 
 /** A `data` part that fails to parse or validate answers 422, like any other contract breach. */
 export function parseJsonPart<T extends TSchema>(schema: T) {
-  return (raw: string): Static<T> | null => {
+  // Elysia pre-parses multipart values that look like JSON; older clients still send a string.
+  return (raw: string | Record<string, unknown>): Static<T> | null => {
     try {
-      return Value.Parse(schema, JSON.parse(raw))
+      return Value.Parse(schema, typeof raw === 'string' ? JSON.parse(raw) : raw)
     } catch {
       return null
     }
