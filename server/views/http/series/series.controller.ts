@@ -12,6 +12,7 @@ export const seriesController = new Elysia({
   .use(authGuard)
   .post('', async ({ body }) => await seriesRepository.create(body), { body: createSeriesBody })
   .get(':id', ({ params: { id } }) => seriesRepository.byId(id))
+  // Returns the updated row so the client learns the localized `poster` path after a save.
   .put(':id', ({ params: { id }, body }) => seriesRepository.update(id, body), { body: updateSeriesBody })
   .patch(':id', ({ params: { id }, body }) => seriesRepository.update(id, body), { body: patchSeriesBody })
   .post(

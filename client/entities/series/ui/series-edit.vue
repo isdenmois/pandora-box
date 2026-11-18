@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { type SeriesUpdate } from '@/shared/api'
 import { EditForm } from '@/shared/ui'
 import { useSeries } from '../model'
@@ -15,6 +16,9 @@ const series = useSeries()
 
 const data = await series.byId(id)
 
+const posterKey = ref(0)
+const redownloading = ref(false)
+
 const save = async (input: SeriesUpdate) => {
   await series.update(id, input)
 
@@ -26,8 +30,28 @@ const toDelete = async () => {
 
   emit('deleted')
 }
+
+const toRedownload = async () => {
+  redownloading.value = true
+
+  try {
+    await series.redownloadPoster(id)
+    // The path stays the same, so the image has to remount to be requested again.
+    posterKey.value++
+  } finally {
+    redownloading.value = false
+  }
+}
 </script>
 
 <template>
-  <EditForm :data="data" :tags="tags" @save="save" @delete="toDelete" />
+  <EditForm
+    :data="data"
+    :tags="tags"
+    :poster-key="posterKey"
+    :redownloading="redownloading"
+    @save="save"
+    @delete="toDelete"
+    @redownload="toRedownload"
+  />
 </template>

@@ -4,7 +4,7 @@ import { confrimData } from './use-confirm'
 </script>
 
 <template>
-  <Dialog v-if="confrimData" className="p-4" :parent="null" id="confirm" @go-back="confrimData.resolve(false)">
+  <Dialog v-if="confrimData" class-name="p-4" :parent="null" id="confirm" @go-back="confrimData.resolve(false)">
     <h1>{{ confrimData.title }}</h1>
     <h3 class="mt-1" v-if="confrimData.message">{{ confrimData.message }}</h3>
 

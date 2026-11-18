@@ -25,7 +25,7 @@ const restore = async () => {
   success.value = false
   error.value = ''
 
-  if (!files.value || !files.value.length) {
+  if (!files.value?.length) {
     error.value = 'File is not selected'
     return
   }

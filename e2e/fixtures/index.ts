@@ -1,4 +1,5 @@
 export * from './movie.fixtures'
+export * from './poster.fixture'
 export * from './search.fixture'
 export * from './series.fixture'
 export * from './user.fixture'

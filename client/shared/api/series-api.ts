@@ -10,8 +10,9 @@ export const series = {
   getAll: () => v1.get().json<Series[]>(),
   byId: (id: string) => v1.get(`/${id}`).json<Series>(),
   delete: (id: string) => v1.url(`/${id}`).delete().text(),
-  update: (id: string, data: SeriesUpdate) => v1.url(`/${id}`).put(data).text(),
-  patch: (id: string, data: Partial<SeriesUpdate>) => v1.url(`/${id}`).patch(data).text(),
+  // The server returns the stored row, which is how the localized `poster` path reaches the client.
+  update: (id: string, data: SeriesUpdate) => v1.url(`/${id}`).put(data).json<Series>(),
+  patch: (id: string, data: Partial<SeriesUpdate>) => v1.url(`/${id}`).patch(data).json<Series>(),
   getViews: () => v1.get('/views').json<SeriesView[]>(),
   markAsViewed: (seriesId: string, date: string, rating: number, comment: string) =>
     v1.url(`/${seriesId}/viewed`).post({ date, rating, comment }).json<SeriesView>(),

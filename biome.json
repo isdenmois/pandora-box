@@ -74,11 +74,11 @@
         "noUnknownPseudoClass": "off"
       },
       "style": {
-        "noNonNullAssertion": "warn",
+        "noNonNullAssertion": "error",
         "useVueMultiWordComponentNames": "off"
       },
       "suspicious": {
-        "noShadowRestrictedNames": "warn"
+        "noShadowRestrictedNames": "error"
       }
     }
   },
@@ -94,6 +94,16 @@
           "style": {
             "useConst": "off",
             "useImportType": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/__tests__/**", "**/*.test.ts", "**/*.spec.ts", "e2e/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noNonNullAssertion": "off"
           }
         }
       }

@@ -4,6 +4,7 @@ import { reactive } from 'vue'
 import { flatten, useForm } from 'vue-standard-schema'
 import type { Movie, Series } from '../api'
 import { useConfirm } from './confirm'
+import ImageWithFallback from './image-with-fallback.vue'
 import ScheduleToggler from './schedule-toggler.vue'
 import SeasonToggler from './season-toggler.vue'
 import TagsInput from './tags-input.vue'
@@ -11,10 +12,13 @@ import TagsInput from './tags-input.vue'
 interface Props {
   data: Movie | Series
   tags: string[]
+  /** Bumped by the parent after a re-download, so the image remounts instead of reusing its cache. */
+  posterKey?: number
+  redownloading?: boolean
 }
 
 const { data } = defineProps<Props>()
-const emit = defineEmits(['save', 'delete'])
+const emit = defineEmits(['save', 'delete', 'redownload'])
 const confirm = useConfirm()
 const isSeries = 'season' in data
 
@@ -54,12 +58,27 @@ const toDelete = async () => {
     emit('delete')
   }
 }
+
+const toRedownload = async () => {
+  const confirmed = await confirm({
+    title: 'Re-download poster',
+    message: 'Drop the stored poster? It downloads again from the source the next time it is shown.',
+  })
+
+  if (confirmed) {
+    emit('redownload')
+  }
+}
 </script>
 
 <template>
   <form class="edit-details" ref="form">
     <div v-if="data.poster" class="poster relative">
-      <img class="object-cover h-44 w-30 sm:h-60 sm:w-40 rounded-lg" :src="data.poster">
+      <ImageWithFallback
+        :key="posterKey"
+        class="object-cover h-44 w-30 sm:h-60 sm:w-40 rounded-lg"
+        :src="data.poster"
+      />
     </div>
 
     <label class="field title">
@@ -101,6 +120,16 @@ const toDelete = async () => {
 
       <TagsInput :tags="tags" v-model="fields.tags" />
     </div>
+
+    <button
+      v-if="data.posterSource"
+      type="button"
+      class="flat"
+      :disabled="submitting || redownloading"
+      @click="toRedownload"
+    >
+      {{ redownloading ? 'Removing stored poster…' : 'Re-download poster' }}
+    </button>
 
     <button type="button" class="flat danger" :disabled="submitting" @click="toDelete">Remove</button>
 

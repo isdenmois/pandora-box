@@ -2,14 +2,18 @@ import { randomUUID } from 'node:crypto'
 import { eq, isNull, or } from 'drizzle-orm'
 import { type Movie, type MovieCreate, type MovieUpdate, table } from '@/domain'
 import { db } from '../db'
+import { posterRepository } from './poster.instance'
+import { posterFieldsFor, posterUpdateFor } from './poster-fields'
 
 export const movieRepository = {
   async create(data: MovieCreate): Promise<Movie> {
     const id = randomUUID()
+    const poster = posterFieldsFor(id, data.poster)
+    const values = { ...data, ...poster, id }
 
-    await db.insert(table.movie).values({ ...data, id })
+    await db.insert(table.movie).values(values)
 
-    return { ...data, id, seen: null, seenRating: null, seenComment: null }
+    return { ...values, seen: null, seenRating: null, seenComment: null }
   },
 
   async getAll(userId: string): Promise<Movie[]> {
@@ -27,12 +31,50 @@ export const movieRepository = {
     return movie || null
   },
 
-  async delete(id: string) {
-    await db.delete(table.movie).where(eq(table.movie.id, id))
+  /** Every id, regardless of owner or visibility; used to tell orphans from live files. */
+  async allIds(): Promise<string[]> {
+    const rows = await db.select({ id: table.movie.id }).from(table.movie)
+
+    return rows.map((row) => row.id)
   },
 
-  async update(id: string, data: Partial<MovieUpdate>) {
-    await db.update(table.movie).set(data).where(eq(table.movie.id, id))
+  async delete(id: string) {
+    await db.delete(table.movie).where(eq(table.movie.id, id))
+    await posterRepository.remove(id)
+  },
+
+  /** Rewrites only the stored path, used when the downloader corrects the file extension. */
+  async setPosterPath(id: string, path: string) {
+    await db.update(table.movie).set({ poster: path }).where(eq(table.movie.id, id))
+  },
+
+  async update(id: string, data: Partial<MovieUpdate>): Promise<Movie | null> {
+    const { poster: posterInput, ...rest } = data
+    const next: Record<string, unknown> = { ...rest }
+
+    if (posterInput !== undefined) {
+      const stored = await this.byId(id)
+
+      if (stored) {
+        const { fields, removeFile } = posterUpdateFor(id, posterInput, stored)
+
+        if (fields) {
+          Object.assign(next, fields)
+        }
+
+        if (removeFile) {
+          // The source changed, so the bytes on disk are stale; the next render downloads again.
+          await posterRepository.remove(id)
+        }
+      }
+    }
+
+    // A poster replay produces no fields at all; Drizzle rejects an empty `set`.
+    if (Object.keys(next).length) {
+      await db.update(table.movie).set(next).where(eq(table.movie.id, id))
+    }
+
+    return await this.byId(id)
   },
 
   async getViews(userId: string) {

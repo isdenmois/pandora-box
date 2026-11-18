@@ -27,10 +27,10 @@ const details = computed(() => {
 <template>
   <ItemAdaptive
     :title="movie.title"
-    :imgUrl="movie.poster"
+    :img-url="movie.poster"
     :description="description"
     :rating="movie.seen ? movie.seenRating : movie.rating"
     :details="details"
-    :testId="`movie-${movie.id}`"
+    :test-id="`movie-${movie.id}`"
   />
 </template>

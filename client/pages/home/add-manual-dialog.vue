@@ -7,7 +7,7 @@ import { useTags } from '@/features/tags'
 import { useMovies } from '@/entities/movie'
 import { useSeries } from '@/entities/series'
 import { toNullable, toNumber, useAuth } from '@/shared/lib'
-import { Dialog, ScheduleToggler, SeasonToggler, TagsInput } from '@/shared/ui'
+import { Dialog, ImageWithFallback, ScheduleToggler, SeasonToggler, TagsInput } from '@/shared/ui'
 
 const router = useRouter()
 const movies = useMovies()
@@ -74,7 +74,7 @@ const { form, submit, submitting, errors } = useForm({
 
       <form class="mt-2" ref="form">
         <div class="flex gap-4">
-          <img v-if="fields.poster" class="w-24 h-40 rounded-lg object-cover" :src="fields.poster">
+          <ImageWithFallback class="w-24 h-40 rounded-lg object-cover" :src="fields.poster" />
 
           <div class="flex flex-1 flex-col gap-4">
             <button type="button" class="group gap-3">

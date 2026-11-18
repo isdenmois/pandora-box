@@ -36,3 +36,6 @@ src/lib/paraglide
 
 # SQLite
 *.db
+
+# Downloaded posters
+/data/images

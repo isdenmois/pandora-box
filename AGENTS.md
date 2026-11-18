@@ -50,6 +50,18 @@ No `typecheck` script exists (no vue-tsc); TypeScript is checked by editors and 
 - Drizzle schema lives in `server/domain/entities/`; after changing it run `npm run db:generate` and commit the migration in `drizzle/`. Migrations apply automatically on server boot.
 - Search is backed by external OMDB (`OMDB_URL`) behind the `SearchProvider` interface (`server/domain/search-provider`, impl in `server/infra/repositories/search-repository/search-providers`).
 
+### Posters
+
+Posters are stored locally and served from `/images/`.
+
+- **DB split:** `poster` holds the public path (`/images/<id>.<ext>`), `posterSource` holds the original remote URL. Create/update requests still send the *remote* URL in `poster`; the repository maps it via `posterFieldsFor`/`posterUpdateFor` (`server/infra/repositories/poster-fields.ts`). Changing `posterSource` unlinks the stale file, so switching source re-downloads. Replaying an **unchanged** source is a no-op: the stored path is the corrected one (`<id>.png` for a URL without an extension, say) and re-guessing it would point the row at a file that was never written.
+- **No eager downloads.** Files are fetched lazily on the first request for the path. nginx serves hits straight from the mounted volume and proxies misses to `/images/:fileName` (`server/views/http/image/`), which downloads, stores and serves them in one response. A miss without a valid session (or with a remembered failure) redirects `302` to `posterSource` with `no-store`. `DELETE /api/v1/poster/:id` drops the file and keeps the path, so the next view downloads again; it answers `409` when the row has no source (a manual poster owns its only copy).
+- **Files:** flat `IMAGE_DIR/<recordId>.<ext>`, written to a unique `<id>.<ext>.<uuid>.tmp` name and renamed into place, so two requests for one cold miss cannot clobber each other. Extension comes from the response content type, and the row is patched if it differs from the guessed one.
+- **Guardrails** (`poster-fetcher.ts`): http(s) only, private/loopback addresses rejected on every redirect hop, image content-type allowlist, `IMAGE_MAX_BYTES` cap enforced while streaming, 4 s per attempt / 10 s total, 3 attempts with backoff, and `Content-Length` plus JPEG/PNG end-marker checks (a truncated JPEG still decodes, so decoding is not a sufficient check). Concurrent requests for one URL are deduped and capped at 3 in flight; a failure is remembered for 10 minutes. Addresses are resolved once for the check and again by `fetch`, so a rebinding host can still slip through — accepted, since planting a poster URL already needs an authenticated write.
+- `IMAGE_FETCH=off` disables downloads entirely. `DELETE /api/v1/admin/images/orphans` removes files no row references and returns the count. It also sweeps `.tmp` files older than 10 minutes (a fresh one belongs to a save in flight) and every `.jpeg`, which no code path writes since `jpeg` is normalized to `jpg`.
+- **Reads are unauthenticated** — `/images/<id>.<ext>` needs no session, including posters of `private` records. That is the trade for nginx answering hits from disk.
+- **Backups are DB-only** (`/api/v1/admin/backup`), so a restore on another machine re-downloads each poster on first view. Restoring localizes rows from a backup taken before the column split, where `poster` still held the remote URL.
+
 ## Client conventions
 
 - API calls go through `client/shared/api/*` (wretch wrapper in `http.ts`); 401/403 globally clear the auth state.
@@ -58,4 +70,6 @@ No `typecheck` script exists (no vue-tsc); TypeScript is checked by editors and 
 
 ## Deployment
 
-`docker-compose.yml` runs two services: `api` (Bun, SQLite volume at `/data`) and `webapp` (nginx serving `dist/`, proxying `/api/` to the api service via `client/nginx.conf` template with `$PORT`/`$API_SERVER`). Client image needs the `VITE_SEARCH_URL` build arg.
+`docker-compose.yml` runs two services: `api` (Bun, SQLite volume at `/data`, posters at `/data/images` via `IMAGE_DIR`) and `webapp` (nginx serving `dist/`, proxying `/api/` to the api service via `client/nginx.conf` template with `$PORT`/`$API_SERVER`). The webapp also mounts `./data/images` read-only at `/usr/share/nginx/html/images`, so nginx answers poster hits itself. Client image needs the `VITE_SEARCH_URL` build arg.
+
+Local posters live in `data/images/`, which is gitignored and excluded from the Docker build context (`data/` in `.dockerignore`).

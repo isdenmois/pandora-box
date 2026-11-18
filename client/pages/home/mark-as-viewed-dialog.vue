@@ -21,7 +21,7 @@ const goToDetails = () => {
 </script>
 
 <template>
-  <Dialog id="view" className="p-4" :parent="parent">
+  <Dialog id="view" class-name="p-4" :parent="parent">
     <MovieMarkAsViewed v-if="type === 'movie'" :id="id" @submitted="goToDetails" />
 
     <SeriesMarkAsViewed v-if="type === 'series'" :id="id" @submitted="goToDetails" />

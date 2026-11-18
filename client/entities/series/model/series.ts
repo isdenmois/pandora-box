@@ -46,13 +46,23 @@ export const useSeries = defineStore('series', () => {
     },
 
     async update(id: string, data: SeriesUpdate) {
+      const saved = await api.series.patch(id, data)
+      const existed = all.value.find((item) => item.id === id)
+
+      // The server owns `poster`/`posterSource`; taking its answer avoids showing a stale path.
+      if (existed) {
+        Object.assign(existed, saved)
+      }
+    },
+
+    /** Drops the stored file; the next render downloads it again. */
+    async redownloadPoster(id: string) {
+      const saved = await api.poster.redownload(id)
       const existed = all.value.find((item) => item.id === id)
 
       if (existed) {
-        Object.assign(existed, data)
+        Object.assign(existed, saved)
       }
-
-      await api.series.patch(id, data)
     },
 
     async markAsViewed(id: string, date: string, rating: number, comment: string) {
@@ -92,7 +102,7 @@ export const useSeries = defineStore('series', () => {
 
       if (existed) {
         seasonHistory = Object.fromEntries(Object.entries(existed.seasonHistory || {}).filter(([s]) => +s < season))
-        seasonHistory[existed.season || '1'] = new Date().toISOString().split('T')[0]!
+        seasonHistory[existed.season || '1'] = new Date().toISOString().slice(0, 10)
 
         existed.season = season
         existed.seasonHistory = seasonHistory
@@ -126,14 +136,15 @@ export const useSeries = defineStore('series', () => {
         title: data.title || existed.title,
         rating: data.rating || existed.rating,
         year: data.year || existed.year,
-        poster: data.poster || existed.poster,
+        // A new remote URL invalidates the stored file; the server unlinks it and downloads again.
+        poster: data.poster || existed.posterSource || existed.poster,
         genre: data.genre || existed.genre,
         extra,
       }
 
-      Object.assign(existed, toRefresh)
+      const saved = await api.series.patch(id, toRefresh)
 
-      await api.series.patch(id, toRefresh)
+      Object.assign(existed, saved)
     },
   }
 })

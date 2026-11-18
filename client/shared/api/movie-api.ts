@@ -10,8 +10,9 @@ export const movie = {
   getAll: () => v1.get().json<Movie[]>(),
   byId: (id: string) => v1.get(`/${id}`).json<Movie>(),
   delete: (id: string) => v1.url(`/${id}`).delete().text(),
-  update: (id: string, data: MovieUpdate) => v1.url(`/${id}`).put(data).text(),
-  patch: (id: string, data: Partial<MovieUpdate>) => v1.url(`/${id}`).patch(data).text(),
+  // The server returns the stored row, which is how the localized `poster` path reaches the client.
+  update: (id: string, data: MovieUpdate) => v1.url(`/${id}`).put(data).json<Movie>(),
+  patch: (id: string, data: Partial<MovieUpdate>) => v1.url(`/${id}`).patch(data).json<Movie>(),
   getViews: () => v1.get('/views').json<MovieView[]>(),
   markAsViewed: (movieId: string, date: string, rating: number, comment: string) =>
     v1.url(`/${movieId}/viewed`).post({ date, rating, comment }).json<MovieView>(),

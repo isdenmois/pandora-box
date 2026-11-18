@@ -69,7 +69,7 @@ const search = async () => {
         <ul class="mt-4 flex flex-col gap-4">
           <li v-for="item in series" :key="item.id">
             <RouterLink class="not-link" :to="`/add/${item.id}`" :data-testid="`search-series-${item.id}`">
-              <Item :title="item.title" :description="item.year ? String(item.year) : null" :imgUrl="item.poster" />
+              <Item :title="item.title" :description="item.year ? String(item.year) : null" :img-url="item.poster" />
             </RouterLink>
           </li>
         </ul>
@@ -80,7 +80,7 @@ const search = async () => {
         <ul class="mt-4 flex flex-col gap-4">
           <li v-for="item in movies" :key="item.id">
             <RouterLink class="not-link" :to="`/add/${item.id}`" :data-testid="`search-movie-${item.id}`">
-              <Item :title="item.title" :description="item.year ? String(item.year) : null" :imgUrl="item.poster" />
+              <Item :title="item.title" :description="item.year ? String(item.year) : null" :img-url="item.poster" />
             </RouterLink>
           </li>
         </ul>

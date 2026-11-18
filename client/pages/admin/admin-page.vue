@@ -9,5 +9,7 @@
 
   <RouterLink to="/admin/import">Import</RouterLink>
 
+  <RouterLink to="/admin/images">Images</RouterLink>
+
   <router-view />
 </template>

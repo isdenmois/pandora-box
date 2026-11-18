@@ -33,10 +33,10 @@ const details = computed(() => {
 <template>
   <ItemAdaptive
     :title="title"
-    :imgUrl="series.poster"
+    :img-url="series.poster"
     :description="description"
     :rating="series.seen ? series.seenRating : series.rating"
     :details="details"
-    :testId="`series-${series.id}`"
+    :test-id="`series-${series.id}`"
   />
 </template>

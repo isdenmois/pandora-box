@@ -12,6 +12,7 @@ export const movieController = new Elysia({
   .use(authGuard)
   .post('', async ({ body }) => await movieRepository.create(body), { body: createMovieBody })
   .get(':id', ({ params: { id } }) => movieRepository.byId(id))
+  // Returns the updated row so the client learns the localized `poster` path after a save.
   .put(':id', ({ params: { id }, body }) => movieRepository.update(id, body), { body: updateMovieBody })
   .patch(':id', ({ params: { id }, body }) => movieRepository.update(id, body), { body: patchMovieBody })
   .post(

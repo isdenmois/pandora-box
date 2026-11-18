@@ -12,4 +12,5 @@ biome.json
 node_modules
 build
 package
+data
 **/.env

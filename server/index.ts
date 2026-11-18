@@ -1,11 +1,13 @@
 import { openapi } from '@elysiajs/openapi'
 import { Elysia } from 'elysia'
-import { httpControllers } from './views'
+import { httpControllers, imageControllers } from './views'
 
 const port = +(process.env.PORT || 3000)
 
-const app = new Elysia().use(openapi()).use(httpControllers)
+export const app = new Elysia().use(openapi()).use(httpControllers).use(imageControllers)
 
-app.listen(port, ({ port }) => {
-  console.log(`🦊 Elysia is running at :${port}`)
-})
+if (import.meta.main) {
+  app.listen(port, ({ port }) => {
+    console.log(`🦊 Elysia is running at :${port}`)
+  })
+}

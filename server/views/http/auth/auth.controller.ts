@@ -1,7 +1,7 @@
 import { Elysia, status } from 'elysia'
 import { auth } from '@/app'
 import { sessionRepository } from '@/infra'
-import { toString } from '@/shared'
+import { errorMessage } from '@/shared'
 import { authCookie, getSession } from '@/views/auth'
 import { loginBody } from './auth.contract'
 
@@ -27,7 +27,7 @@ export const authController = new Elysia({
 
         return user
       } catch (error) {
-        throw status(400, { message: toString(error) })
+        throw status(400, { message: errorMessage(error) })
       }
     },
     {

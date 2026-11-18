@@ -6,12 +6,16 @@ services:
     environment:
       DATABASE_URL: /data/local.db
       OMDB_URL: ${OMDB_URL}
+      IMAGE_DIR: /data/images
   webapp:
     build:
       context: .
       dockerfile: Dockerfile.client
     ports:
       - '3000:3000'
+    volumes:
+      # Only the images are shared; nginx serves hits directly and proxies misses to the API.
+      - ./data/images:/usr/share/nginx/html/images:ro
     environment:
       API_SERVER: http://api:3000
       PORT: 3000

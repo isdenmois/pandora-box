@@ -1,4 +1,4 @@
-export function toString(error: unknown): string {
+export function errorMessage(error: unknown): string {
   if (typeof error === 'string') {
     return error
   }

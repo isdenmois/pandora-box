@@ -4,6 +4,7 @@ import { reactive } from 'vue'
 import { flatten, useForm } from 'vue-standard-schema'
 import type { Movie, Series } from '../api'
 import { dateToString } from '../lib'
+import ImageWithFallback from './image-with-fallback.vue'
 import RatingInput from './rating-input.vue'
 
 interface Props {
@@ -49,7 +50,7 @@ const { form, submit, submitting, errors } = useForm({
     <h3 class="text-l">{{ data.title }}</h3>
 
     <div class="flex mt-2 gap-4">
-      <img v-if="data.poster" class="h-40 rounded-lg" :src="data.poster">
+      <ImageWithFallback class="h-40 rounded-lg" :src="data.poster" />
 
       <div class="flex flex-col mt-2 gap-4">
         <label class="field">

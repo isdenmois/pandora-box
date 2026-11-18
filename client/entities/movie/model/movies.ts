@@ -48,13 +48,23 @@ export const useMovies = defineStore('movies', () => {
     },
 
     async update(id: string, data: MovieUpdate) {
+      const saved = await api.movie.patch(id, data)
+      const existed = all.value.find((movie) => movie.id === id)
+
+      // The server owns `poster`/`posterSource`; taking its answer avoids showing a stale path.
+      if (existed) {
+        Object.assign(existed, saved)
+      }
+    },
+
+    /** Drops the stored file; the next render downloads it again. */
+    async redownloadPoster(id: string) {
+      const saved = await api.poster.redownload(id)
       const existed = all.value.find((movie) => movie.id === id)
 
       if (existed) {
-        Object.assign(existed, data)
+        Object.assign(existed, saved)
       }
-
-      await api.movie.patch(id, data)
     },
 
     async markAsViewed(id: string, date: string, rating: number, comment) {
@@ -110,14 +120,15 @@ export const useMovies = defineStore('movies', () => {
         title: data.title || existed.title,
         rating: data.rating || existed.rating,
         year: data.year || existed.year,
-        poster: data.poster || existed.poster,
+        // A new remote URL invalidates the stored file; the server unlinks it and downloads again.
+        poster: data.poster || existed.posterSource || existed.poster,
         genre: data.genre || existed.genre,
         extra,
       }
 
-      Object.assign(existed, toRefresh)
+      const saved = await api.movie.patch(id, toRefresh)
 
-      await api.series.patch(id, toRefresh)
+      Object.assign(existed, saved)
     },
   }
 })

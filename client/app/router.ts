@@ -25,6 +25,7 @@ const router = createRouter({
         { path: 'register', component: () => import('@/pages/admin/register-user-page.vue') },
         { path: 'backup', component: () => import('@/pages/admin/backup-page.vue') },
         { path: 'import', component: () => import('@/pages/admin/import-page.vue') },
+        { path: 'images', component: () => import('@/pages/admin/images-page.vue') },
       ],
     },
   ],

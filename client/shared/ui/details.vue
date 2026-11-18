@@ -4,6 +4,7 @@ import { formatDate, getExternalUrl, isMobile, isOmdb, isOmdbString, searchLink,
 import type { Movie, Series } from '../api'
 import Icon from './icon.vue'
 import { icons } from './icons'
+import ImageWithFallback from './image-with-fallback.vue'
 import SeasonToggler from './season-toggler.vue'
 import Spinner from './spinner.vue'
 
@@ -33,7 +34,7 @@ const canRefresh = computed(() => data.provider === 'omdb')
 <template>
   <div class="home-details px-6 py-4 sm:p-8">
     <div v-if="data.poster" class="poster relative">
-      <img class="object-cover h-44 w-30 sm:h-60 sm:w-40 rounded-lg" :src="data.poster">
+      <ImageWithFallback class="object-cover h-44 w-30 sm:h-60 sm:w-40 rounded-lg" :src="data.poster" />
 
       <div v-if="data.rating" class="rating absolute top-0 left-0 p-1">{{ data.rating }}</div>
     </div>
@@ -104,6 +105,12 @@ const canRefresh = computed(() => data.provider === 'omdb')
       <div class="label">Year</div>
 
       {{ data.year }}
+    </label>
+
+    <label v-if="data.posterSource" class="field">
+      <div class="label">Poster source</div>
+
+      <a class="not-link break-all" :href="data.posterSource" target="_blank">{{ data.posterSource }}</a>
     </label>
 
     <label v-if="'seasonHistory' in data && data.seasonHistory" class="field">

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import ImageWithFallback from './image-with-fallback.vue'
+
 interface Props {
   title: string
   description?: string | null
@@ -13,8 +15,7 @@ defineProps<Props>()
 
 <template>
   <div class="flex item overflow-hidden relative color-primary" :data-testid="testId">
-    <img v-if="imgUrl" class="object-cover w-14 sm:h-60 sm:w-40" :src="imgUrl" :alt="title">
-    <div v-else class="sm:h-60 sm:w-40"></div>
+    <ImageWithFallback class="object-cover w-14 sm:h-60 sm:w-40" :src="imgUrl" :alt="title" />
 
     <div class="hidden sm:block details-background"></div>
 

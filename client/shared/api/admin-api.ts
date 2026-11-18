@@ -20,4 +20,6 @@ export const admin = {
   backupRestore: (data: unknown) => v1.url('/backup').post(data).res(),
   import: (data: unknown) => v1.url('/import').post(data).res(),
   importStatus: () => v1.get('/import').json<ImportStatus>(),
+  /** Deletes poster files no record references and reports how many were removed. */
+  removeOrphanImages: () => v1.url('/images/orphans').delete().json<{ removed: number }>(),
 }

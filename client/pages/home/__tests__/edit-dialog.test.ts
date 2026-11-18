@@ -44,7 +44,7 @@ describe('edit-dialog', () => {
   it('returns to the details page after saving', async () => {
     // arrange
     useMovies().all = [makeMovie({ id: 'm1', title: 'Some Movie' })]
-    vi.spyOn(api.movie, 'patch').mockResolvedValue('')
+    vi.spyOn(api.movie, 'patch').mockResolvedValue(makeMovie({ id: 'm1', title: 'Some Movie' }))
     route.params = { type: 'movie', id: 'm1' }
     render(EditDialog)
     await flushPromises()

@@ -8,7 +8,7 @@ import { useMovies } from '@/entities/movie'
 import { useSeries } from '@/entities/series'
 import { api } from '@/shared/api'
 import { toNullable, toNumber, useAuth } from '@/shared/lib'
-import { Dialog, MoreButton, ScheduleToggler, SeasonToggler, Spinner, TagsInput } from '@/shared/ui'
+import { Dialog, ImageWithFallback, MoreButton, ScheduleToggler, SeasonToggler, Spinner, TagsInput } from '@/shared/ui'
 
 const router = useRouter()
 const params = useRoute().params as { id: string }
@@ -108,7 +108,7 @@ onMounted(async () => {
     <div v-else class="p-4">
       <form ref="form">
         <div class="flex gap-4">
-          <img v-if="fields.poster" class="w-24 h-40 rounded-lg object-cover" :src="fields.poster">
+          <ImageWithFallback class="w-24 h-40 rounded-lg object-cover" :src="fields.poster" />
 
           <div class="flex flex-1 flex-col gap-4">
             <button type="button" class="group gap-3">
