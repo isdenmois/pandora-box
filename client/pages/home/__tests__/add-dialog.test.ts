@@ -18,10 +18,7 @@ vi.mock('vue-router', () => ({
 
 const user = userEvent.setup()
 
-const findSpinner = (root: ParentNode) =>
-  [...root.querySelectorAll('use')].find((use) =>
-    ['xlink:href', 'href'].some((name) => use.getAttribute(name)?.includes('spinner')),
-  )
+const findSpinner = (root: ParentNode) => root.querySelector('[role="status"]')
 
 describe('add-dialog', () => {
   beforeEach(() => {

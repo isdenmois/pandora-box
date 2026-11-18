@@ -53,12 +53,18 @@ const canRefresh = computed(() => data.provider === 'omdb')
       <div v-if="canRefresh" class="sm:mt-[-1rem]">
         <Spinner v-if="refreshing" :size="iconSize" />
 
-        <div v-else class="cursor-pointer" @click="emit('refresh')">
+        <button v-else type="button" aria-label="Refresh details" class="cursor-pointer" @click="emit('refresh')">
           <Icon :size="iconSize" :icon="icons.rotate" />
-        </div>
+        </button>
       </div>
 
-      <a v-if="externalUrl" class="mr-[-0.5rem] sm:mt-[-1rem] sm:mr-[-1rem]" target="_blank" :href="externalUrl">
+      <a
+        v-if="externalUrl"
+        aria-label="Open on IMDB"
+        class="mr-[-0.5rem] sm:mt-[-1rem] sm:mr-[-1rem]"
+        target="_blank"
+        :href="externalUrl"
+      >
         <Icon :size="iconSize" :icon="icons.globe" />
       </a>
     </div>

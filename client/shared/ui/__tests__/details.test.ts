@@ -10,6 +10,9 @@ import.meta.env.VITE_SEARCH_URL = 'http://localhost?q='
 
 const user = userEvent.setup()
 
+const renderDetails = (data: Parameters<typeof makeMovie>[0] = {}) =>
+  render(Details, { props: { data: makeMovie(data) } })
+
 describe('details', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
@@ -18,7 +21,7 @@ describe('details', () => {
   it('renders the title with a search link', () => {
     // arrange
     // act
-    render(Details, { props: { data: makeMovie() } })
+    renderDetails()
 
     // assert
     expect(screen.getByRole('link', { name: 'Some Movie' })).toHaveAttribute('href', 'http://localhost?q=some%20movie')
@@ -27,18 +30,42 @@ describe('details', () => {
   it('shows the omdb extra fields and the imdb link for a movie', () => {
     // arrange
     // act
-    render(Details, {
-      props: {
-        data: makeMovie({ extra: { Runtime: '120 min', Actors: 'Actor A', Director: 'Director B' } }),
-      },
-    })
+    renderDetails({ extra: { Runtime: '120 min', Actors: 'Actor A', Director: 'Director B' } })
 
     // assert
     expect(screen.getByText('120 min')).toBeInTheDocument()
     expect(screen.getByText('Actor A')).toBeInTheDocument()
     expect(screen.getByText('Director B')).toBeInTheDocument()
     expect(screen.queryByText('Season')).not.toBeInTheDocument()
-    expect(document.querySelector('a[href="https://www.imdb.com/title/tt123"]')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open on IMDB' })).toHaveAttribute(
+      'href',
+      'https://www.imdb.com/title/tt123',
+    )
+  })
+
+  it('hides the omdb fields, the imdb link and the refresh action for a manual row', () => {
+    // arrange
+    // act
+    renderDetails({
+      provider: 'manual',
+      extra: { Runtime: '120 min', Actors: 'Actor A', Director: 'Director B' },
+    })
+
+    // assert
+    expect(screen.queryByText('120 min')).not.toBeInTheDocument()
+    expect(screen.queryByText('Actor A')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Open on IMDB' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Refresh details' })).not.toBeInTheDocument()
+  })
+
+  it('keeps N/A omdb values out of the view', () => {
+    // arrange
+    // act
+    renderDetails({ extra: { Runtime: 'N/A', Actors: 'N/A', Director: 'Director B' } })
+
+    // assert
+    expect(screen.queryByText('N/A')).not.toBeInTheDocument()
+    expect(screen.getByText('Director B')).toBeInTheDocument()
   })
 
   it('renders the season toggler with the total for a series', () => {
@@ -54,7 +81,10 @@ describe('details', () => {
       'href',
       'http://localhost?q=some%20series%202',
     )
-    expect(document.querySelector('a[href="https://www.imdb.com/title/tt456/episodes/?season=2"]')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open on IMDB' })).toHaveAttribute(
+      'href',
+      'https://www.imdb.com/title/tt456/episodes/?season=2',
+    )
   })
 
   it('emits updateSeason when the season is changed', async () => {
@@ -108,23 +138,23 @@ describe('details', () => {
   it('emits refresh when the refresh icon is clicked', async () => {
     // arrange
     const onRefresh = vi.fn()
-    const { container } = render(Details, { props: { data: makeMovie(), onRefresh } })
+    render(Details, { props: { data: makeMovie(), onRefresh } })
 
     // act
-    await user.click(container.querySelector('.cursor-pointer')!)
+    await user.click(screen.getByRole('button', { name: 'Refresh details' }))
 
     // assert
     expect(onRefresh).toHaveBeenCalledExactlyOnceWith()
   })
 
-  it('shows the spinner instead of the refresh action while refreshing', () => {
+  it('shows a spinner instead of the refresh action while refreshing', () => {
     // arrange
     // act
-    const { container } = render(Details, { props: { data: makeMovie(), refreshing: true } })
+    render(Details, { props: { data: makeMovie(), refreshing: true } })
 
     // assert
-    expect(container.querySelector('.cursor-pointer')).not.toBeInTheDocument()
-    expect(container.querySelector('svg')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Refresh details' })).not.toBeInTheDocument()
+    expect(screen.getByRole('status', { name: 'Loading' })).toBeInTheDocument()
   })
 
   it('shows the creator username', () => {
@@ -132,7 +162,7 @@ describe('details', () => {
     useUsers().all = [{ id: 'user-1', username: 'me' }]
 
     // act
-    render(Details, { props: { data: makeMovie() } })
+    renderDetails()
 
     // assert
     expect(screen.getByText('Added by')).toBeInTheDocument()
@@ -147,7 +177,7 @@ describe('details', () => {
     ]
 
     // act
-    render(Details, { props: { data: makeMovie({ recommendedBy: 'user-2' }) } })
+    renderDetails({ recommendedBy: 'user-2' })
 
     // assert
     expect(screen.getByText('Recommended by')).toBeInTheDocument()
@@ -157,7 +187,7 @@ describe('details', () => {
   it('falls back to Unknown when the creator is not in the directory', () => {
     // arrange
     // act
-    render(Details, { props: { data: makeMovie({ createdBy: 'deleted-user' }) } })
+    renderDetails({ createdBy: 'deleted-user' })
 
     // assert
     expect(screen.getByText('Unknown')).toBeInTheDocument()

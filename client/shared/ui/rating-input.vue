@@ -9,15 +9,19 @@ const datas = Array.from({ length: max }, (_, i) => i + 1)
 
 <template>
   <div class="flex items-center">
-    <div
+    <button
+      type="button"
       class="star"
       :class="{ selected: model && item <= model }"
+      :aria-label="`Rate ${item} out of 10`"
+      :aria-pressed="Boolean(model && item <= model)"
+      :data-testid="`star-${item}`"
       v-for="item of datas"
       :key="item"
       @click="model = item"
     >
       <Icon :size="20" :icon="model && item <= model ? icons.starFill : icons.star" />
-    </div>
+    </button>
   </div>
 </template>
 <style scoped>

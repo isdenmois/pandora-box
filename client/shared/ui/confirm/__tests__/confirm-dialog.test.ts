@@ -74,7 +74,7 @@ describe('confirm-dialog', () => {
     await screen.findByText('Delete movie')
 
     // act
-    await user.click(document.querySelector('.backdrop')!)
+    await user.click(screen.getByTestId('dialog-backdrop'))
 
     // assert
     await expect(promise).resolves.toBe(false)

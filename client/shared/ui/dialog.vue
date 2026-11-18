@@ -25,7 +25,7 @@ const goBack = () => {
 <template>
   <Teleport to="body">
     <div class="dialog inset-0 z-1 fixed flex items-center justify-center" :data-testid="`dialog-${id}`">
-      <div class="backdrop absolute inset-0" @click="goBack"></div>
+      <div class="backdrop absolute inset-0" data-testid="dialog-backdrop" @click="goBack"></div>
 
       <div class="content z-1 overflow-y-auto" :class="className">
         <Suspense>

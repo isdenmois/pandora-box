@@ -10,5 +10,5 @@ const { size } = defineProps<Props>()
 </script>
 
 <template>
-  <Icon :icon="svg" :size="size" />
+  <Icon role="status" aria-label="Loading" :icon="svg" :size="size" />
 </template>

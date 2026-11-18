@@ -1,5 +1,5 @@
 import userEvent from '@testing-library/user-event'
-import { fireEvent, render, screen } from '@testing-library/vue'
+import { render, screen } from '@testing-library/vue'
 import { flushPromises } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { dateToString } from '../../lib'
@@ -35,10 +35,10 @@ describe('mark-as-viewed', () => {
 
   it('updates the rating when a star is clicked', async () => {
     // arrange
-    const { container } = render(MarkAsViewed, { props: { data: makeMovie() } })
+    render(MarkAsViewed, { props: { data: makeMovie() } })
 
     // act
-    await user.click(container.querySelectorAll('.star')[2])
+    await user.click(screen.getByTestId('star-3'))
 
     // assert
     expect(screen.getByText('Rating 3/10')).toBeInTheDocument()
@@ -47,13 +47,13 @@ describe('mark-as-viewed', () => {
   it('emits save with the entered data on submit', async () => {
     // arrange
     const onSave = vi.fn()
-    const { container } = render(MarkAsViewed, {
+    render(MarkAsViewed, {
       props: { data: makeMovie({ seenRating: 5 }), onSave },
     })
 
     // act
     await user.type(screen.getByPlaceholderText('Comment'), 'great!')
-    fireEvent.submit(container.querySelector('form')!)
+    await user.click(screen.getByRole('button', { name: 'Save' }))
     await flushPromises()
 
     // assert

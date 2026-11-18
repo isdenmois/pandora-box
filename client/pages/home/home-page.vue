@@ -76,7 +76,12 @@ onBeforeMount(() => {
 
     <div class="flex-1"></div>
 
-    <button :class="{ 'color-secondary': !home.search }" @click="openSearch">
+    <button
+      aria-label="Search"
+      :aria-expanded="searchVisible"
+      :class="{ 'color-secondary': !home.search }"
+      @click="openSearch"
+    >
       <Icon :size="24" :icon="icons.search" />
     </button>
 
@@ -109,6 +114,7 @@ onBeforeMount(() => {
     <button
       v-for="tag of home.tags"
       :key="tag"
+      :aria-pressed="tag === home.tag"
       :class="tag === home.tag ? 'primary' : 'secondary'"
       @click="home.toggleTag(tag)"
     >
@@ -122,11 +128,18 @@ onBeforeMount(() => {
   >
     <span class="color-secondary text-s">Added by</span>
 
-    <button :class="home.creator === null ? 'primary' : 'secondary'" @click="home.setCreator(null)">Anyone</button>
+    <button
+      :aria-pressed="home.creator === null"
+      :class="home.creator === null ? 'primary' : 'secondary'"
+      @click="home.setCreator(null)"
+    >
+      Anyone
+    </button>
 
     <button
       v-for="user of users.all"
       :key="user.id"
+      :aria-pressed="home.creator === user.id"
       :class="home.creator === user.id ? 'primary' : 'secondary'"
       @click="home.toggleCreator(user.id)"
     >

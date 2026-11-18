@@ -38,7 +38,7 @@ describe('dialog', () => {
     render(Dialog, { props: { id: 'test', onGoBack } })
 
     // act
-    await user.click(document.querySelector('.backdrop')!)
+    await user.click(screen.getByTestId('dialog-backdrop'))
 
     // assert
     expect(router.back).toHaveBeenCalledExactlyOnceWith()
@@ -52,7 +52,7 @@ describe('dialog', () => {
     render(Dialog, { props: { id: 'test', parent: '/movies', onGoBack } })
 
     // act
-    await user.click(document.querySelector('.backdrop')!)
+    await user.click(screen.getByTestId('dialog-backdrop'))
 
     // assert
     expect(router.replace).toHaveBeenCalledExactlyOnceWith('/movies')

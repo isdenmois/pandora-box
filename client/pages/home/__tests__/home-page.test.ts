@@ -28,11 +28,6 @@ const renderHome = () => render(HomePage, { global: { components: { RouterLink, 
 
 const movieIds = () => screen.getAllByTestId(/^movie-/).map((movie) => movie.getAttribute('data-testid'))
 
-const findSpinner = (root: ParentNode) =>
-  [...root.querySelectorAll('use')].find((use) =>
-    ['xlink:href', 'href'].some((name) => use.getAttribute(name)?.includes('spinner')),
-  )
-
 describe('home-page', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
@@ -88,16 +83,32 @@ describe('home-page', () => {
   it('shows a spinner while a list is loading', async () => {
     // arrange
     vi.spyOn(api.series, 'getAll').mockReturnValue(new Promise(() => {}))
-    const { container } = renderHome()
 
     // act
+    renderHome()
     await flushPromises()
 
     // assert
-    expect(findSpinner(container)).toBeInTheDocument()
+    expect(screen.getByRole('status', { name: 'Loading' })).toBeInTheDocument()
   })
 
-  it('toggles between the global and for-me lists', async () => {
+  it('hides private rows from the global list', async () => {
+    // arrange
+    vi.spyOn(api.movie, 'getAll').mockResolvedValue([
+      makeMovie({ id: 'public', title: 'Public Movie' }),
+      makeMovie({ id: 'private', title: 'Private Movie', private: true }),
+    ])
+
+    // act
+    renderHome()
+    await flushPromises()
+
+    // assert
+    expect(screen.getByTestId('movie-public')).toBeInTheDocument()
+    expect(screen.queryByTestId('movie-private')).not.toBeInTheDocument()
+  })
+
+  it('shows only private rows when switching to For Me', async () => {
     // arrange
     vi.spyOn(api.movie, 'getAll').mockResolvedValue([
       makeMovie({ id: 'public', title: 'Public Movie' }),
@@ -105,10 +116,6 @@ describe('home-page', () => {
     ])
     renderHome()
     await flushPromises()
-
-    // assert
-    expect(screen.getByTestId('movie-public')).toBeInTheDocument()
-    expect(screen.queryByTestId('movie-private')).not.toBeInTheDocument()
 
     // act
     await user.click(screen.getByText('Global'))
@@ -182,20 +189,21 @@ describe('home-page', () => {
 
   it('opens and closes the search overlay', async () => {
     // arrange
-    const { container } = renderHome()
-    const form = () => container.querySelector('form.search')!
+    renderHome()
+    const searchButton = screen.getByRole('button', { name: 'Search' })
 
     // act
-    await user.click(container.querySelector('.surface button:last-of-type')!)
+    await user.click(searchButton)
 
     // assert
-    expect(form()).toHaveClass('visible')
+    expect(searchButton).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByRole('textbox')).toBeInTheDocument()
 
     // act
     await user.click(document.body)
 
     // assert
-    expect(form()).not.toHaveClass('visible')
+    expect(searchButton).toHaveAttribute('aria-expanded', 'false')
   })
 
   it('filters the lists by the search query', async () => {
@@ -204,12 +212,12 @@ describe('home-page', () => {
       makeMovie({ id: 'matrix', title: 'Matrix' }),
       makeMovie({ id: 'inception', title: 'Inception' }),
     ])
-    const { container } = renderHome()
+    renderHome()
     await flushPromises()
-    await user.click(container.querySelector('.surface button:last-of-type')!)
+    await user.click(screen.getByRole('button', { name: 'Search' }))
 
     // act
-    await user.type(container.querySelector('input[name="filter"]')!, 'matr')
+    await user.type(screen.getByRole('textbox'), 'matr')
 
     // assert
     expect(screen.getByTestId('movie-matrix')).toBeInTheDocument()
@@ -226,13 +234,13 @@ describe('home-page', () => {
     await flushPromises()
 
     // assert
-    expect(screen.getByRole('button', { name: 'drama' })).toHaveClass('secondary')
+    expect(screen.getByRole('button', { name: 'drama' })).not.toBePressed()
 
     // act
     await user.click(screen.getByRole('button', { name: 'drama' }))
 
     // assert
-    expect(screen.getByRole('button', { name: 'drama' })).toHaveClass('primary')
+    expect(screen.getByRole('button', { name: 'drama' })).toBePressed()
     expect(screen.getByTestId('movie-drama')).toBeInTheDocument()
     expect(screen.queryByTestId('movie-comedy')).not.toBeInTheDocument()
 
@@ -240,7 +248,7 @@ describe('home-page', () => {
     await user.click(screen.getByRole('button', { name: 'drama' }))
 
     // assert
-    expect(screen.getByRole('button', { name: 'drama' })).toHaveClass('secondary')
+    expect(screen.getByRole('button', { name: 'drama' })).not.toBePressed()
     expect(screen.getByTestId('movie-comedy')).toBeInTheDocument()
   })
 

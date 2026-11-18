@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia'
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { api } from '../../../api'
 import { auth } from '../../auth'
 import { useAuth } from '../auth-state'
@@ -7,11 +7,8 @@ import { useAuth } from '../auth-state'
 describe('auth', () => {
   let authStore: ReturnType<typeof useAuth>
 
-  beforeAll(() => {
-    setActivePinia(createPinia())
-  })
-
   beforeEach(() => {
+    setActivePinia(createPinia())
     vi.clearAllMocks()
     authStore = useAuth()
 

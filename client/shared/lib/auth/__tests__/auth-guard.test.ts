@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia'
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { User } from '@/shared/api'
 import { authGuard } from '../auth-guard'
 import { useAuth } from '../auth-state'
@@ -7,11 +7,8 @@ import { useAuth } from '../auth-state'
 describe('authGuard', () => {
   let store: ReturnType<typeof useAuth>
 
-  beforeAll(() => {
-    setActivePinia(createPinia())
-  })
-
   beforeEach(() => {
+    setActivePinia(createPinia())
     store = useAuth()
   })
 

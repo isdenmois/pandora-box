@@ -75,7 +75,7 @@ describe('useHome store', () => {
       const store = useHome()
 
       // assert
-      expect(store.forMe).toBeFalsy()
+      expect(store.forMe).toBe(false)
       expect(store.movies).toEqual([c, b])
     })
 
@@ -87,7 +87,7 @@ describe('useHome store', () => {
       store.toggleForMe()
 
       // assert
-      expect(store.forMe).toBeTruthy()
+      expect(store.forMe).toBe(true)
       expect(store.movies).toEqual([a])
     })
   })
