@@ -32,6 +32,21 @@ const ByIdSchema = v.looseObject({
 const searchParse = v.parser(SearchSchema)
 const byIdParse = v.parser(ByIdSchema)
 
+/** OMDB spells "no value" as `N/A`; treat it the same as an empty string. */
+const valueOrNull = (value: string | undefined) => (value && value !== 'N/A' ? value : null)
+
+const numberOrNull = (value: string | undefined) => {
+  const raw = valueOrNull(value)
+
+  if (raw === null) {
+    return null
+  }
+
+  const parsed = Number.parseFloat(raw)
+
+  return Number.isNaN(parsed) ? null : parsed
+}
+
 interface OmdbSearchQuery {
   s: string
   type?: string
@@ -53,8 +68,8 @@ export const omdbSearchProvider: SearchProvider = {
             id: item.imdbID,
             title: item.Title,
             type: item.Type as 'movie' | 'series',
-            poster: item.Poster || null,
-            year: item.Year ? parseInt(item.Year, 10) : null,
+            poster: valueOrNull(item.Poster),
+            year: numberOrNull(item.Year),
           }) satisfies SearchItem,
       )
   },
@@ -77,11 +92,11 @@ export const omdbSearchProvider: SearchProvider = {
       provider: 'omdb',
       title: Title,
       type: Type,
-      poster: Poster || null,
-      year: Year ? parseInt(Year, 10) : null,
-      rating: imdbRating ? parseFloat(imdbRating) : null,
-      genre: Genre || null,
-      language: Language || null,
+      poster: valueOrNull(Poster),
+      year: numberOrNull(Year),
+      rating: numberOrNull(imdbRating),
+      genre: valueOrNull(Genre),
+      language: valueOrNull(Language),
       extra,
     }
   },

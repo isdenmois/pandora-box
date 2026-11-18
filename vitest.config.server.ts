@@ -8,6 +8,11 @@ export default defineConfig({
     environment: 'node',
     include: ['server/**/__tests__/**/*.test.ts'],
     exclude: [...configDefaults.exclude],
+    // The server runs on Bun; `bun:sqlite` lets repository tests use a real migrated database.
+    env: {
+      DATABASE_URL: ':memory:',
+      OMDB_URL: 'https://omdb.test/api',
+    },
   },
   resolve: {
     alias: {

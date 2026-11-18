@@ -1,9 +1,10 @@
 import { randomUUID } from 'node:crypto'
 import { eq, or } from 'drizzle-orm'
-import { claimedCreator, type Movie, type MovieCreate, type MovieUpdate, table } from '@/domain'
+import { type Movie, type MovieCreate, type MovieUpdate, table } from '@/domain'
 import { db } from '../db'
 import { posterRepository } from './poster.instance'
-import { posterFieldsFor, posterUpdateFor } from './poster-fields'
+import { posterFieldsFor } from './poster-fields'
+import { recordUpdateFor } from './record-update'
 
 export const movieRepository = {
   async create(data: MovieCreate, creatorId: string): Promise<Movie> {
@@ -54,41 +55,18 @@ export const movieRepository = {
   },
 
   async update(id: string, data: Partial<MovieUpdate>, filePoster?: string, editorId?: string): Promise<Movie | null> {
-    const { poster: posterInput, ...rest } = data
-    const next: Record<string, unknown> = { ...rest }
     // Claiming needs the stored visibility; poster changes already need the stored source.
-    const stored = data.private === true || posterInput !== undefined ? await this.byId(id) : null
-    const claimedBy = stored ? claimedCreator(stored, data.private, editorId) : null
+    const stored = data.private === true || data.poster !== undefined ? await this.byId(id) : null
+    const { values, removeFile } = recordUpdateFor(id, data, stored, filePoster, editorId)
 
-    if (claimedBy) {
-      next.createdBy = claimedBy
-
-      // A creator cannot recommend their own row; drop the credit if the claim created that state.
-      if ((next.recommendedBy ?? stored?.recommendedBy) === claimedBy) {
-        next.recommendedBy = null
-      }
+    if (removeFile) {
+      // The source changed, so the bytes on disk are stale; the next render downloads again.
+      await posterRepository.remove(id)
     }
 
-    if (filePoster) {
-      // An uploaded file owns the only copy, so there is no source to download it from again.
-      next.poster = filePoster
-      next.posterSource = null
-    } else if (posterInput !== undefined && stored) {
-      const { fields, removeFile } = posterUpdateFor(id, posterInput, stored)
-
-      if (fields) {
-        Object.assign(next, fields)
-      }
-
-      if (removeFile) {
-        // The source changed, so the bytes on disk are stale; the next render downloads again.
-        await posterRepository.remove(id)
-      }
-    }
-
-    // A poster replay produces no fields at all; Drizzle rejects an empty `set`.
-    if (Object.keys(next).length) {
-      await db.update(table.movie).set(next).where(eq(table.movie.id, id))
+    // A poster replay produces no values at all; Drizzle rejects an empty `set`.
+    if (Object.keys(values).length) {
+      await db.update(table.movie).set(values).where(eq(table.movie.id, id))
     }
 
     return await this.byId(id)

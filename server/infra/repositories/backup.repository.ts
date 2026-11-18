@@ -25,7 +25,9 @@ export const backupRepository = {
       (users[0]?.id as string | undefined) ??
       null
 
-    await db.transaction(async (tx) => {
+    // The Bun SQLite driver runs transactions synchronously: statements inside the callback must
+    // not be awaited, or they execute after the transaction has already committed.
+    db.transaction((tx) => {
       for (const key in data) {
         const t = key as BackupTable
 
@@ -33,10 +35,15 @@ export const backupRepository = {
           const table = toBackup[t]
           const rows = data[t] as Record<string, unknown>[]
 
-          await tx.delete(table)
-          await tx
-            .insert(table)
-            .values(rows.map((row) => normalizeRow(t, row, fallbackCreatorId)) as (typeof table.$inferInsert)[])
+          tx.delete(table).run()
+
+          // A normal backup contains empty tables (the view tables, usually); Drizzle rejects an
+          // empty `values()` call, so only insert when there is something to insert.
+          if (rows.length) {
+            tx.insert(table)
+              .values(rows.map((row) => normalizeRow(t, row, fallbackCreatorId)) as (typeof table.$inferInsert)[])
+              .run()
+          }
         }
       }
     })
