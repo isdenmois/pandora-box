@@ -1,6 +1,6 @@
 import type { Static, TSchema } from '@sinclair/typebox'
 import { Value } from '@sinclair/typebox/value'
-import { type Context, status } from 'elysia'
+import { status } from 'elysia'
 import { type PosterFileStore, type PosterRecordStore, replacePoster } from '@/app'
 import { type ImageExtension, imageExtensionFromBytes } from '@/domain'
 import { hasEndMarker } from '@/infra/repositories/poster-fetcher'
@@ -15,11 +15,12 @@ export interface PosterUploadOptions<Row, Fields> {
   validateFields?: (id: string, fields: Fields) => Promise<boolean>
 }
 
-type UploadContext = Context<{
+/** Only the parts of Elysia's context this handler reads; `user` comes from `authGuard`. */
+interface UploadContext {
   params: { id: string }
   body: { data: string | Record<string, unknown>; file: File }
   user: { id: string }
-}>
+}
 
 /** A `data` part that fails to parse or validate answers 422, like any other contract breach. */
 export function parseJsonPart<T extends TSchema>(schema: T) {

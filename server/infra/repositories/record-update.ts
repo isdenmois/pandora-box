@@ -6,6 +6,8 @@ export interface RecordUpdateData {
   poster?: string | null
   private?: boolean
   recommendedBy?: string | null
+  /** The remaining columns are opaque here; the contract validated them on the way in. */
+  [column: string]: unknown
 }
 
 export type StoredRecord = StoredPoster & OwnedRecord & { recommendedBy: string | null }

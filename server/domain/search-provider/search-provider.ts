@@ -23,5 +23,6 @@ export type SearchItemType = SearchItem['type']
 
 export interface SearchProvider {
   search: (query: string, type?: SearchItem['type'], year?: number) => Promise<SearchItem[]>
-  getById: (id: string) => Promise<SearchItemDetails>
+  /** `null` when the provider does not know the id; import uses that as "skip this row". */
+  getById: (id: string) => Promise<SearchItemDetails | null>
 }

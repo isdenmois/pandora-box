@@ -3,6 +3,12 @@ import { eq } from 'drizzle-orm'
 import { SESSION_EXPIRE_IN, type Session, table } from '@/domain'
 import { db } from '../db'
 
+/** The join shape the session guard needs; `undefined` when the id is unknown. */
+export interface SessionWithUser {
+  user: { id: string; role: string | null; username: string }
+  session: Session
+}
+
 export const sessionRepository = {
   async create(userId: string) {
     const sessionId = randomUUID()
@@ -17,7 +23,7 @@ export const sessionRepository = {
     return session
   },
 
-  async getById(sessionId: string) {
+  async getById(sessionId: string): Promise<SessionWithUser | undefined> {
     const result = await db
       .select({
         // Adjust user table here to tweak returned data

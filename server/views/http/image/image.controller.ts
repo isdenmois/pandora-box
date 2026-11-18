@@ -33,6 +33,15 @@ const redirect = (location: string) =>
 
 const notFound = () => new Response(null, { status: 404, headers: { 'cache-control': NO_STORE } })
 
+/** Bun types `Uint8Array` over `ArrayBufferLike`; `Response` wants ArrayBuffer-backed bytes. */
+function imageBody(bytes: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(bytes.byteLength)
+
+  copy.set(bytes)
+
+  return copy.buffer
+}
+
 export function createImageController(deps: ImageControllerDeps) {
   return new Elysia({ name: 'image controller' }).get(
     `${IMAGE_URL_PREFIX}/:fileName`,
@@ -55,7 +64,7 @@ export function createImageController(deps: ImageControllerDeps) {
           })
         }
 
-        return new Response(stored.bytes, {
+        return new Response(imageBody(stored.bytes), {
           status: 200,
           headers: { 'content-type': stored.contentType, 'cache-control': REVALIDATE, etag: stored.etag },
         })
@@ -94,7 +103,7 @@ export function createImageController(deps: ImageControllerDeps) {
           await deps.setPosterPath(parsed.id, storedPath)
         }
 
-        return new Response(downloaded.bytes, {
+        return new Response(imageBody(downloaded.bytes), {
           status: 200,
           headers: { 'content-type': contentTypeForExtension(downloaded.extension), 'cache-control': REVALIDATE },
         })

@@ -10,6 +10,7 @@
     "client:preview": "vite preview",
     "format": "biome check --write .",
     "lint": "biome check .",
+    "typecheck": "tsc -p server/tsconfig.json --noEmit",
     "test:client": "vitest --run ",
     "test:server": "bun --bun x vitest --run --config vitest.config.server.ts",
     "test:unit": "npm run test:client && npm run test:server",

@@ -20,6 +20,17 @@ const respond = (payload: unknown) =>
     headers: { 'content-type': 'application/json' },
   })
 
+/** `null` means "unknown id" in the provider contract; these cases all expect a hit. */
+async function detailsFor(id: string) {
+  const details = await omdbSearchProvider.getById(id)
+
+  if (!details) {
+    throw new Error(`Expected OMDB details for ${id}`)
+  }
+
+  return details
+}
+
 describe('omdbSearchProvider.search', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -151,7 +162,7 @@ describe('omdbSearchProvider.getById', () => {
     )
 
     // act
-    const details = await omdbSearchProvider.getById('tt7')
+    const details = await detailsFor('tt7')
 
     // assert
     expect(requestedUrl().searchParams.get('i')).toBe('tt7')
@@ -189,7 +200,7 @@ describe('omdbSearchProvider.getById', () => {
     )
 
     // act
-    const details = await omdbSearchProvider.getById('tt8')
+    const details = await detailsFor('tt8')
 
     // assert
     expect(details.poster).toBeNull()
@@ -215,7 +226,7 @@ describe('omdbSearchProvider.getById', () => {
     )
 
     // act
-    const details = await omdbSearchProvider.getById('tt9')
+    const details = await detailsFor('tt9')
 
     // assert
     expect(details.year).toBeNull()
