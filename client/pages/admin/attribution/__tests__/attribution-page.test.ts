@@ -7,7 +7,7 @@ import { api } from '@/shared/api'
 import { useUsers } from '@/shared/lib'
 import { makeMovie } from '@/shared/ui/__tests__/fixtures'
 import { confrimData } from '@/shared/ui/confirm/use-confirm'
-import AttributionPage from '../attribution-page.vue'
+import AttributionPage from '../ui/attribution-page.vue'
 
 const user = userEvent.setup()
 

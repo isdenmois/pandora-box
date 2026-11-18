@@ -3,11 +3,11 @@ import * as v from 'valibot'
 import { computed, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { flatten, useForm } from 'vue-standard-schema'
-import { useTags } from '@/features/tags'
 import { useMovies } from '@/entities/movie'
 import { useSeries } from '@/entities/series'
 import { toNullable, toNumber, useAuth, useUsers } from '@/shared/lib'
 import { Dialog, ImageWithFallback, ScheduleToggler, SeasonToggler, TagsInput } from '@/shared/ui'
+import { useTags } from './model'
 
 const router = useRouter()
 const movies = useMovies()

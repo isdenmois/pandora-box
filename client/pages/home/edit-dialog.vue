@@ -1,9 +1,9 @@
 <script lang="ts">
 import { useRoute, useRouter } from 'vue-router'
-import { useTags } from '@/features/tags'
 import { MovieEdit } from '@/entities/movie'
 import { SeriesEdit } from '@/entities/series'
 import { Dialog } from '@/shared/ui'
+import { useTags } from './model'
 
 type Props = {
   id: string

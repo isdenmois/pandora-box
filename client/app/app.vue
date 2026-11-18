@@ -2,8 +2,9 @@
 import { storeToRefs } from 'pinia'
 import { onMounted, watch } from 'vue'
 import { auth, useAuth, useUsers } from '@/shared/lib'
-import { ConfirmDialog, Navbar, Spinner } from '@/shared/ui'
+import { ConfirmDialog, Spinner } from '@/shared/ui'
 import { LoginPage } from '@/pages/login'
+import Navbar from './ui/navbar.vue'
 
 const { isLoggedIn, initialized } = storeToRefs(useAuth())
 const users = useUsers()

@@ -8,7 +8,7 @@ Pandora Box — a personal media watchlist app (movies/series with tags, ratings
 
 Monorepo with two apps in one package (Bun-managed, `bun.lock`, exact versions via `bunfig.toml`):
 
-- `client/` — Vue 3 SPA (Pinia, vue-router, UnoCSS presetWind4, wretch, valibot). Layered (FSD-style): `app/` → `pages/` → `features/` → `entities/` → `shared/`. Dependencies point downward only.
+- `client/` — Vue 3 SPA (Pinia, vue-router, UnoCSS presetWind4, wretch, valibot). Layered (FSD-style): `app/` → `pages/` → `entities/` → `shared/` (add a `features/` layer once a user action is shared by more than one page slice). Dependencies point downward only.
 - `server/` — Bun + Elysia API. Layered: `views/` (HTTP controllers + Elysia `t.` contracts, auth guards) → `app/` (use-cases) → `domain/` (drizzle entities/schema, search-provider interface, session) ← `infra/` (db, env, repositories).
 - `e2e/` — Playwright tests (`builders/`, `fixtures/`, `mocks/`, `page-objects/`, `tests/`).
 - `drizzle/` — generated SQL migrations. `data/` — local SQLite db. `public/` — static assets.
@@ -76,6 +76,9 @@ Posters are stored locally and served from `/images/`.
 ## Client conventions
 
 - API calls go through `client/shared/api/*` (wretch wrapper in `http.ts`); 401/403 globally clear the auth state.
+- Pages are FSD slices with an `index.ts` public API; `client/app/router.ts` imports page components only through it. `pages/admin` is a slice group (`pages/admin/<page>/ui/<page>.vue`) because the admin routes are independent pages sharing one shell.
+- `shared/ui` has one deliberate exception to "no business logic in shared": `Details`, `EditForm` and `MarkAsViewed` are the shared movie/series presentation and know attribution, poster and OMDB rules. `entities` may not import each other, so this copy is preferred over duplication; keep new domain components out of `shared`.
+- App-wide layout lives in `app/` (`app/ui/navbar.vue`); `shared/ui` holds only context-free components.
 - `VITE_SEARCH_URL` is a build-time env used for external search links.
 - `client/shared/lib/poster.ts` mirrors the server's `IMAGE_MAX_BYTES` default for the upload pre-check; the server contract enforces the real cap.
 - UnoCSS with presetWind4; custom breakpoint `zf: 380px` defined in `vite.config.ts`.

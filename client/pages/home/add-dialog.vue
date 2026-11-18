@@ -3,12 +3,12 @@ import * as v from 'valibot'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { flatten, useForm } from 'vue-standard-schema'
-import { useTags } from '@/features/tags'
 import { useMovies } from '@/entities/movie'
 import { useSeries } from '@/entities/series'
 import { api } from '@/shared/api'
 import { toNullable, toNumber, useAuth, useUsers } from '@/shared/lib'
 import { Dialog, ImageWithFallback, MoreButton, ScheduleToggler, SeasonToggler, Spinner, TagsInput } from '@/shared/ui'
+import { useTags } from './model'
 
 const router = useRouter()
 const params = useRoute().params as { id: string }
