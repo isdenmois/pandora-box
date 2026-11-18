@@ -14,9 +14,13 @@ export type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE'
 
 export interface RequestOptions {
   method?: Method
-  /** Path below `/api`, e.g. `/v1/movie`. */
+  /** Path below `/api` (or below `/` when `base` is `root`), e.g. `/v1/movie`. */
   path: string
+  /** `/api` for the controllers, `root` for the image route nginx would serve. */
+  base?: 'api' | 'root'
   body?: unknown
+  /** Multipart body; takes precedence over `body`. */
+  form?: FormData
   /** Value of the `Cookie` header, as returned by `login`. */
   cookie?: string
 }
@@ -33,12 +37,14 @@ export const PASSWORD = 'correct horse battery staple'
 export async function request<T = unknown>({
   method = 'GET',
   path,
+  base = 'api',
   body,
+  form,
   cookie,
 }: RequestOptions): Promise<ApiResponse<T>> {
   const headers: Record<string, string> = {}
 
-  if (body !== undefined) {
+  if (body !== undefined && !form) {
     headers['content-type'] = 'application/json'
   }
 
@@ -47,16 +53,33 @@ export async function request<T = unknown>({
   }
 
   const response = await app.handle(
-    new Request(`http://localhost/api${path}`, {
+    new Request(urlFor(base, path), {
       method,
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: form ?? (body === undefined ? undefined : JSON.stringify(body)),
     }),
   )
   const text = await response.text()
   const setCookie = response.headers.getSetCookie().find((value) => value.startsWith('auth-session=')) ?? null
 
   return { status: response.status, body: parseBody(text) as T, setCookie }
+}
+
+function urlFor(base: 'api' | 'root', path: string) {
+  return base === 'api' ? `http://localhost/api${path}` : `http://localhost${path}`
+}
+
+/** For binary responses (posters), where decoding as text would corrupt the bytes. */
+export async function requestBytes(options: RequestOptions) {
+  const response = await app.handle(
+    new Request(urlFor(options.base ?? 'api', options.path), { method: options.method }),
+  )
+
+  return {
+    status: response.status,
+    bytes: new Uint8Array(await response.arrayBuffer()),
+    contentType: response.headers.get('content-type'),
+  }
 }
 
 /** Guards answer with an empty body or plain text, so JSON is a best-effort parse. */

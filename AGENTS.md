@@ -10,7 +10,8 @@ Monorepo with two apps in one package (Bun-managed, `bun.lock`, exact versions v
 
 - `client/` — Vue 3 SPA (Pinia, vue-router, UnoCSS presetWind4, wretch, valibot). Layered (FSD-style): `app/` → `pages/` → `entities/` → `shared/` (add a `features/` layer once a user action is shared by more than one page slice). Dependencies point downward only.
 - `server/` — Bun + Elysia API. Layered: `views/` (HTTP controllers + Elysia `t.` contracts, auth guards) → `app/` (use-cases) → `domain/` (drizzle entities/schema, search-provider interface, session) ← `infra/` (db, env, repositories).
-- `e2e/` — Playwright tests (`builders/`, `fixtures/`, `mocks/`, `page-objects/`, `tests/`).
+- `e2e/` — Playwright browser tests (`builders/`, `fixtures/`, `mocks/`, `page-objects/`, `tests/`).
+- `server/e2e/` — server HTTP e2e, run by `test:server`: real requests through `app.handle` against a migrated `:memory:` database.
 - `drizzle/` — generated SQL migrations. `data/` — local SQLite db. `public/` — static assets.
 
 ## Commands
@@ -21,8 +22,9 @@ bun run server       # API server with --watch on :3000
 npm run lint         # biome check .   (npm, not bun, for scripts)
 npm run format       # biome check --write .
 npm run test:client  # vitest --run (jsdom; client tests colocated in __tests__/ dirs)
-npm run test:server  # vitest --run (node env; server tests)
+npm run test:server  # vitest --run (node env; server tests + server HTTP e2e)
 npm run test:unit    # test:client + test:server
+npm run typecheck    # tsc -p server/tsconfig.json --noEmit (server only)
 npm run test:pw      # playwright (chromium only; auto-starts dev server on :5173)
 npm run test         # unit + pw  (manual full run)
 npm run db:generate  # generate migration from schema  (needs DATABASE_URL)
@@ -32,10 +34,10 @@ npm run db:studio    # drizzle studio
 
 Git hooks are managed by lefthook (`lefthook.yml`, installed via the `prepare` script):
 
-- pre-commit: `biome check --write` on staged files, fixes re-staged (`stage_fixed`).
+- pre-commit: `biome check --write` on staged files, fixes re-staged (`stage_fixed`); server typecheck when a `server/**/*.ts` file is staged.
 - pre-push: `test:server`, `test:client`, `test:pw` as parallel jobs.
 
-No `typecheck` script exists (no vue-tsc); TypeScript is checked by editors and bun's transpiler only.
+`npm run typecheck` covers the server. There is no vue-tsc dependency, so `.vue` files are only checked by editors and the build.
 
 ## Path aliases & imports
 

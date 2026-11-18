@@ -1,3 +1,5 @@
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 import { configDefaults, defineConfig } from 'vitest/config'
 
@@ -14,6 +16,8 @@ export default defineConfig({
     env: {
       DATABASE_URL: ':memory:',
       OMDB_URL: 'https://omdb.test/api',
+      // Keep poster writes out of `data/images`; the OS owns the directory.
+      IMAGE_DIR: join(tmpdir(), 'pandora-box-test-images'),
     },
   },
   resolve: {
