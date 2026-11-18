@@ -23,6 +23,8 @@ export interface RequestOptions {
   form?: FormData
   /** Value of the `Cookie` header, as returned by `login`. */
   cookie?: string
+  /** Extra headers, e.g. `if-none-match` for image revalidation. */
+  headers?: Record<string, string>
 }
 
 export interface ApiResponse<T = unknown> {
@@ -41,8 +43,9 @@ export async function request<T = unknown>({
   body,
   form,
   cookie,
+  headers: extraHeaders,
 }: RequestOptions): Promise<ApiResponse<T>> {
-  const headers: Record<string, string> = {}
+  const headers: Record<string, string> = { ...extraHeaders }
 
   if (body !== undefined && !form) {
     headers['content-type'] = 'application/json'
@@ -71,14 +74,24 @@ function urlFor(base: 'api' | 'root', path: string) {
 
 /** For binary responses (posters), where decoding as text would corrupt the bytes. */
 export async function requestBytes(options: RequestOptions) {
+  const headers = { ...options.headers }
+
+  if (options.cookie) {
+    headers.cookie = options.cookie
+  }
+
   const response = await app.handle(
-    new Request(urlFor(options.base ?? 'api', options.path), { method: options.method }),
+    new Request(urlFor(options.base ?? 'api', options.path), { method: options.method, headers }),
   )
 
   return {
     status: response.status,
     bytes: new Uint8Array(await response.arrayBuffer()),
     contentType: response.headers.get('content-type'),
+    /** Where a cold miss redirects to: the remote source, or the corrected stored path. */
+    location: response.headers.get('location'),
+    etag: response.headers.get('etag'),
+    cacheControl: response.headers.get('cache-control'),
   }
 }
 
