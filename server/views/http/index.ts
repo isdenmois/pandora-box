@@ -1,6 +1,7 @@
 import Elysia from 'elysia'
 import { adminController } from './admin'
 import { authController } from './auth'
+import { offsiteController } from './backup-offsite'
 import { imageController } from './image'
 import { movieController } from './movie'
 import { posterController } from './poster'
@@ -11,6 +12,7 @@ import { userController } from './user'
 export const httpControllers = new Elysia({ prefix: '/api' })
   .use(authController)
   .use(adminController)
+  .use(offsiteController)
   .use(movieController)
   .use(posterController)
   .use(searchController)

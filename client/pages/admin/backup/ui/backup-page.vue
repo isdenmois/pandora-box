@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { api } from '@/shared/api'
 import { downloadBlob } from '@/shared/lib'
+import OffsiteCard from './offsite-card.vue'
 
 const files = ref<FileList | null>(null)
 const error = ref('')
@@ -74,4 +75,6 @@ const restore = async () => {
     <div v-if="success" class="mt-4">Backup successfully restored</div>
     <button class="mt-4">Restore backup</button>
   </form>
+
+  <OffsiteCard />
 </template>

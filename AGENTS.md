@@ -63,6 +63,28 @@ Posters are stored locally and served from `/images/`.
 - **Reads are unauthenticated** — `/images/<id>.<ext>` needs no session, including posters of `private` records. That is the trade for nginx answering hits from disk.
 - **Backups are DB-only** (`/api/v1/admin/backup`), so a restore on another machine re-downloads each poster on first view. Restoring localizes rows from a backup taken before the column split, where `poster` still held the remote URL.
 
+### Offsite backup
+
+The database is also copied to Firebase Realtime Database as JSON: the payload of
+`GET /api/v1/admin/backup` verbatim (raw rows, so `passwordHash` travels with it), written under
+`/backups/<YYYY-MM-DD>`. The key is the UTC day, so a second run that day overwrites it; Realtime
+Database keys cannot contain `.`, which rules out a finer timestamp. After a successful write the
+endpoint lists the tree with `shallow=true` and deletes everything past the newest 14 keys; a prune
+failure is logged and does not fail the run.
+
+- `POST /api/v1/backup/offsite` is the machine route: timing-safe `Authorization: Bearer $BACKUP_TOKEN`
+  in its own plugin, so the token can never reach `/admin`. `POST /api/v1/admin/backup/offsite` is
+  the same use-case behind the admin cookie, for the button on `pages/admin/backup`, and
+  `GET /api/v1/admin/backup/offsite` lists the retained keys for that page.
+- Firebase auth is a service-account key → RS256 assertion → OAuth2 access token, cached until a
+  minute before expiry and sent in a header (never `?access_token=`). Database rules stay deny-all:
+  the access token is admin-scoped and bypasses them.
+- `FIREBASE_DB_URL`, `FIREBASE_SERVICE_ACCOUNT_B64` (base64 of the JSON key, so the PEM newlines
+  survive env) and `BACKUP_TOKEN` (16+ chars) are all optional; until all three are set the routes
+  answer `503`. Compose passes unset values as empty strings, which the env schema reads as absent.
+- The upload is inline: a failure answers `502` with the upstream reason and nothing is written to
+  disk. Scheduling lives outside the app — a host crontab `curl -fsS -X POST … -H "Authorization: Bearer …"`.
+
 ### Attribution and visibility
 
 - Every movie/series has a required `createdBy` (set from the session on insert, never accepted from the client) and an optional `recommendedBy`; both reference `user.id`. The schema declares the foreign keys but SQLite enforcement stays off (`server/infra/db/db.ts` sets `PRAGMA foreign_keys = OFF`), so the server validates references itself.

@@ -1,4 +1,5 @@
 export * from './admin.guard'
 export * from './auth.guard'
 export * from './auth-cookie'
+export * from './backup-token.guard'
 export * from './session'

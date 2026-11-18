@@ -18,9 +18,30 @@ const EnvSchema = v.object({
   ),
   /** `off` makes cold misses answer 302 to the source without downloading anything. */
   IMAGE_FETCH: v.optional(v.picklist(['on', 'off']), 'on'),
+  /** Realtime Database URL, e.g. `https://<project>-default-rtdb.<region>.firebasedatabase.app`. */
+  FIREBASE_DB_URL: v.optional(v.pipe(v.string(), v.url())),
+  /** Service-account JSON in base64: the PEM newlines do not survive `.env` or compose otherwise. */
+  FIREBASE_SERVICE_ACCOUNT_B64: v.optional(v.pipe(v.string(), v.nonEmpty())),
+  /** Bearer token the offsite backup cron sends. Unset keeps the machine endpoint off. */
+  BACKUP_TOKEN: v.optional(v.pipe(v.string(), v.minLength(16))),
 })
 
-const { DATABASE_URL, OMDB_URL, IMAGE_DIR, IMAGE_MAX_BYTES, IMAGE_FETCH } = v.parse(EnvSchema, process.env)
+/**
+ * Compose turns an unset variable into an empty string, which would trip every `nonEmpty` rule;
+ * an empty value means absent, so optional variables fall back to their defaults.
+ */
+const source = Object.fromEntries(Object.entries(process.env).filter(([, value]) => value))
+
+const {
+  DATABASE_URL,
+  OMDB_URL,
+  IMAGE_DIR,
+  IMAGE_MAX_BYTES,
+  IMAGE_FETCH,
+  FIREBASE_DB_URL,
+  FIREBASE_SERVICE_ACCOUNT_B64,
+  BACKUP_TOKEN,
+} = v.parse(EnvSchema, source)
 
 export const env = {
   DATABASE_URL,
@@ -28,4 +49,7 @@ export const env = {
   IMAGE_DIR,
   IMAGE_MAX_BYTES,
   IMAGE_FETCH,
+  FIREBASE_DB_URL,
+  FIREBASE_SERVICE_ACCOUNT_B64,
+  BACKUP_TOKEN,
 }

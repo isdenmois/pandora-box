@@ -1,16 +1,18 @@
 import Elysia, { StatusMap, status } from 'elysia'
-import { admin } from '@/app'
+import { admin, offsiteUC } from '@/app'
 import {
   attributionRepository,
   backupRepository,
   importRepository,
   movieRepository,
+  OFFSITE_RETENTION,
   posterRepository,
   seriesRepository,
   userRepository,
 } from '@/infra'
 import { errorMessage } from '@/shared'
 import { adminGuard } from '@/views/auth'
+import { respond } from '../backup-offsite/respond'
 import { BackupRestoreBody, ImportBody, ReassignAttributionBody, RegisterUserBody } from './admin.contract'
 
 /** Ids that still have a row; anything else on disk is an orphan. */
@@ -47,6 +49,14 @@ export const adminController = new Elysia({
   )
   .get('/backup', () => backupRepository.create())
   .post('/backup', ({ body }) => backupRepository.restore(body), { body: BackupRestoreBody })
+  // The admin half of the offsite pair: same snapshot, but authenticated by the session cookie and
+  // able to report what is already stored. The cron uses the bearer route in `/backup-offsite`.
+  .get('/backup/offsite', async ({ status }) => {
+    const keys = await offsiteUC.list()
+
+    return keys ? { keys, retention: OFFSITE_RETENTION } : status(503, { message: 'Offsite backup is not configured' })
+  })
+  .post('/backup/offsite', async () => respond(await offsiteUC.upload()))
   // Only shared rows: a private row belongs to its creator, so an admin never sees or moves one.
   .get('/attribution', () => attributionRepository.getGlobal())
   .patch(

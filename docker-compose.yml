@@ -7,6 +7,10 @@ services:
       DATABASE_URL: /data/local.db
       OMDB_URL: ${OMDB_URL}
       IMAGE_DIR: /data/images
+      # Offsite backup. Unset values arrive as empty strings, which the env schema reads as absent.
+      FIREBASE_DB_URL: ${FIREBASE_DB_URL:-}
+      FIREBASE_SERVICE_ACCOUNT_B64: ${FIREBASE_SERVICE_ACCOUNT_B64:-}
+      BACKUP_TOKEN: ${BACKUP_TOKEN:-}
   webapp:
     build:
       context: .
