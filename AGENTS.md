@@ -63,6 +63,16 @@ Posters are stored locally and served from `/images/`.
 - **Reads are unauthenticated** — `/images/<id>.<ext>` needs no session, including posters of `private` records. That is the trade for nginx answering hits from disk.
 - **Backups are DB-only** (`/api/v1/admin/backup`), so a restore on another machine re-downloads each poster on first view. Restoring localizes rows from a backup taken before the column split, where `poster` still held the remote URL.
 
+### Attribution and visibility
+
+- Every movie/series has a required `createdBy` (set from the session on insert, never accepted from the client) and an optional `recommendedBy`; both reference `user.id`. The schema declares the foreign keys but SQLite enforcement stays off (`server/infra/db/db.ts` sets `PRAGMA foreign_keys = OFF`), so the server validates references itself.
+- `private=false` rows are shared: any authenticated user may read, edit and delete them. `private=true` rows belong to their creator alone: other users, **including admins**, get `404` from every record route, poster upload and poster re-download. There is no admin override in the API.
+- `createdBy` changes only when a user claims a global row by flipping it to For Me (the editor becomes the creator) or through the admin attribution page (`/admin/attribution`, `GET/PATCH /api/v1/admin/attribution`). That page lists shared rows only and supports bulk + per-row reassignment; it clears `recommendedBy` when it equals the new creator. A private row must be made Global by its owner before an admin can move it.
+- `GET /api/v1/user` is the name directory (`id` + `username`) for attribution labels and the recommender picker. `GET /api/v1/user/current` still returns the full session user.
+- The creator is displayed only in the details (view) mode. The add and edit forms do not show the `Added by` field; the edit form only hints that making a global row private claims it.
+- The home added-by filter is hidden by default; the filter button on the line below the toolbar shows/hides its chips, and hiding it clears the creator filter. Sort and filter buttons share the left end of that line; tag chips follow them without a label. Entering For Me clears the creator filter.
+- Import is admin-only: new rows get the importer as creator, existing rows keep theirs, and old `userId` values in the import JSON are ignored. Full backup/restore remains a server-owner exception and still includes other users' private rows; a legacy backup maps `userId` → `createdBy` and assigns ownerless rows to the first admin in the backup.
+
 ## Client conventions
 
 - API calls go through `client/shared/api/*` (wretch wrapper in `http.ts`); 401/403 globally clear the auth state.

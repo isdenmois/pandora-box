@@ -11,18 +11,18 @@ button {
 
 button.primary {
   background-color: var(--surface2);
-  padding: 10px 16px;
-  border-radius: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
   justify-content: center;
 }
 
 button.secondary {
-  padding: 10px 16px;
+  padding: 8px 12px;
   color: var(--text-secondary);
 }
 
 button.flat {
-  padding: 10px 16px;
+  padding: 8px 12px;
 }
 
 button.selected {
@@ -50,7 +50,7 @@ button.group .active {
 
 button.group.primary .active {
   background-color: var(--surface2);
-  padding: 8px 16px;
+  padding: 8px 12px;
   border-radius: 8px;
 }
 

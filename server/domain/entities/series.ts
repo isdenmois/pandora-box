@@ -22,13 +22,18 @@ export const series = sqliteTable(
     seen: text(),
     seenRating: integer(),
     seenComment: text(),
-    userId: text('user_id'),
-    private: integer({ mode: 'boolean' }),
+    /** The account that added the row. Set from the session, never from the request body. */
+    createdBy: text('created_by')
+      .notNull()
+      .references(() => user.id),
+    /** The account that recommended the title, if any. Metadata only; never affects visibility. */
+    recommendedBy: text('recommended_by').references(() => user.id, { onDelete: 'set null' }),
+    private: integer({ mode: 'boolean' }).notNull().default(false),
     scheduled: integer({ mode: 'number' }),
     tags: blob({ mode: 'json' }).$type<string[]>(),
     extra: blob({ mode: 'json' }),
   },
-  (table) => [index('series_user_id_idx').on(table.userId, table.private)],
+  (table) => [index('series_created_by_idx').on(table.createdBy, table.private)],
 )
 
 export const seriesView = sqliteTable('series_view', {
@@ -49,13 +54,22 @@ export type SeriesView = typeof series.$inferSelect
 /** Create payload: `poster` is the source URL, mapped to `posterSource` by the repository. */
 export type SeriesCreate = Omit<
   Series,
-  'id' | 'seasonHistory' | 'seen' | 'seenRating' | 'seenComment' | 'poster' | 'posterSource'
+  'id' | 'createdBy' | 'seasonHistory' | 'seen' | 'seenRating' | 'seenComment' | 'poster' | 'posterSource'
 > & {
   poster: string | null
 }
 export type SeriesUpdate = Pick<
   Series,
-  'title' | 'season' | 'seasonHistory' | 'year' | 'rating' | 'reason' | 'userId' | 'private'
+  | 'title'
+  | 'season'
+  | 'seasonHistory'
+  | 'year'
+  | 'rating'
+  | 'reason'
+  | 'recommendedBy'
+  | 'private'
+  | 'scheduled'
+  | 'tags'
 > & {
   poster?: string | null
 }

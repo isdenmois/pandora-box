@@ -20,13 +20,18 @@ export const movie = sqliteTable(
     seen: text(),
     seenRating: integer(),
     seenComment: text(),
-    userId: text('user_id'),
-    private: integer({ mode: 'boolean' }),
+    /** The account that added the row. Set from the session, never from the request body. */
+    createdBy: text('created_by')
+      .notNull()
+      .references(() => user.id),
+    /** The account that recommended the title, if any. Metadata only; never affects visibility. */
+    recommendedBy: text('recommended_by').references(() => user.id, { onDelete: 'set null' }),
+    private: integer({ mode: 'boolean' }).notNull().default(false),
     scheduled: integer({ mode: 'number' }),
     tags: blob({ mode: 'json' }).$type<string[]>(),
     extra: blob({ mode: 'json' }),
   },
-  (table) => [index('movie_user_id_idx').on(table.userId, table.private)],
+  (table) => [index('movie_created_by_idx').on(table.createdBy, table.private)],
 )
 
 export const movieView = sqliteTable('movie_view', {
@@ -45,12 +50,15 @@ export type Movie = typeof movie.$inferSelect
 export type MovieView = typeof movieView.$inferSelect
 
 /** Create payload: `poster` is the source URL, mapped to `posterSource` by the repository. */
-export type MovieCreate = Omit<Movie, 'id' | 'seen' | 'seenRating' | 'seenComment' | 'poster' | 'posterSource'> & {
+export type MovieCreate = Omit<
+  Movie,
+  'id' | 'createdBy' | 'seen' | 'seenRating' | 'seenComment' | 'poster' | 'posterSource'
+> & {
   poster: string | null
 }
 export type MovieUpdate = Pick<
   Movie,
-  'title' | 'year' | 'rating' | 'reason' | 'userId' | 'private' | 'scheduled' | 'tags'
+  'title' | 'year' | 'rating' | 'reason' | 'recommendedBy' | 'private' | 'scheduled' | 'tags'
 > & {
   poster?: string | null
 }

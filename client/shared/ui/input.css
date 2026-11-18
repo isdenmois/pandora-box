@@ -9,7 +9,7 @@ input[type='date'],
 input[type='password'] {
   border: 0;
   border-bottom: 1px solid var(--border);
-  color: var(--primary-text);
+  color: var(--text-primary);
   background-color: transparent;
   padding: 0.5rem;
   font-size: 16px;
@@ -35,12 +35,15 @@ label.field {
 }
 
 .field input,
+.field select,
 label.field input,
+label.field select,
 label.search input {
   display: block;
   border: 0;
   padding: 8px 12px;
   background-color: var(--surface1);
+  color: var(--text-primary);
   border-radius: 8px;
   width: 100%;
 }

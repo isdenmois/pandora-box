@@ -35,6 +35,8 @@ export const useHome = defineStore('home', () => {
   const seen = ref(false)
   const search = ref('')
   const tag = ref<string | null>(null)
+  // The creator-filter UI is hidden for now; the state stays wired so it can be shown again.
+  const creator = ref<string | null>(null)
   const searchValue = computed(() => search.value.trim().toLowerCase())
 
   const now = Date.now()
@@ -55,12 +57,15 @@ export const useHome = defineStore('home', () => {
   const filterByTag = (item: Movie | Series) => {
     return !tag.value || item.tags?.includes(tag.value)
   }
+  const filterByCreator = (item: Movie | Series) => {
+    return !creator.value || item.createdBy === creator.value
+  }
 
   const filter = (item: Movie | Series) => {
-    return filterByFilters(item) && filterBySearch(item) && filterBySchedule(item)
+    return filterByFilters(item) && filterBySearch(item) && filterBySchedule(item) && filterByCreator(item)
   }
   const filterScheduled = (item: Movie | Series) => {
-    return filterByFilters(item) && filterBySearch(item) && !filterBySchedule(item)
+    return filterByFilters(item) && filterBySearch(item) && !filterBySchedule(item) && filterByCreator(item)
   }
   const sortBy = computed(() => (seen.value ? bySeen : sorts[sort.value]))
 
@@ -77,6 +82,7 @@ export const useHome = defineStore('home', () => {
     forMe: readonly(forMe),
     sort: readonly(sort),
     seen: readonly(seen),
+    creator: readonly(creator),
     search,
     tag,
     movies: computed(() => movieList.value.filter(filterByTag)),
@@ -85,6 +91,11 @@ export const useHome = defineStore('home', () => {
     tags,
     toggleForMe() {
       forMe.value = !forMe.value
+
+      // The creator chips only exist on the Global tab; do not leave a hidden filter behind.
+      if (forMe.value) {
+        creator.value = null
+      }
     },
     toggleSort() {
       if (sort.value === 'season') {
@@ -103,6 +114,16 @@ export const useHome = defineStore('home', () => {
         tag.value = null
       } else {
         tag.value = value
+      }
+    },
+    setCreator(value: string | null) {
+      creator.value = value
+    },
+    toggleCreator(value: string) {
+      if (creator.value === value) {
+        creator.value = null
+      } else {
+        creator.value = value
       }
     },
   }

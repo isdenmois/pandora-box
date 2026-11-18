@@ -1,7 +1,9 @@
 import userEvent from '@testing-library/user-event'
 import { fireEvent, render, screen } from '@testing-library/vue'
 import { flushPromises } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { useUsers } from '@/shared/lib'
 import { confrimData } from '../confirm/use-confirm'
 import EditForm from '../edit-form.vue'
 import { makeMovie } from './fixtures'
@@ -10,6 +12,7 @@ const user = userEvent.setup()
 
 describe('edit-form', () => {
   beforeEach(() => {
+    setActivePinia(createPinia())
     confrimData.value = null
     // jsdom has no blob URLs; the preview only needs a stable value.
     URL.createObjectURL = vi.fn(() => 'blob:poster-preview')
@@ -60,6 +63,7 @@ describe('edit-form', () => {
         title: 'New Title',
         season: 0,
         reason: 'because',
+        recommendedBy: null,
         private: false,
         scheduled: null,
         tags: ['old'],
@@ -88,12 +92,31 @@ describe('edit-form', () => {
         title: 'Some Movie',
         season: 0,
         reason: 'because',
+        recommendedBy: null,
         private: false,
         scheduled: null,
         tags: [],
       },
       file,
     )
+  })
+
+  it('sends the selected recommender', async () => {
+    // arrange
+    useUsers().all = [
+      { id: 'user-1', username: 'me' },
+      { id: 'user-2', username: 'other' },
+    ]
+    const onSave = vi.fn()
+    render(EditForm, { props: { data: makeMovie(), tags: [], onSave } })
+
+    // act
+    await user.click(screen.getByText('other'))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    await flushPromises()
+
+    // assert
+    expect(onSave).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ recommendedBy: 'user-2' }), null)
   })
 
   it('shows the picked file in the preview', async () => {

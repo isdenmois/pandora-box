@@ -12,7 +12,7 @@ vi.mock('@/infra', () => ({
 vi.mock('@/views/auth', async () => {
   const { Elysia } = await import('elysia')
 
-  return { authGuard: new Elysia({ name: 'auth guard' }).derive(() => ({ user: { id: 'user-1' } })) }
+  return { authGuard: new Elysia({ name: 'auth guard' }).derive({ as: 'scoped' }, () => ({ user: { id: 'user-1' } })) }
 })
 
 const { movieRepository, posterRepository } = await import('@/infra')
@@ -61,7 +61,7 @@ describe('PATCH /v1/movie/:id/poster', () => {
     expect(await response.json()).toEqual(ROW)
     // The extension comes from the bytes, never from the file name the client chose.
     expect(posterRepository.save).toHaveBeenCalledWith(ID, 'png', expect.any(Uint8Array))
-    expect(movieRepository.update).toHaveBeenCalledWith(ID, { title: 'New Title' }, `/images/${ID}.png`)
+    expect(movieRepository.update).toHaveBeenCalledWith(ID, { title: 'New Title' }, `/images/${ID}.png`, 'user-1')
   })
 
   it('rejects a payload that does not satisfy the update contract', async () => {

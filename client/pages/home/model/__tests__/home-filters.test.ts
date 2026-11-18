@@ -92,6 +92,39 @@ describe('useHome store', () => {
     })
   })
 
+  describe('creator filter', () => {
+    const a = { id: 'a', rating: 5, createdBy: 'user-1' } as Movie
+    const b = { id: 'b', rating: 3, createdBy: 'user-2' } as Movie
+
+    beforeEach(() => {
+      moviesMock.all = readonly([a, b])
+    })
+
+    it('should filter by creator', () => {
+      // arrange
+      const store = useHome()
+
+      // act
+      store.toggleCreator('user-2')
+
+      // assert
+      expect(store.creator).toBe('user-2')
+      expect(store.movies).toEqual([b])
+    })
+
+    it('should clear the creator filter when entering "for me"', () => {
+      // arrange
+      const store = useHome()
+      store.toggleCreator('user-1')
+
+      // act
+      store.toggleForMe()
+
+      // assert
+      expect(store.creator).toBeNull()
+    })
+  })
+
   describe('sort mode', () => {
     const a = { title: 'a', rating: 5 } as Movie
     const b = { title: 'b', rating: 3 } as Movie

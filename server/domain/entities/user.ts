@@ -9,3 +9,5 @@ export const user = sqliteTable('user', {
 })
 
 export type User = typeof user.$inferSelect
+/** The public directory shape: names only, never credentials or roles. */
+export type UserSummary = Pick<User, 'id' | 'username'>

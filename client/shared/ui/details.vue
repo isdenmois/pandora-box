@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { formatDate, getExternalUrl, isMobile, isOmdb, isOmdbString, searchLink, useAuth } from '@/shared/lib'
+import { formatDate, getExternalUrl, isMobile, isOmdb, isOmdbString, searchLink, useUsers } from '@/shared/lib'
 import type { Movie, Series } from '../api'
 import Icon from './icon.vue'
 import { icons } from './icons'
@@ -21,7 +21,9 @@ const searchUrl = computed(() =>
   searchLink('season' in data && data.season ? `${data.title} ${data.season}` : data.title),
 )
 
-const { user } = useAuth()
+const users = useUsers()
+const creatorName = computed(() => users.nameFor(data.createdBy) ?? 'Unknown')
+const recommenderName = computed(() => users.nameFor(data.recommendedBy))
 const totalSeasons = computed(() => (isOmdb(data) && data.extra.totalSeasons ? +data.extra.totalSeasons : null))
 const season = ref('season' in data ? data.season || 1 : 1)
 const externalUrl = computed(() =>
@@ -75,14 +77,11 @@ const canRefresh = computed(() => data.provider === 'omdb')
       </div>
     </div>
 
-    <label class="field">
+    <div class="field">
       <div class="label">List</div>
 
-      <button type="button" class="group primary mt-1 gap-3">
-        <span :class="{ active: !data.private }">Global</span>
-        <span :class="{ active: data.private }">For Me</span>
-      </button>
-    </label>
+      <div>{{ data.private ? 'For Me' : 'Global' }}</div>
+    </div>
 
     <label v-if="data.reason" class="field">
       <div class="label">Reason</div>
@@ -96,9 +95,15 @@ const canRefresh = computed(() => data.provider === 'omdb')
     </label>
 
     <label class="field">
-      <div class="label">Who Added</div>
+      <div class="label">Added by</div>
 
-      {{ data.userId === user?.id ? 'Me' : 'Not me' }}
+      {{ creatorName }}
+    </label>
+
+    <label v-if="data.recommendedBy" class="field">
+      <div class="label">Recommended by</div>
+
+      {{ recommenderName }}
     </label>
 
     <label v-if="data.year" class="field">

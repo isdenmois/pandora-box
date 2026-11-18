@@ -2,7 +2,7 @@ import userEvent from '@testing-library/user-event'
 import { render, screen } from '@testing-library/vue'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { useAuth } from '@/shared/lib'
+import { useUsers } from '@/shared/lib'
 import Details from '../details.vue'
 import { makeMovie, makeSeries } from './fixtures'
 
@@ -127,25 +127,39 @@ describe('details', () => {
     expect(container.querySelector('svg')).toBeInTheDocument()
   })
 
-  it('shows Me when the data belongs to the current user', () => {
+  it('shows the creator username', () => {
     // arrange
-    useAuth().setUser({ id: 'user-1', username: 'me', role: 'admin' })
+    useUsers().all = [{ id: 'user-1', username: 'me' }]
 
     // act
     render(Details, { props: { data: makeMovie() } })
 
     // assert
-    expect(screen.getByText('Me')).toBeInTheDocument()
+    expect(screen.getByText('Added by')).toBeInTheDocument()
+    expect(screen.getByText('me')).toBeInTheDocument()
   })
 
-  it('shows Not me when the data belongs to another user', () => {
+  it('shows the recommender when one is set', () => {
     // arrange
-    useAuth().setUser({ id: 'someone-else', username: 'other', role: 'user' })
+    useUsers().all = [
+      { id: 'user-1', username: 'me' },
+      { id: 'user-2', username: 'other' },
+    ]
 
     // act
-    render(Details, { props: { data: makeMovie() } })
+    render(Details, { props: { data: makeMovie({ recommendedBy: 'user-2' }) } })
 
     // assert
-    expect(screen.getByText('Not me')).toBeInTheDocument()
+    expect(screen.getByText('Recommended by')).toBeInTheDocument()
+    expect(screen.getByText('other')).toBeInTheDocument()
+  })
+
+  it('falls back to Unknown when the creator is not in the directory', () => {
+    // arrange
+    // act
+    render(Details, { props: { data: makeMovie({ createdBy: 'deleted-user' }) } })
+
+    // assert
+    expect(screen.getByText('Unknown')).toBeInTheDocument()
   })
 })

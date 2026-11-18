@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { readonly, ref, shallowRef } from 'vue'
 import { api, type Movie, type MovieCreate } from '@/shared/api'
-import { isOmdb, isOmdbString, useAuth } from '@/shared/lib'
+import { isOmdb, isOmdbString } from '@/shared/lib'
 import type { MovieUpdate } from '@/server/*'
 
 export const useMovies = defineStore('movies', () => {
@@ -85,17 +85,6 @@ export const useMovies = defineStore('movies', () => {
       }
 
       await api.movie.removeMovieView(id)
-    },
-
-    async togglePrivate(id: string) {
-      const existed = all.value.find((movie) => movie.id === id)
-
-      if (existed) {
-        const { user } = useAuth()
-        existed.private = !existed.private
-
-        await api.movie.patch(id, { private: existed.private, userId: user?.id || null })
-      }
     },
 
     async refreshData(id: string) {

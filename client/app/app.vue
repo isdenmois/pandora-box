@@ -1,11 +1,26 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { onMounted } from 'vue'
-import { auth, useAuth } from '@/shared/lib'
+import { onMounted, watch } from 'vue'
+import { auth, useAuth, useUsers } from '@/shared/lib'
 import { ConfirmDialog, Navbar, Spinner } from '@/shared/ui'
 import { LoginPage } from '@/pages/login'
 
 const { isLoggedIn, initialized } = storeToRefs(useAuth())
+const users = useUsers()
+
+// The directory powers every attribution label and the recommender picker. Load it as soon as a
+// session exists, including after a login that happens without remounting the app.
+watch(
+  isLoggedIn,
+  (loggedIn) => {
+    if (loggedIn) {
+      users.refresh()
+    } else {
+      users.clear()
+    }
+  },
+  { immediate: true },
+)
 
 onMounted(() => {
   auth.init()

@@ -57,6 +57,7 @@ describe('edit-dialog', () => {
     expect(api.movie.patch).toHaveBeenCalledExactlyOnceWith('m1', {
       title: 'Some Movie',
       reason: 'because',
+      recommendedBy: null,
       private: false,
       scheduled: null,
       tags: [],

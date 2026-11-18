@@ -3,6 +3,8 @@ import { movieRepository, seriesRepository } from '@/infra'
 export interface PosterRow {
   poster: string | null
   posterSource: string | null
+  private: boolean
+  createdBy: string
 }
 
 /**
@@ -13,10 +15,22 @@ export async function findPosterRow(id: string): Promise<PosterRow | null> {
   const movie = await movieRepository.byId(id)
 
   if (movie) {
-    return { poster: movie.poster, posterSource: movie.posterSource }
+    return {
+      poster: movie.poster,
+      posterSource: movie.posterSource,
+      private: movie.private,
+      createdBy: movie.createdBy,
+    }
   }
 
   const series = await seriesRepository.byId(id)
 
-  return series ? { poster: series.poster, posterSource: series.posterSource } : null
+  return series
+    ? {
+        poster: series.poster,
+        posterSource: series.posterSource,
+        private: series.private,
+        createdBy: series.createdBy,
+      }
+    : null
 }

@@ -4,6 +4,7 @@ import { flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { api } from '@/shared/api'
+import { useAuth, useUsers } from '@/shared/lib'
 import AddManualDialog from '../add-manual-dialog.vue'
 import { makeMovie, makeSeries } from './fixtures'
 
@@ -56,10 +57,30 @@ describe('add-manual-dialog', () => {
       language: null,
       genre: null,
       extra: {},
-      userId: null,
+      recommendedBy: null,
       private: false,
     })
     expect(router.replace).toHaveBeenCalledExactlyOnceWith('/')
+  })
+
+  it('sends the selected recommender', async () => {
+    // arrange
+    useAuth().setUser({ id: 'user-1', username: 'me', role: 'admin' })
+    useUsers().all = [
+      { id: 'user-1', username: 'me' },
+      { id: 'user-2', username: 'other' },
+    ]
+    const create = vi.spyOn(api.movie, 'create').mockResolvedValue(makeMovie())
+    render(AddManualDialog)
+    await user.type(screen.getByPlaceholderText('Title'), 'My Movie')
+
+    // act
+    await user.click(screen.getByText('other'))
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+    await flushPromises()
+
+    // assert
+    expect(create).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ recommendedBy: 'user-2' }))
   })
 
   it('creates a manual series with the season on submit', async () => {

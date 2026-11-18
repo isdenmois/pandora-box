@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import * as v from 'valibot'
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { flatten, useForm } from 'vue-standard-schema'
 import { useTags } from '@/features/tags'
 import { useMovies } from '@/entities/movie'
 import { useSeries } from '@/entities/series'
 import { api } from '@/shared/api'
-import { toNullable, toNumber, useAuth } from '@/shared/lib'
+import { toNullable, toNumber, useAuth, useUsers } from '@/shared/lib'
 import { Dialog, ImageWithFallback, MoreButton, ScheduleToggler, SeasonToggler, Spinner, TagsInput } from '@/shared/ui'
 
 const router = useRouter()
@@ -15,7 +15,10 @@ const params = useRoute().params as { id: string }
 const movies = useMovies()
 const series = useSeries()
 const tags = useTags()
+const users = useUsers()
 const auth = useAuth()
+
+const recommenderOptions = computed(() => users.all.filter((user) => user.id !== auth.user?.id))
 
 const isLoading = ref(true)
 const error = ref(false)
@@ -34,7 +37,7 @@ const fields = reactive({
   poster: '',
   season: 1,
   reason: '',
-  iAdded: true,
+  recommendedBy: null as string | null,
   forMe: false,
   scheduled: null,
   tags: [],
@@ -50,13 +53,13 @@ const { form, submit, submitting, errors } = useForm({
     poster: v.nullable(v.pipe(v.string(), v.trim(), v.transform(toNullable))),
     season: v.nullable(v.number()),
     reason: v.pipe(v.string(), v.trim()),
-    iAdded: v.boolean(),
+    recommendedBy: v.nullable(v.string()),
     forMe: v.boolean(),
     scheduled: v.nullable(v.number()),
     tags: v.nullable(v.array(v.string())),
   }),
   formatErrors: flatten,
-  async submit({ type, season, iAdded, forMe, ...input }) {
+  async submit({ type, season, forMe, ...input }) {
     const data = {
       ...input,
       extId: params.id,
@@ -64,7 +67,6 @@ const { form, submit, submitting, errors } = useForm({
       language,
       genre,
       extra,
-      userId: iAdded ? auth.user?.id || null : null,
       private: forMe,
     }
     if (type === 'series') {
@@ -148,21 +150,29 @@ onMounted(async () => {
           </label>
         </div>
 
-        <div class="mt-4" @click="fields.iAdded = !fields.iAdded">
-          <div class="color-secondary text-s">Who Added</div>
+        <div v-if="recommenderOptions.length" class="mt-4">
+          <div class="color-secondary text-s">Recommended by</div>
 
-          <button type="button" class="group primary mt-1 gap-3">
-            <span :class="{ active: fields.iAdded }">Me</span>
-            <span :class="{ active: !fields.iAdded }">Not Me</span>
+          <button type="button" class="group primary mt-1 gap-3" :disabled="submitting">
+            <span :class="{ active: fields.recommendedBy === null }" @click="fields.recommendedBy = null">Me</span>
+
+            <span
+              v-for="user in recommenderOptions"
+              :key="user.id"
+              :class="{ active: fields.recommendedBy === user.id }"
+              @click="fields.recommendedBy = user.id"
+            >
+              {{ user.username }}
+            </span>
           </button>
         </div>
 
-        <div class="mt-4" @click="fields.forMe = !fields.forMe">
+        <div class="mt-4">
           <div class="color-secondary text-s">List</div>
 
           <button type="button" class="group primary mt-1 gap-3">
-            <span :class="{ active: !fields.forMe }">Global</span>
-            <span :class="{ active: fields.forMe }">For Me</span>
+            <span :class="{ active: !fields.forMe }" @click="fields.forMe = false">Global</span>
+            <span :class="{ active: fields.forMe }" @click="fields.forMe = true">For Me</span>
           </button>
         </div>
 

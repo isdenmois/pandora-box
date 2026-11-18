@@ -1,3 +1,4 @@
+export * from './access'
 export * from './entities'
 export * from './poster'
 export * from './search-provider'

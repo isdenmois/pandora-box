@@ -1,15 +1,15 @@
 import { randomUUID } from 'node:crypto'
-import { eq, isNull, or } from 'drizzle-orm'
-import { type Series, type SeriesCreate, type SeriesUpdate, table } from '@/domain'
+import { eq, or } from 'drizzle-orm'
+import { claimedCreator, type Series, type SeriesCreate, type SeriesUpdate, table } from '@/domain'
 import { db } from '../db'
 import { posterRepository } from './poster.instance'
 import { posterFieldsFor, posterUpdateFor } from './poster-fields'
 
 export const seriesRepository = {
-  async create(data: SeriesCreate): Promise<Series> {
+  async create(data: SeriesCreate, creatorId: string): Promise<Series> {
     const id = randomUUID()
     const poster = posterFieldsFor(id, data.poster)
-    const values = { ...data, ...poster, id }
+    const values = { ...data, ...poster, id, createdBy: creatorId }
 
     await db.insert(table.series).values(values)
 
@@ -20,7 +20,12 @@ export const seriesRepository = {
     return await db
       .select()
       .from(table.series)
-      .where(or(eq(table.series.userId, userId), isNull(table.series.userId), eq(table.series.private, false)))
+      .where(or(eq(table.series.createdBy, userId), eq(table.series.private, false)))
+  },
+
+  /** Every shared row, regardless of creator; the admin attribution page uses this. */
+  async getGlobal(): Promise<Series[]> {
+    return await db.select().from(table.series).where(eq(table.series.private, false))
   },
 
   async byId(id: string): Promise<Series | null> {
@@ -48,28 +53,41 @@ export const seriesRepository = {
     await db.update(table.series).set({ poster: path }).where(eq(table.series.id, id))
   },
 
-  async update(id: string, data: Partial<SeriesUpdate>, filePoster?: string): Promise<Series | null> {
+  async update(
+    id: string,
+    data: Partial<SeriesUpdate>,
+    filePoster?: string,
+    editorId?: string,
+  ): Promise<Series | null> {
     const { poster: posterInput, ...rest } = data
     const next: Record<string, unknown> = { ...rest }
+    // Claiming needs the stored visibility; poster changes already need the stored source.
+    const stored = data.private === true || posterInput !== undefined ? await this.byId(id) : null
+    const claimedBy = stored ? claimedCreator(stored, data.private, editorId) : null
+
+    if (claimedBy) {
+      next.createdBy = claimedBy
+
+      // A creator cannot recommend their own row; drop the credit if the claim created that state.
+      if ((next.recommendedBy ?? stored?.recommendedBy) === claimedBy) {
+        next.recommendedBy = null
+      }
+    }
 
     if (filePoster) {
       // An uploaded file owns the only copy, so there is no source to download it from again.
       next.poster = filePoster
       next.posterSource = null
-    } else if (posterInput !== undefined) {
-      const stored = await this.byId(id)
+    } else if (posterInput !== undefined && stored) {
+      const { fields, removeFile } = posterUpdateFor(id, posterInput, stored)
 
-      if (stored) {
-        const { fields, removeFile } = posterUpdateFor(id, posterInput, stored)
+      if (fields) {
+        Object.assign(next, fields)
+      }
 
-        if (fields) {
-          Object.assign(next, fields)
-        }
-
-        if (removeFile) {
-          // The source changed, so the bytes on disk are stale; the next render downloads again.
-          await posterRepository.remove(id)
-        }
+      if (removeFile) {
+        // The source changed, so the bytes on disk are stale; the next render downloads again.
+        await posterRepository.remove(id)
       }
     }
 
@@ -102,17 +120,6 @@ export const seriesRepository = {
       .where(eq(table.series.id, seriesId))
 
     return data
-  },
-
-  async removeView(viewId: string) {
-    const view = await db.query.seriesView.findFirst({
-      where: eq(table.seriesView.id, viewId),
-    })
-
-    if (view) {
-      await db.delete(table.seriesView).where(eq(table.seriesView.id, viewId))
-      await db.update(table.series).set({ seen: null }).where(eq(table.series.id, view.seriesId))
-    }
   },
 
   async removeSeriesView(seriesId: string) {

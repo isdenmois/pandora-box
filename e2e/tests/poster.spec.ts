@@ -17,6 +17,7 @@ test('poster images', async ({ page }) => {
   await test.step('Render a stored poster from /images', async () => {
     // arrange
     await UserMock.mockCurrent(page)
+    await UserMock.mockList(page)
     await page.route('**/images/**', (route) => route.fulfill({ status: 200, contentType: 'image/png', body: PIXEL }))
 
     const builder = new MovieBuilder(page)

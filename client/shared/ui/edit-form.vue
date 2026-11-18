@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import * as v from 'valibot'
-import { onBeforeUnmount, reactive, ref, shallowRef } from 'vue'
+import { computed, onBeforeUnmount, reactive, ref, shallowRef } from 'vue'
 import { flatten, useForm } from 'vue-standard-schema'
 import type { Movie, Series } from '../api'
-import { POSTER_ACCEPT, posterFileError } from '../lib'
+import { POSTER_ACCEPT, posterFileError, useAuth, useUsers } from '../lib'
 import { useConfirm } from './confirm'
 import ImageWithFallback from './image-with-fallback.vue'
 import ScheduleToggler from './schedule-toggler.vue'
@@ -21,7 +21,11 @@ interface Props {
 const { data } = defineProps<Props>()
 const emit = defineEmits(['save', 'delete', 'redownload'])
 const confirm = useConfirm()
+const { user } = useAuth()
+const users = useUsers()
 const isSeries = 'season' in data
+
+const recommenderOptions = computed(() => users.all.filter((option) => option.id !== data.createdBy))
 
 const mode = ref<'url' | 'file'>('url')
 const file = shallowRef<File | null>(null)
@@ -84,6 +88,7 @@ const fields = reactive({
   title: data.title,
   season: 'season' in data ? data.season || 0 : 0,
   reason: data.reason,
+  recommendedBy: data.recommendedBy,
   private: data.private,
   scheduled: data.scheduled,
   tags: data.tags || [],
@@ -110,6 +115,7 @@ const { form, submit, submitting, errors } = useForm({
     title: v.pipe(v.string(), v.trim(), v.minLength(1, 'Title is required')),
     season: v.number(),
     reason: v.nullable(v.pipe(v.string(), v.trim())),
+    recommendedBy: v.nullable(v.string()),
     private: v.pipe(v.boolean()),
     scheduled: v.nullable(v.number()),
     tags: v.nullable(v.array(v.string())),
@@ -229,14 +235,35 @@ const toRedownload = async () => {
       <div v-for="error in errors?.nested?.reason" :key="error">{{ error }}</div>
     </label>
 
-    <label class="field list" @click="fields.private = !fields.private">
+    <div class="field list">
       <div class="label">List</div>
 
       <button type="button" class="group primary mt-1 gap-3">
-        <span :class="{ active: !fields.private }">Global</span>
-        <span :class="{ active: fields.private }">For Me</span>
+        <span :class="{ active: !fields.private }" @click="fields.private = false">Global</span>
+        <span :class="{ active: fields.private }" @click="fields.private = true">For Me</span>
       </button>
-    </label>
+    </div>
+
+    <div v-if="data.createdBy !== user?.id && !fields.private" class="field color-secondary text-s">
+      Making this For Me makes you the creator.
+    </div>
+
+    <div v-if="recommenderOptions.length" class="field">
+      <div class="label">Recommended by</div>
+
+      <button type="button" class="group primary mt-1 gap-3" :disabled="submitting">
+        <span :class="{ active: fields.recommendedBy === null }" @click="fields.recommendedBy = null">Me</span>
+
+        <span
+          v-for="option in recommenderOptions"
+          :key="option.id"
+          :class="{ active: fields.recommendedBy === option.id }"
+          @click="fields.recommendedBy = option.id"
+        >
+          {{ option.username }}
+        </span>
+      </button>
+    </div>
 
     <label class="field">
       <div class="label">Scheduled</div>

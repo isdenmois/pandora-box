@@ -5,6 +5,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h } from 'vue'
 import { api } from '@/shared/api'
+import { useUsers } from '@/shared/lib'
 import HomePage from '../home-page.vue'
 import { makeMovie, makeSeries } from './fixtures'
 
@@ -241,6 +242,42 @@ describe('home-page', () => {
     // assert
     expect(screen.getByRole('button', { name: 'drama' })).toHaveClass('secondary')
     expect(screen.getByTestId('movie-comedy')).toBeInTheDocument()
+  })
+
+  it('toggles the added-by filter while tags stay visible', async () => {
+    // arrange
+    useUsers().all = [
+      { id: 'user-1', username: 'me' },
+      { id: 'user-2', username: 'other' },
+    ]
+    vi.spyOn(api.movie, 'getAll').mockResolvedValue([
+      makeMovie({ id: 'mine', title: 'Mine', createdBy: 'user-1', tags: ['drama'] }),
+      makeMovie({ id: 'theirs', title: 'Theirs', createdBy: 'user-2', tags: ['drama'] }),
+    ])
+    renderHome()
+    await flushPromises()
+
+    // assert
+    expect(screen.getByRole('button', { name: 'drama' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'other' })).not.toBeInTheDocument()
+
+    // act
+    await user.click(screen.getByRole('button', { name: 'Filters' }))
+    await user.click(screen.getByRole('button', { name: 'other' }))
+
+    // assert
+    expect(screen.getByTestId('movie-theirs')).toBeInTheDocument()
+    expect(screen.queryByTestId('movie-mine')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'drama' })).toBeInTheDocument()
+
+    // act
+    await user.click(screen.getByRole('button', { name: 'Filters' }))
+
+    // assert
+    // Hiding the panel also clears the hidden creator filter; tags are unaffected.
+    expect(screen.queryByRole('button', { name: 'other' })).not.toBeInTheDocument()
+    expect(screen.getByTestId('movie-mine')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'drama' })).toBeInTheDocument()
   })
 
   it('collapses a section on heading click', async () => {

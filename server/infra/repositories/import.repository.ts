@@ -24,13 +24,17 @@ interface ImportData {
   series: SeriesImport[]
 }
 
-const importSeries = async (userId: string, item: SeriesImport) => {
+/**
+ * Import is an admin-only migration tool. New rows belong to the importer; an existing row keeps
+ * its creator so a re-import never steals ownership. The old `userId` field is ignored because
+ * ids from another installation do not map to this one.
+ */
+const importSeries = async (importerId: string, item: SeriesImport) => {
   const found = await db.query.series.findFirst({
     where: () => eq(table.series.extId, item.extId),
   })
 
   const isPrivate = item.private ?? found?.private ?? false
-  const uid = item.private || item.userId ? userId : null
 
   if (found) {
     return await db
@@ -39,7 +43,6 @@ const importSeries = async (userId: string, item: SeriesImport) => {
         reason: item.reason || found.reason,
         season: item.season ?? found.season,
         private: isPrivate,
-        userId: uid,
       })
       .where(eq(table.series.id, found.id))
   }
@@ -52,30 +55,34 @@ const importSeries = async (userId: string, item: SeriesImport) => {
     return
   }
 
-  await seriesRepository.create({
-    extId: item.extId,
-    provider: 'omdb',
-    title: series.title,
-    poster: series.poster || null,
-    year: series.year || null,
-    season: item.season || 1,
-    rating: series.rating || null,
-    language: series.language || null,
-    genre: series.genre || null,
-    reason: item.reason || null,
-    userId: uid,
-    private: isPrivate,
-    extra: series.extra ?? {},
-  })
+  await seriesRepository.create(
+    {
+      extId: item.extId,
+      provider: 'omdb',
+      title: series.title,
+      poster: series.poster || null,
+      year: series.year || null,
+      season: item.season || 1,
+      rating: series.rating || null,
+      language: series.language || null,
+      genre: series.genre || null,
+      reason: item.reason || null,
+      recommendedBy: null,
+      private: isPrivate,
+      scheduled: null,
+      tags: null,
+      extra: series.extra ?? {},
+    },
+    importerId,
+  )
 }
 
-const importMovie = async (userId: string, item: MovieImport) => {
+const importMovie = async (importerId: string, item: MovieImport) => {
   const found = await db.query.movie.findFirst({
     where: () => eq(table.movie.extId, item.extId),
   })
 
   const isPrivate = item.private ?? found?.private ?? false
-  const uid = item.private || item.userId ? userId : null
 
   if (found) {
     return await db
@@ -83,7 +90,6 @@ const importMovie = async (userId: string, item: MovieImport) => {
       .set({
         reason: item.reason || found.reason,
         private: isPrivate,
-        userId: uid,
       })
       .where(eq(table.movie.id, found.id))
   }
@@ -96,20 +102,25 @@ const importMovie = async (userId: string, item: MovieImport) => {
     return
   }
 
-  await movieRepository.create({
-    extId: item.extId,
-    provider: 'omdb',
-    title: movie.title,
-    poster: movie.poster || null,
-    year: movie.year || null,
-    rating: movie.rating || null,
-    language: movie.language || null,
-    genre: movie.genre || null,
-    reason: item.reason || null,
-    userId: uid,
-    private: isPrivate,
-    extra: movie.extra ?? {},
-  })
+  await movieRepository.create(
+    {
+      extId: item.extId,
+      provider: 'omdb',
+      title: movie.title,
+      poster: movie.poster || null,
+      year: movie.year || null,
+      rating: movie.rating || null,
+      language: movie.language || null,
+      genre: movie.genre || null,
+      reason: item.reason || null,
+      recommendedBy: null,
+      private: isPrivate,
+      scheduled: null,
+      tags: null,
+      extra: movie.extra ?? {},
+    },
+    importerId,
+  )
 }
 
 const status = {
@@ -125,7 +136,7 @@ const status = {
 }
 
 export const importRepository = {
-  async import(userId: string, data: ImportData) {
+  async import(importerId: string, data: ImportData) {
     if (status.inProgress) {
       return { ok: true }
     }
@@ -144,7 +155,7 @@ export const importRepository = {
 
     for (const item of movies) {
       try {
-        await importMovie(userId, item)
+        await importMovie(importerId, item)
       } catch (e) {
         console.log(e)
       } finally {
@@ -154,7 +165,7 @@ export const importRepository = {
 
     for (const item of series) {
       try {
-        await importSeries(userId, item)
+        await importSeries(importerId, item)
       } catch (e) {
         console.log(e)
       } finally {

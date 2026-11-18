@@ -4,13 +4,13 @@ import { movie } from './movie-api'
 import { poster } from './poster-api'
 import { type SearchItem, type SearchItemDetails, search } from './search-api'
 import { series } from './series-api'
-import { type User, user } from './user-api'
+import { type User, type UserSummary, user } from './user-api'
 
 export type * from './admin-api'
 export type * from './movie-api'
 export type * from './poster-api'
 export type * from './series-api'
-export type { SearchItem, SearchItemDetails, User }
+export type { SearchItem, SearchItemDetails, User, UserSummary }
 
 export const api = {
   auth,

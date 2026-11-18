@@ -10,7 +10,7 @@ vi.mock('@/infra', () => ({
 vi.mock('@/views/auth', async () => {
   const { Elysia } = await import('elysia')
 
-  return { authGuard: new Elysia({ name: 'auth guard' }).derive(() => ({ user: { id: 'user-1' } })) }
+  return { authGuard: new Elysia({ name: 'auth guard' }).derive({ as: 'scoped' }, () => ({ user: { id: 'user-1' } })) }
 })
 
 const { createPosterController } = await import('../poster.controller')
@@ -22,7 +22,12 @@ type Handler = (request: Request) => Promise<Response>
 
 function setup(overrides: Partial<Parameters<typeof createPosterController>[0]> = {}) {
   const deps = {
-    findRow: vi.fn(async () => ({ poster: `/images/${ID}.jpg`, posterSource: SOURCE })),
+    findRow: vi.fn(async () => ({
+      poster: `/images/${ID}.jpg`,
+      posterSource: SOURCE,
+      private: false,
+      createdBy: 'user-1',
+    })),
     remove: vi.fn(async () => {}),
     ...overrides,
   }
@@ -44,7 +49,12 @@ describe('DELETE /v1/poster/:id', () => {
 
     // assert
     expect(response.status).toBe(200)
-    expect(await response.json()).toEqual({ poster: `/images/${ID}.jpg`, posterSource: SOURCE })
+    expect(await response.json()).toEqual({
+      poster: `/images/${ID}.jpg`,
+      posterSource: SOURCE,
+      private: false,
+      createdBy: 'user-1',
+    })
     expect(deps.remove).toHaveBeenCalledWith(ID)
   })
 
@@ -63,7 +73,12 @@ describe('DELETE /v1/poster/:id', () => {
   it('refuses to drop a poster that has no source to download it from', async () => {
     // arrange
     const { deps, handle } = setup({
-      findRow: vi.fn(async () => ({ poster: `/images/${ID}.jpg`, posterSource: null })),
+      findRow: vi.fn(async () => ({
+        poster: `/images/${ID}.jpg`,
+        posterSource: null,
+        private: false,
+        createdBy: 'user-1',
+      })),
     })
 
     // act
@@ -72,6 +87,25 @@ describe('DELETE /v1/poster/:id', () => {
     // assert
     // The file is the only copy of a manual poster; deleting it would lose the image for good.
     expect(response.status).toBe(409)
+    expect(deps.remove).not.toHaveBeenCalled()
+  })
+
+  it("answers 404 for another user's private row", async () => {
+    // arrange
+    const { deps, handle } = setup({
+      findRow: vi.fn(async () => ({
+        poster: `/images/${ID}.jpg`,
+        posterSource: SOURCE,
+        private: true,
+        createdBy: 'someone-else',
+      })),
+    })
+
+    // act
+    const response = await handle(redownload())
+
+    // assert
+    expect(response.status).toBe(404)
     expect(deps.remove).not.toHaveBeenCalled()
   })
 })

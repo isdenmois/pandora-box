@@ -4,6 +4,7 @@ import { flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { api } from '@/shared/api'
+import { useAuth, useUsers } from '@/shared/lib'
 import AddDialog from '../add-dialog.vue'
 import { makeMovie, makeSearchItemDetails, makeSeries } from './fixtures'
 
@@ -93,10 +94,31 @@ describe('add-dialog', () => {
       language: 'English',
       genre: 'Drama',
       extra: {},
-      userId: null,
+      recommendedBy: null,
       private: false,
     })
     expect(router.replace).toHaveBeenCalledExactlyOnceWith('/')
+  })
+
+  it('sends the selected recommender', async () => {
+    // arrange
+    vi.spyOn(api.search, 'byId').mockResolvedValue(makeSearchItemDetails())
+    useAuth().setUser({ id: 'user-1', username: 'me', role: 'admin' })
+    useUsers().all = [
+      { id: 'user-1', username: 'me' },
+      { id: 'user-2', username: 'other' },
+    ]
+    const create = vi.spyOn(api.movie, 'create').mockResolvedValue(makeMovie())
+    render(AddDialog)
+    await flushPromises()
+
+    // act
+    await user.click(screen.getByText('other'))
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+    await flushPromises()
+
+    // assert
+    expect(create).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ recommendedBy: 'user-2' }))
   })
 
   it('creates a series with the selected season on submit', async () => {

@@ -28,6 +28,7 @@ test('poster upload from the edit form', async ({ page }) => {
 
   // arrange
   await UserMock.mockCurrent(page)
+  await UserMock.mockList(page)
   const builder = new MovieBuilder(page)
   builder.addItem(manualMovie)
   await builder.build()
@@ -64,6 +65,7 @@ test('details page does not print the poster URL', async ({ page }) => {
 
   // arrange
   await UserMock.mockCurrent(page)
+  await UserMock.mockList(page)
   const builder = new MovieBuilder(page)
   builder.addItem(posterMovie)
   await builder.build()

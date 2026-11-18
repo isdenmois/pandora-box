@@ -1,3 +1,4 @@
+import filter from './filter.svg'
 import globe from './globe.svg'
 import home from './home.svg'
 import minus from './minus.svg'
@@ -15,6 +16,7 @@ import starFill from './star-fill.svg'
 import unseen from './unseen.svg'
 
 export const icons = {
+  filter,
   globe,
   home,
   minus,

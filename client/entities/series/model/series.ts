@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { readonly, ref, shallowRef } from 'vue'
 import { api, type Series, type SeriesCreate, type SeriesUpdate } from '@/shared/api'
-import { isOmdb, isOmdbString, useAuth } from '@/shared/lib'
+import { isOmdb, isOmdbString } from '@/shared/lib'
 
 export const useSeries = defineStore('series', () => {
   const all = ref<Series[]>([])
@@ -83,17 +83,6 @@ export const useSeries = defineStore('series', () => {
       }
 
       await api.series.removeSeriesView(id)
-    },
-
-    async togglePrivate(id: string) {
-      const existed = all.value.find((item) => item.id === id)
-
-      if (existed) {
-        const { user } = useAuth()
-        existed.private = !existed.private
-
-        await api.series.patch(id, { private: existed.private, userId: user?.id || null })
-      }
     },
 
     async setSeason(id: string, season: number) {

@@ -13,6 +13,7 @@ test('home page', async ({ page }) => {
   await test.step('Open home page', async () => {
     // arrange
     await UserMock.mockCurrent(page)
+    await UserMock.mockList(page)
     await new SeriesBuilder(page).build()
     await new MovieBuilder(page).build()
     await new SearchBuilder(page)

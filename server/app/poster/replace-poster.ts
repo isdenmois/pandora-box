@@ -3,7 +3,7 @@ import { IMAGE_URL_PREFIX, type ImageExtension } from '@/domain'
 export interface PosterRecordStore<Row, Fields> {
   byId(id: string): Promise<Row | null>
   /** `filePoster` is the path of a file that is already on disk; it wins over `data.poster`. */
-  update(id: string, data: Fields, filePoster?: string): Promise<Row | null>
+  update(id: string, data: Fields, filePoster?: string, editorId?: string): Promise<Row | null>
 }
 
 export interface PosterFileStore {
@@ -26,6 +26,7 @@ export async function replacePoster<Row, Fields>(
   records: PosterRecordStore<Row, Fields>,
   files: PosterFileStore,
   input: ReplacePosterInput<Fields>,
+  editorId?: string,
 ): Promise<Row | null> {
   if (!(await records.byId(input.id))) {
     return null
@@ -34,7 +35,7 @@ export async function replacePoster<Row, Fields>(
   const fileName = await files.save(input.id, input.extension, input.bytes)
 
   try {
-    const saved = await records.update(input.id, input.fields, `${IMAGE_URL_PREFIX}/${fileName}`)
+    const saved = await records.update(input.id, input.fields, `${IMAGE_URL_PREFIX}/${fileName}`, editorId)
 
     // The record can be deleted between the check and the update; the file is then an orphan.
     if (!saved) {

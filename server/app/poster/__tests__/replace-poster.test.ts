@@ -8,7 +8,7 @@ const FIELDS = { title: 'New Title' }
 type Row = { id: string; poster?: string }
 type Records = {
   byId: (id: string) => Promise<Row | null>
-  update: (id: string, data: typeof FIELDS, path?: string) => Promise<Row | null>
+  update: (id: string, data: typeof FIELDS, path?: string, editorId?: string) => Promise<Row | null>
 }
 
 function setup(overrides: Partial<Records> = {}) {
@@ -26,7 +26,7 @@ function setup(overrides: Partial<Records> = {}) {
 }
 
 const run = (records: ReturnType<typeof setup>['records'], files: ReturnType<typeof setup>['files']) =>
-  replacePoster(records, files, { id: ID, fields: FIELDS, extension: 'png', bytes: BYTES })
+  replacePoster(records, files, { id: ID, fields: FIELDS, extension: 'png', bytes: BYTES }, 'user-1')
 
 describe('replacePoster', () => {
   it('writes the bytes and points the record at the public path', async () => {
@@ -38,7 +38,7 @@ describe('replacePoster', () => {
 
     // assert
     expect(files.save).toHaveBeenCalledWith(ID, 'png', BYTES)
-    expect(records.update).toHaveBeenCalledWith(ID, FIELDS, `/images/${ID}.png`)
+    expect(records.update).toHaveBeenCalledWith(ID, FIELDS, `/images/${ID}.png`, 'user-1')
     expect(saved).toMatchObject({ poster: `/images/${ID}.png` })
   })
 

@@ -11,3 +11,9 @@ export const ImportBody = t.Object({
   series: t.Array(t.Any()),
   movies: t.Array(t.Any()),
 })
+
+export const ReassignAttributionBody = t.Object({
+  movies: t.Optional(t.Array(t.String())),
+  series: t.Optional(t.Array(t.String())),
+  createdBy: t.String(),
+})

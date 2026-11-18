@@ -9,11 +9,16 @@ export interface PosterUploadOptions<Row, Fields> {
   records: PosterRecordStore<Row, Fields>
   files: PosterFileStore
   parseFields: (raw: string) => Fields | null
+  /** Private rows are invisible to everyone but their creator; answer 404 when this fails. */
+  authorize?: (id: string, userId: string) => Promise<boolean>
+  /** Field-level validation that the TypeBox contract cannot express, e.g. a recommender id. */
+  validateFields?: (id: string, fields: Fields) => Promise<boolean>
 }
 
 type UploadContext = Context<{
   params: { id: string }
   body: { data: string; file: File }
+  user: { id: string }
 }>
 
 /** A `data` part that fails to parse or validate answers 422, like any other contract breach. */
@@ -39,11 +44,19 @@ function sniffImage(bytes: Uint8Array): ImageExtension | null {
 }
 
 export function createPosterUploadHandler<Row, Fields>(options: PosterUploadOptions<Row, Fields>) {
-  return async ({ params: { id }, body }: UploadContext) => {
+  return async ({ params: { id }, body, user }: UploadContext) => {
     const fields = options.parseFields(body.data)
 
     if (!fields) {
       return status(422, { message: 'Invalid poster payload' })
+    }
+
+    if (options.authorize && !(await options.authorize(id, user.id))) {
+      return status(404, { message: 'Not found' })
+    }
+
+    if (options.validateFields && !(await options.validateFields(id, fields))) {
+      return status(422, { message: 'Invalid field' })
     }
 
     const bytes = new Uint8Array(await body.file.arrayBuffer())
@@ -53,7 +66,7 @@ export function createPosterUploadHandler<Row, Fields>(options: PosterUploadOpti
       return status(422, { message: 'Unsupported image type' })
     }
 
-    const saved = await replacePoster(options.records, options.files, { id, fields, extension, bytes })
+    const saved = await replacePoster(options.records, options.files, { id, fields, extension, bytes }, user.id)
 
     if (!saved) {
       return status(404, { message: 'Not found' })

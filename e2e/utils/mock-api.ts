@@ -19,6 +19,8 @@ export const mockRest = <T>(page: Page, url: string, json: T[]) => {
       const data = {
         ...route.request().postDataJSON(),
         id: String(id++),
+        // The real server fills this from the session.
+        createdBy: 'user-1',
       }
 
       json.push(data)

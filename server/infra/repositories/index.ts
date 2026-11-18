@@ -1,3 +1,4 @@
+export * from './attribution.repository'
 export * from './backup.repository'
 export * from './import.repository'
 export * from './movie.repository'

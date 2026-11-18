@@ -3,15 +3,27 @@ import { onClickOutside } from '@vueuse/core'
 import { onBeforeMount, ref } from 'vue'
 import { MovieItem, useMovies } from '@/entities/movie'
 import { SeriesItem, useSeries } from '@/entities/series'
+import { useUsers } from '@/shared/lib'
 import { Icon, icons, Spinner } from '@/shared/ui'
 import { useHome } from './model'
 
 const home = useHome()
 const series = useSeries()
 const movies = useMovies()
+const users = useUsers()
 
 const seriesVisible = ref(true)
 const moviesVisible = ref(true)
+const filtersVisible = ref(false)
+
+const toggleFilters = () => {
+  filtersVisible.value = !filtersVisible.value
+
+  // Do not leave an active creator filter hidden behind a closed panel.
+  if (!filtersVisible.value) {
+    home.setCreator(null)
+  }
+}
 
 const searchVisible = ref(false)
 const searchElement = ref<HTMLInputElement | null>(null)
@@ -36,21 +48,10 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <div class="surface p-4 sm:pl-10 sm:pt-6 flex gap-6 sticky top-0 z-1">
+  <div class="surface p-3 sm:pl-10 sm:pt-6 flex gap-6 sticky top-0 z-1">
     <button class="group gap-3" @click="home.toggleForMe">
       <span :class="{ active: !home.forMe, 'max-zf:hidden': home.forMe }">Global</span>
       <span :class="{ active: home.forMe, 'max-zf:hidden': !home.forMe }">For Me</span>
-    </button>
-
-    <button v-if="!home.seen" class="color-secondary" @click="home.toggleSort">
-      <template v-if="home.sort === 'rating' || home.sort === 'season'">
-        <Icon :size="24" :icon="icons.sortDesc" />
-      </template>
-      <template v-else-if="home.sort === 'title'">
-        <Icon :size="24" :icon="icons.sortAsc" />
-      </template>
-
-      by {{ home.sort }}
     </button>
 
     <button class="gap-2" @click="home.toggleSeen" :title="home.seen ? 'Seen' : 'New'">
@@ -62,6 +63,17 @@ onBeforeMount(() => {
       </template>
     </button>
 
+    <button
+      v-if="!home.forMe"
+      class="gap-2"
+      :class="{ 'color-secondary': !filtersVisible }"
+      aria-label="Filters"
+      :title="filtersVisible ? 'Hide added-by filter' : 'Show added-by filter'"
+      @click="toggleFilters"
+    >
+      <Icon :size="24" :icon="icons.filter" />
+    </button>
+
     <div class="flex-1"></div>
 
     <button :class="{ 'color-secondary': !home.search }" @click="openSearch">
@@ -69,7 +81,7 @@ onBeforeMount(() => {
     </button>
 
     <form
-      class="search absolute left-4 right-4"
+      class="search absolute left-3 right-3 top-2 sm:top-4"
       :class="{ visible: searchVisible }"
       @submit.prevent="closeSearch"
       @transitionend="searchVisible && searchElement?.focus()"
@@ -82,7 +94,18 @@ onBeforeMount(() => {
     </form>
   </div>
 
-  <div v-if="home.tags.length > 0" class="flex flex-wrap gap-4 px-2 sm:pl-8 mt-2">
+  <div class="flex flex-wrap items-center gap-4 px-2 sm:pl-8">
+    <button v-if="!home.seen" class="color-secondary" @click="home.toggleSort">
+      <template v-if="home.sort === 'rating' || home.sort === 'season'">
+        <Icon :size="24" :icon="icons.sortDesc" />
+      </template>
+      <template v-else-if="home.sort === 'title'">
+        <Icon :size="24" :icon="icons.sortAsc" />
+      </template>
+
+      by {{ home.sort }}
+    </button>
+
     <button
       v-for="tag of home.tags"
       :key="tag"
@@ -90,6 +113,24 @@ onBeforeMount(() => {
       @click="home.toggleTag(tag)"
     >
       {{ tag }}
+    </button>
+  </div>
+
+  <div
+    v-if="filtersVisible && !home.forMe && users.all.length > 0"
+    class="flex flex-wrap items-center gap-4 px-2 sm:pl-8 mt-2"
+  >
+    <span class="color-secondary text-s">Added by</span>
+
+    <button :class="home.creator === null ? 'primary' : 'secondary'" @click="home.setCreator(null)">Anyone</button>
+
+    <button
+      v-for="user of users.all"
+      :key="user.id"
+      :class="home.creator === user.id ? 'primary' : 'secondary'"
+      @click="home.toggleCreator(user.id)"
+    >
+      {{ user.username }}
     </button>
   </div>
 
