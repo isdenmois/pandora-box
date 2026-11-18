@@ -216,6 +216,61 @@ describe.each(resources)('server e2e: $name access rules', ({ path, create }) =>
     expect(bobViews.body).toEqual([])
   })
 
+  it('lists own private rows together with other users’ shared ones', async () => {
+    // arrange
+    const alice = await seedSession('alice')
+    const bob = await seedSession('bob')
+    const ownPrivate = await request<{ id: string }>({
+      method: 'POST',
+      path,
+      cookie: alice.cookie,
+      body: create({ title: 'Own secret', private: true }),
+    })
+    const foreignShared = await request<{ id: string }>({
+      method: 'POST',
+      path,
+      cookie: bob.cookie,
+      body: create({ title: 'Bobs shared' }),
+    })
+
+    // act
+    const list = await request<{ id: string }[]>({ path, cookie: alice.cookie })
+
+    // assert
+    // The list is `own rows or shared`: both of alice's must appear, none of bob's private ones.
+    expect(list.body).toHaveLength(2)
+    expect(list.body.map((row) => row.id)).toEqual(expect.arrayContaining([ownPrivate.body.id, foreignShared.body.id]))
+  })
+
+  it('clears the view history when the view is removed', async () => {
+    // arrange
+    const alice = await seedSession('alice')
+    const bob = await seedSession('bob')
+    const created = await request<{ id: string }>({
+      method: 'POST',
+      path,
+      cookie: alice.cookie,
+      body: create(),
+    })
+    const id = created.body.id
+    await request({
+      method: 'POST',
+      path: `${path}/${id}/viewed`,
+      cookie: bob.cookie,
+      body: { date: '2026-11-18', rating: 8, comment: 'Good one' },
+    })
+
+    // act
+    const removed = await request({ method: 'DELETE', path: `${path}/${id}/view`, cookie: alice.cookie })
+    const bobViews = await request<unknown[]>({ path: `${path}/views`, cookie: bob.cookie })
+    const readAsBob = await request<{ seen: string | null }>({ path: `${path}/${id}`, cookie: bob.cookie })
+
+    // assert
+    expect(removed.status).toBe(200)
+    expect(bobViews.body).toEqual([])
+    expect(readAsBob.body.seen).toBeNull()
+  })
+
   it('rejects recommending yourself', async () => {
     // arrange
     const alice = await seedSession('alice')
