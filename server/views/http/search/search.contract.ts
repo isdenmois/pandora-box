@@ -1,6 +1,9 @@
 import { t } from 'elysia'
 
-const ProviderSchema = t.UnionEnum(['omdb'])
+// `t.UnionEnum` injects `default: values[0]`, and Elysia applies params defaults to Bun's
+// non-configurable `request.params`, which fails every request with a TypeError. A path param has
+// no default anyway: it is either in the URL or the route does not match.
+const ProviderSchema = t.Literal('omdb')
 
 export const searchJson = {
   external: {
