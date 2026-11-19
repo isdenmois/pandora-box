@@ -16,6 +16,7 @@
     "test:unit": "npm run test:client && npm run test:server",
     "test:pw": "playwright test",
     "perf:series": "bun server/perf/series.bench.ts",
+    "perf:idle": "bun server/perf/idle.bench.ts",
     "test": "npm run test:unit && npm run test:pw",
     "server": "bun run --watch server/index.ts",
     "server:build": "bun build server/index.ts --target bun --outdir ./build",
