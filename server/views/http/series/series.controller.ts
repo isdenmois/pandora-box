@@ -1,10 +1,12 @@
-import Elysia from 'elysia'
-import { isValidRecommender } from '@/app'
-import { canAccess } from '@/domain'
-import { env, posterRepository, seriesRepository } from '@/infra'
-import { authGuard } from '@/views/auth'
+import { isValidRecommender } from '@server/app'
+import { canAccess } from '@server/domain'
+import { env, posterRepository, seriesRepository } from '@server/infra'
+import { type AppEnv, requireAuth } from '@server/views/auth'
+import { Hono } from 'hono'
+import { invalid, notFound } from '../error'
 import { createPosterUploadHandler, parseJsonPart } from '../poster/poster-upload'
 import { posterUploadBody } from '../poster/poster-upload.contract'
+import { vform, vjson } from '../validate'
 import { createSeriesBody, markSeriesViewedBody, patchSeriesBody } from './series.contract'
 
 const uploadPoster = createPosterUploadHandler({
@@ -34,78 +36,80 @@ const visible = async (id: string, userId: string) => {
   return row && canAccess(row, userId) ? row : null
 }
 
-export const seriesController = new Elysia({
-  prefix: '/v1/series',
-  detail: {
-    tags: ['series'],
-  },
-})
-  .use(authGuard)
-  .post(
-    '',
-    async ({ body, user, status }) => {
-      if (!(await isValidRecommender(body.recommendedBy, user.id))) {
-        return status(422, { message: 'Unknown or invalid recommender' })
-      }
+export const seriesController = new Hono<AppEnv>()
+  .use(requireAuth)
+  // `/views` must be registered before `/:id`; Hono matches in registration order.
+  .get('/views', async (c) => c.json(await seriesRepository.getViews(c.get('user').id), 200))
+  .get('/', async (c) => c.json(await seriesRepository.getAll(c.get('user').id), 200))
+  .post('/', vjson(createSeriesBody), async (c) => {
+    const body = c.req.valid('json')
+    const user = c.get('user')
 
-      return await seriesRepository.create(body, user.id)
-    },
-    { body: createSeriesBody },
-  )
-  .get(':id', async ({ params: { id }, user, status }) => {
-    const row = await visible(id, user.id)
+    if (!(await isValidRecommender(body.recommendedBy, user.id))) {
+      return invalid(c, 'Unknown or invalid recommender')
+    }
 
-    return row ?? status(404, { message: 'Not found' })
+    return c.json(await seriesRepository.create(body, user.id), 200)
+  })
+  .get('/:id', async (c) => {
+    const row = await visible(c.req.param('id'), c.get('user').id)
+
+    return row ? c.json(row, 200) : notFound(c)
   })
   // The edit form saves the fields and a picked image file in one request.
-  .patch('/:id/poster', uploadPoster, { body: posterUploadBody(env.IMAGE_MAX_BYTES) })
-  .patch(
-    ':id',
-    async ({ params: { id }, body, user, status }) => {
-      const row = await visible(id, user.id)
-
-      if (!row) {
-        return status(404, { message: 'Not found' })
-      }
-
-      if (body.recommendedBy !== undefined && !(await isValidRecommender(body.recommendedBy, row.createdBy))) {
-        return status(422, { message: 'Unknown or invalid recommender' })
-      }
-
-      return await seriesRepository.update(id, body, undefined, user.id)
-    },
-    { body: patchSeriesBody },
-  )
-  .post(
-    '/:id/viewed',
-    async ({ params: { id }, user, body: { date, rating, comment }, status }) => {
-      const row = await visible(id, user.id)
-
-      if (!row) {
-        return status(404, { message: 'Not found' })
-      }
-
-      return await seriesRepository.markAsViewed(id, user.id, date, rating, comment)
-    },
-    { body: markSeriesViewedBody },
-  )
-  .delete(':id', async ({ params: { id }, user, status }) => {
+  .patch('/:id/poster', vform(posterUploadBody(env.IMAGE_MAX_BYTES)), (c) => uploadPoster(c, c.req.valid('form')))
+  .patch('/:id', vjson(patchSeriesBody), async (c) => {
+    const id = c.req.param('id')
+    const body = c.req.valid('json')
+    const user = c.get('user')
     const row = await visible(id, user.id)
 
     if (!row) {
-      return status(404, { message: 'Not found' })
+      return notFound(c)
     }
 
-    return await seriesRepository.delete(id)
+    if (body.recommendedBy !== undefined && !(await isValidRecommender(body.recommendedBy, row.createdBy))) {
+      return invalid(c, 'Unknown or invalid recommender')
+    }
+
+    const updated = await seriesRepository.update(id, body, undefined, user.id)
+
+    return updated ? c.json(updated, 200) : notFound(c)
   })
-  .delete('/:id/view', async ({ params: { id }, user, status }) => {
+  .post('/:id/viewed', vjson(markSeriesViewedBody), async (c) => {
+    const id = c.req.param('id')
+    const user = c.get('user')
     const row = await visible(id, user.id)
 
     if (!row) {
-      return status(404, { message: 'Not found' })
+      return notFound(c)
     }
 
-    return await seriesRepository.removeSeriesView(id)
+    const { date, rating, comment } = c.req.valid('json')
+
+    return c.json(await seriesRepository.markAsViewed(id, user.id, date, rating, comment), 200)
   })
-  .get('', ({ user }) => seriesRepository.getAll(user.id))
-  .get('views', ({ user }) => seriesRepository.getViews(user.id))
+  .delete('/:id', async (c) => {
+    const id = c.req.param('id')
+    const row = await visible(id, c.get('user').id)
+
+    if (!row) {
+      return notFound(c)
+    }
+
+    await seriesRepository.delete(id)
+
+    return c.body(null, 200)
+  })
+  .delete('/:id/view', async (c) => {
+    const id = c.req.param('id')
+    const row = await visible(id, c.get('user').id)
+
+    if (!row) {
+      return notFound(c)
+    }
+
+    await seriesRepository.removeSeriesView(id)
+
+    return c.body(null, 200)
+  })

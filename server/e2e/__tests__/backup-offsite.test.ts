@@ -24,7 +24,9 @@ describe('server e2e: offsite backup gates', () => {
     // assert
     expect(listing.status).toBe(503)
     expect(upload.status).toBe(503)
-    expect(listing.body).toEqual({ message: 'Offsite backup is not configured' })
+    expect(listing.body).toEqual({
+      error: { code: 'unavailable', message: 'Offsite backup is not configured' },
+    })
   })
 
   it('keeps the admin routes behind the role even while the feature is off', async () => {

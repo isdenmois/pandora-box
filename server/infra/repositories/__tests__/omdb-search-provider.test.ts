@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@/infra/env', () => ({ env: { OMDB_URL: 'https://omdb.test/api' } }))
+vi.mock('@server/infra/env', () => ({ env: { OMDB_URL: 'https://omdb.test/api' } }))
 
 const { omdbSearchProvider } = await import('../search-repository/search-providers/omdb-search-provider')
 

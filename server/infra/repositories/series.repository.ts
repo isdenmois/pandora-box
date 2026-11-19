@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
+import { type Series, type SeriesCreate, type SeriesUpdate, table } from '@server/domain'
 import { eq, or } from 'drizzle-orm'
-import { type Series, type SeriesCreate, type SeriesUpdate, table } from '@/domain'
 import { db } from '../db'
 import { posterRepository } from './poster.instance'
 import { posterFieldsFor } from './poster-fields'

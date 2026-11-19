@@ -1,8 +1,8 @@
+import type { SearchItem, SearchProvider } from '@server/domain'
+import { env } from '@server/infra/env'
 import * as v from 'valibot'
 import Wretch from 'wretch'
 import QueryStringAddon from 'wretch/addons/queryString'
-import type { SearchItem, SearchProvider } from '@/domain'
-import { env } from '@/infra/env'
 
 const api = Wretch(env.OMDB_URL).addon(QueryStringAddon)
 

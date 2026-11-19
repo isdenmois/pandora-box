@@ -1,6 +1,6 @@
+import { table } from '@server/domain'
+import { sleep } from '@server/shared'
 import { eq } from 'drizzle-orm'
-import { table } from '@/domain'
-import { sleep } from '@/shared'
 import { db } from '../db'
 import { movieRepository } from './movie.repository'
 import { searchRepository } from './search-repository'

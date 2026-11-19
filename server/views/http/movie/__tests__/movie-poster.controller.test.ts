@@ -2,20 +2,25 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // The controller module also builds the production instance, which reaches the database through
 // `@/infra`; stubbing it keeps these tests free of bun:sqlite.
-vi.mock('@/infra', () => ({
+vi.mock('@server/infra', () => ({
   env: { IMAGE_MAX_BYTES: 5 * 1024 * 1024 },
   movieRepository: { byId: vi.fn(), update: vi.fn() },
   posterRepository: { save: vi.fn(), remove: vi.fn() },
 }))
 
-// The guard is a plugin, so the stub has to be one too — a `derive` is enough to let requests in.
-vi.mock('@/views/auth', async () => {
-  const { Elysia } = await import('elysia')
+// The guard is middleware; a stub is enough to let requests in.
+vi.mock('@server/views/auth', async () => {
+  const { createMiddleware } = await import('hono/factory')
 
-  return { authGuard: new Elysia({ name: 'auth guard' }).derive({ as: 'scoped' }, () => ({ user: { id: 'user-1' } })) }
+  return {
+    requireAuth: createMiddleware(async (c, next) => {
+      c.set('user', { id: 'user-1', role: 'user', username: 'user-1' })
+      await next()
+    }),
+  }
 })
 
-const { movieRepository, posterRepository } = await import('@/infra')
+const { movieRepository, posterRepository } = await import('@server/infra')
 const { movieController } = await import('../movie.controller')
 
 const ID = 'movie-1'
@@ -27,9 +32,7 @@ const PIXEL = Uint8Array.from(
   (char) => char.charCodeAt(0),
 )
 
-type Handler = (request: Request) => Promise<Response>
-
-const handle = movieController.handle as unknown as Handler
+const handle = (request: Request) => movieController.request(request)
 
 function upload(options: { data?: string; file?: File | null; id?: string } = {}) {
   const form = new FormData()
@@ -39,7 +42,7 @@ function upload(options: { data?: string; file?: File | null; id?: string } = {}
     form.append('file', options.file ?? new File([PIXEL], 'poster.png', { type: 'image/png' }))
   }
 
-  return new Request(`http://localhost/v1/movie/${options.id ?? ID}/poster`, { method: 'PATCH', body: form })
+  return new Request(`http://localhost/${options.id ?? ID}/poster`, { method: 'PATCH', body: form })
 }
 
 describe('PATCH /v1/movie/:id/poster', () => {

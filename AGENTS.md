@@ -8,10 +8,10 @@ Pandora Box — a personal media watchlist app (movies/series with tags, ratings
 
 Monorepo with two apps in one package (Bun-managed, `bun.lock`, exact versions via `bunfig.toml`):
 
-- `client/` — Vue 3 SPA (Pinia, vue-router, UnoCSS presetWind4, wretch, valibot). Layered (FSD-style): `app/` → `pages/` → `entities/` → `shared/` (add a `features/` layer once a user action is shared by more than one page slice). Dependencies point downward only.
-- `server/` — Bun + Elysia API. Layered: `views/` (HTTP controllers + Elysia `t.` contracts, auth guards) → `app/` (use-cases) → `domain/` (drizzle entities/schema, search-provider interface, session) ← `infra/` (db, env, repositories).
+- `client/` — Vue 3 SPA (Pinia, vue-router, UnoCSS presetWind4, `hc` from `hono/client`, valibot). Layered (FSD-style): `app/` → `pages/` → `entities/` → `shared/` (add a `features/` layer once a user action is shared by more than one page slice). Dependencies point downward only.
+- `server/` — Bun + Hono API. Layered: `views/` (Hono controllers + valibot contracts, auth middleware) → `app/` (use-cases) → `domain/` (drizzle entities/schema, search-provider interface, session) ← `infra/` (db, env, repositories).
 - `e2e/` — Playwright browser tests (`builders/`, `fixtures/`, `mocks/`, `page-objects/`, `tests/`).
-- `server/e2e/` — server HTTP e2e, run by `test:server`: real requests through `app.handle` against a migrated `:memory:` database.
+- `server/e2e/` — server HTTP e2e, run by `test:server`: real requests through `app.request` against a migrated `:memory:` database.
 - `drizzle/` — generated SQL migrations. `data/` — local SQLite db. `public/` — static assets.
 
 ## Commands
@@ -24,7 +24,10 @@ npm run format       # biome check --write .
 npm run test:client  # vitest --run (jsdom; client tests colocated in __tests__/ dirs)
 npm run test:server  # vitest --run (node env; server tests + server HTTP e2e)
 npm run test:unit    # test:client + test:server
-npm run typecheck    # tsc -p server/tsconfig.json --noEmit (server only)
+npm run typecheck    # typecheck:server + typecheck:client
+npm run typecheck:server  # tsc -p server/tsconfig.json --noEmit
+npm run typecheck:client  # vue-tsc -p client/tsconfig.app.json --noEmit
+npm run typecheck:perf    # the same vue-tsc run with --extendedDiagnostics
 npm run test:pw      # playwright (chromium only; auto-starts dev server on :5173)
 npm run test         # unit + pw  (manual full run)
 bun run perf:series  # GET /api/v1/series baseline over a real socket; --compare <json> gates p95/rps at 10%
@@ -35,20 +38,24 @@ npm run db:studio    # drizzle studio
 
 Git hooks are managed by lefthook (`lefthook.yml`, installed via the `prepare` script):
 
-- pre-commit: `biome check --write` on staged files, fixes re-staged (`stage_fixed`); server typecheck when a `server/**/*.ts` file is staged.
+- pre-commit: `biome check --write` on staged files, fixes re-staged (`stage_fixed`); server typecheck when a `server/**/*.ts` file is staged, client `vue-tsc` when a `client/**/*.{ts,vue}` file is staged.
 - pre-push: `test:server`, `test:client`, `test:pw` as parallel jobs.
 
-`npm run typecheck` covers the server. There is no vue-tsc dependency, so `.vue` files are only checked by editors and the build.
+`npm run typecheck` runs the server `tsc` project and the client `vue-tsc` project. `typecheck:client` follows `AppType` into the server graph, which is intentional: the `hc` client depends on exactly that graph, so `client/tsconfig.app.json` also includes `bun-types` to resolve `bun:sqlite`.
 
 ## Path aliases & imports
 
-- Client: `@/*` → `client/*`; **`@/server/*` → `server/domain/*`** — the client imports server domain types through this alias. Keep domain entities dependency-free so both sides can use them.
-- Server (relative to `server/`): `@/domain`, `@/infra`, `@/views`, `@/app` (see `server/tsconfig.json`).
+- Client: `@/*` → `client/*`; **`@/server/*` → `server/domain/*`** — the client imports server domain types through this alias. Keep domain entities dependency-free so both sides can use them. **`@server/*` → `server/*`** is for the type-only `AppType` / per-resource app types; never import server runtime code from the SPA.
+- Server: `@server/*` → `server/*` (`@server/domain`, `@server/infra`, `@server/views`, `@server/app`, `@server/shared`; see `server/tsconfig.json`). The shared prefix lets `vue-tsc` follow the server graph without colliding with client `@/*` paths.
 - Import order is enforced by Biome's `organizeImports` (`assist` in `biome.json`): `node:*`/bun, external, internal (`@/...` in FSD layer order: `@/app`, `@/features`, `@/entities`, `@/shared`), then relative. Alphabetized. Run `npm run lint` / `npm run format` before committing — the pre-commit hook fixes and re-stages staged files.
 
 ## Server conventions
 
-- Routes are Elysia plugins under `/api` (see `server/views/http/index.ts`); request/response validation via Elysia `t.` contracts in `*.contract.ts` files.
+- Routes are Hono controllers under `/api` (see `server/views/http/app.ts`); request validation uses valibot contracts in `*.contract.ts` files. **Every controller is one chained expression** (`new Hono().use(...).get(...).post(...)`) and the root chains its `.route()` calls — statement-form registration is invisible to `hc`. Handlers pass an explicit status (`c.json(row, 200)`, `c.body(null, 200)` for empty bodies).
+- Error bodies are `{ error: { code, message, details? } }` (`server/views/http/error.ts`). Validation failures answer **422** with normalized `{ path, message }[]` details; guards answer 401; private/unknown rows answer 404; `hc` narrows by status.
+- Auth is the `auth-session` cookie via `hono/cookie`, with `requireAuth` / `requireAdmin` middleware (`server/views/auth/`). `getSession` takes the Hono `Context` and rotates the session inside the guard; image requests pass `{ rotate: false }`.
+- Hono matches routes in registration order: register `/views` **before** `/:id` (both movie and series).
+- `server/views/http/app-type.ts` is type-only. It exports one `*AppType` per controller (plus the whole `AppType`) and merges the global 401/500/503 envelopes with `ApplyGlobalResponse`, so `hc` sees guard/error responses. The client builds a separate `hc` client per resource.
 - Env vars are valibot-parsed at import time in `server/infra/env` — the server throws without `DATABASE_URL` and `OMDB_URL`.
 - Drizzle schema lives in `server/domain/entities/`; after changing it run `npm run db:generate` and commit the migration in `drizzle/`. Migrations apply automatically on server boot.
 - Search is backed by external OMDB (`OMDB_URL`) behind the `SearchProvider` interface (`server/domain/search-provider`, impl in `server/infra/repositories/search-repository/search-providers`).
@@ -100,7 +107,8 @@ failure is logged and does not fail the run.
 
 ## Client conventions
 
-- API calls go through `client/shared/api/*` (wretch wrapper in `http.ts`); 401/403 globally clear the auth state.
+- API calls go through `client/shared/api/*`: `client.ts` exposes `apiFetch` (clears auth state on 401/403) and `createClient<T>(baseUrl)`, which wraps `hc<T>` typed against the matching `*AppType`. `request.ts` turns `!ok` responses into `ApiError { code, message, status, details }`; pages keep `try/catch` + `getMessage`.
+- `server/e2e` drives real requests through `app.request`; controller unit tests call `app.request` too and stub guards with Hono middleware. Socket-level tests and the perf bench use `Bun.serve({ port: 0, fetch: app.fetch })`.
 - Pages are FSD slices with an `index.ts` public API; `client/app/router.ts` imports page components only through it. `pages/admin` is a slice group (`pages/admin/<page>/ui/<page>.vue`) because the admin routes are independent pages sharing one shell.
 - `shared/ui` has one deliberate exception to "no business logic in shared": `Details`, `EditForm` and `MarkAsViewed` are the shared movie/series presentation and know attribution, poster and OMDB rules. `entities` may not import each other, so this copy is preferred over duplication; keep new domain components out of `shared`.
 - App-wide layout lives in `app/` (`app/ui/navbar.vue`); `shared/ui` holds only context-free components.

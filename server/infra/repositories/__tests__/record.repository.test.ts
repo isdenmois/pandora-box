@@ -6,7 +6,7 @@ vi.mock('../poster.instance', () => ({
   posterRepository: { remove: vi.fn() },
 }))
 
-const { movieRepository, seriesRepository, posterRepository } = await import('@/infra')
+const { movieRepository, seriesRepository, posterRepository } = await import('@server/infra')
 const { insertMovie, insertSeries, resetDatabase } = await import('./db-fixtures')
 
 describe('movie repository', () => {

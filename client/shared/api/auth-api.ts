@@ -1,10 +1,16 @@
-import { http } from './http'
+import type { AuthAppType } from '@server/views/http/app-type'
+import { createClient } from './client'
+import { ensure, unwrap } from './request'
 import type { User } from './user-api'
 
-const api = http.url('/auth')
+const api = createClient<AuthAppType>('/api/auth')
 
 export const auth = {
-  login: (username: string, password: string) => api.post({ username, password }, '/login').json<User>(),
+  login: async (username: string, password: string) => unwrap(await api.login.$post({ json: { username, password } })),
 
-  logout: () => api.post({}, '/logout').text(),
+  logout: async () => {
+    await ensure(await api.logout.$post())
+  },
 }
+
+export type { User }

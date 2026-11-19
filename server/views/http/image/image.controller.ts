@@ -1,7 +1,8 @@
-import { Elysia } from 'elysia'
-import { contentTypeForExtension, IMAGE_URL_PREFIX, parsePosterFileName } from '@/domain'
-import { movieRepository, posterRepository, seriesRepository } from '@/infra'
-import { type Cookies, getSession } from '@/views/auth'
+import { contentTypeForExtension, IMAGE_URL_PREFIX, parsePosterFileName } from '@server/domain'
+import { movieRepository, posterRepository, seriesRepository } from '@server/infra'
+import { getSession } from '@server/views/auth'
+import type { Context } from 'hono'
+import { Hono } from 'hono'
 import { findPosterRow } from '../poster/poster-record'
 
 export interface PosterRecord {
@@ -22,16 +23,19 @@ export interface ImageControllerDeps {
   isFailing: (source: string) => boolean
   findRecord: (id: string) => Promise<PosterRecord | null>
   setPosterPath: (id: string, path: string) => Promise<void>
-  hasSession: (cookies: unknown) => Promise<boolean>
+  hasSession: (c: Context) => Promise<boolean>
 }
 
 const NO_STORE = 'no-store'
 const REVALIDATE = 'public, no-cache'
 
-const redirect = (location: string) =>
-  new Response(null, { status: 302, headers: { location, 'cache-control': NO_STORE } })
+const redirect = (c: Context, location: string) => {
+  c.header('cache-control', NO_STORE)
 
-const notFound = () => new Response(null, { status: 404, headers: { 'cache-control': NO_STORE } })
+  return c.redirect(location, 302)
+}
+
+const notFound = (c: Context) => c.body(null, 404, { 'cache-control': NO_STORE })
 
 /** Bun types `Uint8Array` over `ArrayBufferLike`; `Response` wants ArrayBuffer-backed bytes. */
 function imageBody(bytes: Uint8Array): ArrayBuffer {
@@ -43,75 +47,71 @@ function imageBody(bytes: Uint8Array): ArrayBuffer {
 }
 
 export function createImageController(deps: ImageControllerDeps) {
-  return new Elysia({ name: 'image controller' }).get(
-    `${IMAGE_URL_PREFIX}/:fileName`,
-    async ({ params, cookie, headers }) => {
-      const parsed = parsePosterFileName(params.fileName)
+  return new Hono().get(`${IMAGE_URL_PREFIX}/:fileName`, async (c) => {
+    const fileName = c.req.param('fileName')
+    const parsed = parsePosterFileName(fileName)
 
-      if (!parsed) {
-        return notFound()
+    if (!parsed) {
+      return notFound(c)
+    }
+
+    const stored = await deps.read(fileName)
+
+    // nginx serves hits; this handler only runs on a miss (nginx proxy, vite, e2e).
+    if (stored) {
+      // `no-cache` still revalidates, so the validator keeps unchanged posters off the wire.
+      if (c.req.header('if-none-match') === stored.etag) {
+        return c.body(null, 304, { etag: stored.etag, 'cache-control': REVALIDATE })
       }
 
-      const stored = await deps.read(params.fileName)
+      return c.body(imageBody(stored.bytes), 200, {
+        'content-type': stored.contentType,
+        'cache-control': REVALIDATE,
+        etag: stored.etag,
+      })
+    }
 
-      // nginx serves hits; this handler only runs on a miss (nginx proxy, vite, e2e).
-      if (stored) {
-        // `no-cache` still revalidates, so the validator keeps unchanged posters off the wire.
-        if (headers['if-none-match'] === stored.etag) {
-          return new Response(null, {
-            status: 304,
-            headers: { etag: stored.etag, 'cache-control': REVALIDATE },
-          })
-        }
+    const record = await deps.findRecord(parsed.id)
 
-        return new Response(imageBody(stored.bytes), {
-          status: 200,
-          headers: { 'content-type': stored.contentType, 'cache-control': REVALIDATE, etag: stored.etag },
-        })
+    if (!record) {
+      return notFound(c)
+    }
+
+    const expected = `${IMAGE_URL_PREFIX}/${fileName}`
+
+    // The row points at another extension: correct the client instead of writing a second file.
+    if (record.poster && record.poster !== expected) {
+      return redirect(c, record.poster)
+    }
+
+    const source = record.posterSource
+
+    if (!source) {
+      return notFound(c)
+    }
+
+    // No session means no server-side fetch; the card still renders from the CDN.
+    if (!(await deps.hasSession(c)) || deps.isFailing(source)) {
+      return redirect(c, source)
+    }
+
+    try {
+      const downloaded = await deps.download(source)
+      const savedName = await deps.save(parsed.id, downloaded.extension, downloaded.bytes)
+      const storedPath = `${IMAGE_URL_PREFIX}/${savedName}`
+
+      if (storedPath !== record.poster) {
+        await deps.setPosterPath(parsed.id, storedPath)
       }
 
-      const record = await deps.findRecord(parsed.id)
-
-      if (!record) {
-        return notFound()
-      }
-
-      const expected = `${IMAGE_URL_PREFIX}/${params.fileName}`
-
-      // The row points at another extension: correct the client instead of writing a second file.
-      if (record.poster && record.poster !== expected) {
-        return redirect(record.poster)
-      }
-
-      const source = record.posterSource
-
-      if (!source) {
-        return notFound()
-      }
-
-      // No session means no server-side fetch; the card still renders from the CDN.
-      if (!(await deps.hasSession(cookie)) || deps.isFailing(source)) {
-        return redirect(source)
-      }
-
-      try {
-        const downloaded = await deps.download(source)
-        const fileName = await deps.save(parsed.id, downloaded.extension, downloaded.bytes)
-        const storedPath = `${IMAGE_URL_PREFIX}/${fileName}`
-
-        if (storedPath !== record.poster) {
-          await deps.setPosterPath(parsed.id, storedPath)
-        }
-
-        return new Response(imageBody(downloaded.bytes), {
-          status: 200,
-          headers: { 'content-type': contentTypeForExtension(downloaded.extension), 'cache-control': REVALIDATE },
-        })
-      } catch {
-        return redirect(source)
-      }
-    },
-  )
+      return c.body(imageBody(downloaded.bytes), 200, {
+        'content-type': contentTypeForExtension(downloaded.extension),
+        'cache-control': REVALIDATE,
+      })
+    } catch {
+      return redirect(c, source)
+    }
+  })
 }
 
 export const imageController = createImageController({
@@ -125,10 +125,10 @@ export const imageController = createImageController({
     await movieRepository.setPosterPath(id, path)
     await seriesRepository.setPosterPath(id, path)
   },
-  async hasSession(cookies) {
+  async hasSession(c) {
     // Validation must not rotate: a poster request has no use for the new cookie, and rotating
     // here would retire the id that the other images firing at the same time still hold.
-    const { user } = await getSession(cookies as Cookies, { rotate: false })
+    const { user } = await getSession(c, { rotate: false })
 
     return !!user
   },

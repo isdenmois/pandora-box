@@ -1,12 +1,15 @@
-import { Elysia } from 'elysia'
-import { getSession } from './session'
+import { createMiddleware } from 'hono/factory'
+import { unauthorized } from '../http/error'
+import { type AppEnv, getSession } from './session'
 
-export const adminGuard = new Elysia({ name: 'admin guard' })
-  // Check only role
-  .derive({ as: 'scoped' }, async ({ cookie, status }) => {
-    const { user } = await getSession(cookie)
+export const requireAdmin = createMiddleware<AppEnv>(async (c, next) => {
+  const { user } = await getSession(c)
 
-    if (user?.role !== 'admin') return status(401)
+  if (user?.role !== 'admin') {
+    return unauthorized(c)
+  }
 
-    return { user }
-  })
+  c.set('user', user)
+
+  await next()
+})

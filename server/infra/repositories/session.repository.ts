@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
+import { SESSION_EXPIRE_IN, type Session, table } from '@server/domain'
 import { eq } from 'drizzle-orm'
-import { SESSION_EXPIRE_IN, type Session, table } from '@/domain'
 import { db } from '../db'
 
 /** The join shape the session guard needs; `undefined` when the id is unknown. */

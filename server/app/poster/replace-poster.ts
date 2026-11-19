@@ -1,4 +1,4 @@
-import { IMAGE_URL_PREFIX, type ImageExtension } from '@/domain'
+import { IMAGE_URL_PREFIX, type ImageExtension } from '@server/domain'
 
 export interface PosterRecordStore<Row, Fields> {
   byId(id: string): Promise<Row | null>

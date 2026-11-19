@@ -1,8 +1,8 @@
 import { Database } from 'bun:sqlite'
+import { schema } from '@server/domain'
+import { env } from '@server/infra/env'
 import { drizzle } from 'drizzle-orm/bun-sqlite'
 import { migrate } from 'drizzle-orm/bun-sqlite/migrator'
-import { schema } from '@/domain'
-import { env } from '@/infra/env'
 
 const client = new Database(env.DATABASE_URL)
 // References are declared in the schema for documentation and future enforcement, but the app

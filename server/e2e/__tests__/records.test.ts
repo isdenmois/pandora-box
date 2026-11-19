@@ -13,6 +13,76 @@ describe.each(resources)('server e2e: $name access rules', ({ path, create }) =>
     expect(response.status).toBe(401)
   })
 
+  it('drops unknown patch fields instead of writing them', async () => {
+    // arrange
+    const alice = await seedSession('alice')
+    const created = await request<{ id: string }>({
+      method: 'POST',
+      path,
+      cookie: alice.cookie,
+      body: create({ title: 'Original' }),
+    })
+
+    // act
+    // The repository spreads the validated body into drizzle's `.set()`, so a contract that keeps
+    // unknown keys would let a client write any column — `createdBy` included.
+    const patched = await request<{ title: string; createdBy: string }>({
+      method: 'PATCH',
+      path: `${path}/${created.body.id}`,
+      cookie: alice.cookie,
+      body: { title: 'Renamed', createdBy: 'someone-else', notAColumn: 'x' },
+    })
+
+    // assert
+    expect(patched.status).toBe(200)
+    expect(patched.body.title).toBe('Renamed')
+    expect(patched.body.createdBy).toBe(alice.id)
+  })
+
+  it('routes /views as a static path rather than as an id', async () => {
+    // arrange
+    const alice = await seedSession('alice')
+
+    // act
+    // `/views` is registered after `/:id`; a router that matches in declaration order would read
+    // it as an id and answer 404.
+    const views = await request({ path: `${path}/views`, cookie: alice.cookie })
+
+    // assert
+    expect(views.status).toBe(200)
+    expect(Array.isArray(views.body)).toBe(true)
+  })
+
+  it('answers deletes with an empty 200 rather than a 204', async () => {
+    // arrange
+    const alice = await seedSession('alice')
+    const created = await request<{ id: string }>({
+      method: 'POST',
+      path,
+      cookie: alice.cookie,
+      body: create(),
+    })
+
+    // act
+    // The view goes first: removing the record would make the view route answer 404.
+    const removedView = await request({
+      method: 'DELETE',
+      path: `${path}/${created.body.id}/view`,
+      cookie: alice.cookie,
+    })
+    const removedRecord = await request({
+      method: 'DELETE',
+      path: `${path}/${created.body.id}`,
+      cookie: alice.cookie,
+    })
+
+    // assert
+    expect(removedView.status).toBe(200)
+    expect(removedView.body).toBeNull()
+    expect(removedRecord.status).toBe(200)
+    expect(removedRecord.body).toBeNull()
+  })
+
   it('sets the creator from the session, not the body', async () => {
     // arrange
     const alice = await seedSession('alice')

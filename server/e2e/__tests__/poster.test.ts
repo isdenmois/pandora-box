@@ -1,6 +1,6 @@
 import { readdir } from 'node:fs/promises'
+import { env } from '@server/infra'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { env } from '@/infra'
 import { request, requestBytes, resetDatabase, seedSession } from '../support/api'
 import { PNG, uploadPosterForm } from '../support/poster'
 import { moviePayload } from '../support/records'

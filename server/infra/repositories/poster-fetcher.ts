@@ -1,6 +1,6 @@
 import { lookup } from 'node:dns/promises'
 import { isIP } from 'node:net'
-import { extensionFromContentType, type ImageExtension, isImageSource } from '@/domain'
+import { extensionFromContentType, type ImageExtension, isImageSource } from '@server/domain'
 
 export interface DownloadedPoster {
   bytes: Uint8Array

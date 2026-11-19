@@ -1,21 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@/app', () => ({ offsiteUC: { list: vi.fn(), upload: vi.fn() } }))
+vi.mock('@server/app', () => ({ offsiteUC: { list: vi.fn(), upload: vi.fn() } }))
 
 // The guard is covered on its own; here only the handler matters.
-vi.mock('@/views/auth', async () => {
-  const { Elysia } = await import('elysia')
+vi.mock('@server/views/auth', async () => {
+  const { createMiddleware } = await import('hono/factory')
 
-  return { backupTokenGuard: new Elysia({ name: 'backup token guard' }) }
+  return { backupTokenGuard: createMiddleware(async (_c, next) => next()) }
 })
 
-const { offsiteUC } = await import('@/app')
+const { offsiteUC } = await import('@server/app')
 const { offsiteController } = await import('../backup-offsite.controller')
 
-type Handler = (request: Request) => Promise<Response>
-const handle = offsiteController.handle as unknown as Handler
+const handle = (request: Request) => offsiteController.request(request)
 
-const post = () => new Request('http://localhost/v1/backup/offsite', { method: 'POST' })
+const post = () => new Request('http://localhost/offsite', { method: 'POST' })
 
 describe('offsite backup route', () => {
   beforeEach(() => {
@@ -43,7 +42,7 @@ describe('offsite backup route', () => {
 
     // assert
     expect(response.status).toBe(502)
-    expect(await response.json()).toEqual({ message: 'Permission denied' })
+    expect(await response.json()).toEqual({ error: { code: 'upstream', message: 'Permission denied' } })
   })
 
   it('answers 503 when the feature has no credentials', async () => {

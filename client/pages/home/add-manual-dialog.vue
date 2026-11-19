@@ -52,14 +52,14 @@ const { form, submit, submitting, errors } = useForm({
     const data = {
       ...input,
       extId: null,
-      provider: 'manual',
+      provider: 'manual' as const,
       language: null,
       genre: null,
       extra: {},
       private: forMe,
     }
     if (type === 'series') {
-      await series.create({ ...data, season })
+      await series.create({ ...data, season: season ?? 1 })
     } else if (type === 'movie') {
       await movies.create(data)
     }

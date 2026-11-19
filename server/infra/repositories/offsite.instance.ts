@@ -1,4 +1,4 @@
-import { env } from '@/infra/env'
+import { env } from '@server/infra/env'
 import { createAccessToken, decodeServiceAccount } from '../firebase/service-account'
 import { createOffsiteBackupRepository } from './offsite.repository'
 

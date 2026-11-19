@@ -1,6 +1,7 @@
 import { timingSafeEqual } from 'node:crypto'
-import { Elysia } from 'elysia'
-import { env } from '@/infra/env'
+import { env } from '@server/infra/env'
+import { createMiddleware } from 'hono/factory'
+import { unauthorized, unavailable } from '../http/error'
 
 /**
  * Constant-time comparison. Length differences leak the expected length, which is fine: the
@@ -28,15 +29,17 @@ export function bearerToken(authorization: string | undefined): string | undefin
  * the routes that use this guard, never the rest of `/admin`.
  */
 export function createBackupTokenGuard(expected: string | undefined) {
-  return new Elysia({ name: 'backup token guard' }).derive({ as: 'scoped' }, ({ headers, status }) => {
+  return createMiddleware(async (c, next) => {
     // No token configured means the feature is off, which is a server-side condition, not a 401.
     if (!expected) {
-      return status(503, { message: 'Offsite backup is not configured' })
+      return unavailable(c, 'Offsite backup is not configured')
     }
 
-    if (!tokenMatches(bearerToken(headers.authorization), expected)) {
-      return status(401, { message: 'Unauthorized' })
+    if (!tokenMatches(bearerToken(c.req.header('authorization')), expected)) {
+      return unauthorized(c)
     }
+
+    await next()
   })
 }
 

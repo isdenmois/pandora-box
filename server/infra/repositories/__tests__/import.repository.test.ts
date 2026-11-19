@@ -5,12 +5,12 @@ vi.mock('../search-repository', () => ({
 }))
 
 // The importer sleeps 5 s per item to stay under OMDB's rate limit; tests must not wait for it.
-vi.mock('@/shared', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/shared')>()),
+vi.mock('@server/shared', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@server/shared')>()),
   sleep: vi.fn(() => Promise.resolve()),
 }))
 
-const { importRepository, movieRepository, seriesRepository } = await import('@/infra')
+const { importRepository, movieRepository, seriesRepository } = await import('@server/infra')
 const { searchRepository } = await import('../search-repository')
 const { insertSeries, resetDatabase } = await import('./db-fixtures')
 

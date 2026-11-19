@@ -1,33 +1,29 @@
-import type { Static, TSchema } from '@sinclair/typebox'
-import { Value } from '@sinclair/typebox/value'
-import { status } from 'elysia'
-import { type PosterFileStore, type PosterRecordStore, replacePoster } from '@/app'
-import { type ImageExtension, imageExtensionFromBytes } from '@/domain'
-import { hasEndMarker } from '@/infra/repositories/poster-fetcher'
+import { type PosterFileStore, type PosterRecordStore, replacePoster } from '@server/app'
+import { type ImageExtension, imageExtensionFromBytes } from '@server/domain'
+import { hasEndMarker } from '@server/infra/repositories/poster-fetcher'
+import type { AppEnv } from '@server/views/auth'
+import type { Context } from 'hono'
+import * as v from 'valibot'
+import { invalid, notFound } from '../error'
+import type { PosterUploadForm } from './poster-upload.contract'
 
 export interface PosterUploadOptions<Row, Fields> {
   records: PosterRecordStore<Row, Fields>
   files: PosterFileStore
-  parseFields: (raw: string | Record<string, unknown>) => Fields | null
+  parseFields: (raw: string) => Fields | null
   /** Private rows are invisible to everyone but their creator; answer 404 when this fails. */
   authorize?: (id: string, userId: string) => Promise<boolean>
-  /** Field-level validation that the TypeBox contract cannot express, e.g. a recommender id. */
+  /** Field-level validation that the contract cannot express, e.g. a recommender id. */
   validateFields?: (id: string, fields: Fields) => Promise<boolean>
 }
 
-/** Only the parts of Elysia's context this handler reads; `user` comes from `authGuard`. */
-interface UploadContext {
-  params: { id: string }
-  body: { data: string | Record<string, unknown>; file: File }
-  user: { id: string }
-}
-
 /** A `data` part that fails to parse or validate answers 422, like any other contract breach. */
-export function parseJsonPart<T extends TSchema>(schema: T) {
-  // Elysia pre-parses multipart values that look like JSON; older clients still send a string.
-  return (raw: string | Record<string, unknown>): Static<T> | null => {
+export function parseJsonPart<S extends v.GenericSchema>(schema: S) {
+  return (raw: string): v.InferOutput<S> | null => {
     try {
-      return Value.Parse(schema, typeof raw === 'string' ? JSON.parse(raw) : raw)
+      const result = v.safeParse(schema, JSON.parse(raw))
+
+      return result.success ? result.output : null
     } catch {
       return null
     }
@@ -46,34 +42,36 @@ function sniffImage(bytes: Uint8Array): ImageExtension | null {
 }
 
 export function createPosterUploadHandler<Row, Fields>(options: PosterUploadOptions<Row, Fields>) {
-  return async ({ params: { id }, body, user }: UploadContext) => {
-    const fields = options.parseFields(body.data)
+  return async (c: Context<AppEnv>, form: PosterUploadForm) => {
+    const id = c.req.param('id') ?? ''
+    const user = c.get('user')
+    const fields = options.parseFields(form.data)
 
     if (!fields) {
-      return status(422, { message: 'Invalid poster payload' })
+      return invalid(c, 'Invalid poster payload')
     }
 
     if (options.authorize && !(await options.authorize(id, user.id))) {
-      return status(404, { message: 'Not found' })
+      return notFound(c)
     }
 
     if (options.validateFields && !(await options.validateFields(id, fields))) {
-      return status(422, { message: 'Invalid field' })
+      return invalid(c, 'Invalid field')
     }
 
-    const bytes = new Uint8Array(await body.file.arrayBuffer())
+    const bytes = new Uint8Array(await form.file.arrayBuffer())
     const extension = sniffImage(bytes)
 
     if (!extension) {
-      return status(422, { message: 'Unsupported image type' })
+      return invalid(c, 'Unsupported image type')
     }
 
     const saved = await replacePoster(options.records, options.files, { id, fields, extension, bytes }, user.id)
 
     if (!saved) {
-      return status(404, { message: 'Not found' })
+      return notFound(c)
     }
 
-    return saved
+    return c.json(saved, 200)
   }
 }

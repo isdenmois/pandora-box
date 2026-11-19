@@ -1,24 +1,27 @@
 import { describe, expect, it, vi } from 'vitest'
 
 // The controller module also builds the production instance, which reaches the database through
-// `@/infra`; stubbing both keeps these tests free of bun:sqlite.
-vi.mock('@/infra', () => ({
+// `@server/infra`; stubbing both keeps these tests free of bun:sqlite.
+vi.mock('@server/infra', () => ({
   posterRepository: { remove: vi.fn() },
 }))
 
-// The guard is a plugin, so the stub has to be one too — a `derive` is enough to let requests in.
-vi.mock('@/views/auth', async () => {
-  const { Elysia } = await import('elysia')
+// The guard is middleware; a stub is enough to let requests in.
+vi.mock('@server/views/auth', async () => {
+  const { createMiddleware } = await import('hono/factory')
 
-  return { authGuard: new Elysia({ name: 'auth guard' }).derive({ as: 'scoped' }, () => ({ user: { id: 'user-1' } })) }
+  return {
+    requireAuth: createMiddleware(async (c, next) => {
+      c.set('user', { id: 'user-1', role: 'user', username: 'user-1' })
+      await next()
+    }),
+  }
 })
 
 const { createPosterController } = await import('../poster.controller')
 
 const ID = 'movie-1'
 const SOURCE = 'https://cdn.example.com/poster.jpg'
-
-type Handler = (request: Request) => Promise<Response>
 
 function setup(overrides: Partial<Parameters<typeof createPosterController>[0]> = {}) {
   const deps = {
@@ -34,10 +37,10 @@ function setup(overrides: Partial<Parameters<typeof createPosterController>[0]> 
 
   const app = createPosterController(deps)
 
-  return { deps, handle: app.handle as unknown as Handler }
+  return { deps, handle: (request: Request) => app.request(request) }
 }
 
-const redownload = () => new Request(`http://localhost/v1/poster/${ID}`, { method: 'DELETE' })
+const redownload = () => new Request(`http://localhost/${ID}`, { method: 'DELETE' })
 
 describe('DELETE /v1/poster/:id', () => {
   it('drops the stored file and answers with the unchanged row', async () => {

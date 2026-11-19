@@ -1,5 +1,5 @@
+import { table } from '@server/domain'
 import { and, eq, inArray } from 'drizzle-orm'
-import { table } from '@/domain'
 import { db } from '../db'
 import { movieRepository } from './movie.repository'
 import { seriesRepository } from './series.repository'

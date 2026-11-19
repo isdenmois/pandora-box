@@ -1,4 +1,4 @@
-import { claimedCreator, type OwnedRecord } from '@/domain'
+import { claimedCreator, type OwnedRecord } from '@server/domain'
 import { posterUpdateFor, type StoredPoster } from './poster-fields'
 
 /** Fields every record patch may carry that change ownership or the poster. */

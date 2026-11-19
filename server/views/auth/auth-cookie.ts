@@ -1,30 +1,25 @@
-import type { Cookie } from 'elysia'
-import type { Session } from '@/domain'
-
-export type Cookies = Record<string, Cookie<unknown>>
+import type { Session } from '@server/domain'
+import type { Context } from 'hono'
+import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 
 export const sessionCookieName = 'auth-session'
 
 export const authCookie = {
-  getSessionId(cookies: Cookies): string | null {
-    const cookie = cookies[sessionCookieName].value
+  getSessionId(c: Context): string | null {
+    const value = getCookie(c, sessionCookieName)
 
-    if (typeof cookie === 'string' && cookie.length) {
-      return cookie
-    }
-
-    return null
+    return typeof value === 'string' && value.length ? value : null
   },
 
-  setSession(cookies: Cookies, session: Session) {
-    cookies[sessionCookieName].value = session.id
-    cookies[sessionCookieName].path = '/'
-    cookies[sessionCookieName].expires = session.expiresAt
-    cookies[sessionCookieName].httpOnly = true
+  setSession(c: Context, session: Session) {
+    setCookie(c, sessionCookieName, session.id, {
+      path: '/',
+      expires: session.expiresAt,
+      httpOnly: true,
+    })
   },
 
-  deleteSession(cookies: Cookies) {
-    cookies[sessionCookieName].remove()
-    delete cookies[sessionCookieName]
+  deleteSession(c: Context) {
+    deleteCookie(c, sessionCookieName, { path: '/' })
   },
 }

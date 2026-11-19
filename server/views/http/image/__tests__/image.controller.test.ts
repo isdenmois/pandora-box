@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 // The controller module also builds the production instance, which reaches the database
 // through `@/infra`; stubbing both keeps these tests free of bun:sqlite.
-vi.mock('@/infra', () => ({
+vi.mock('@server/infra', () => ({
   movieRepository: { byId: vi.fn(), setPosterPath: vi.fn() },
   seriesRepository: { byId: vi.fn(), setPosterPath: vi.fn() },
   posterRepository: {
@@ -13,7 +13,7 @@ vi.mock('@/infra', () => ({
   },
 }))
 
-vi.mock('@/views/auth', () => ({
+vi.mock('@server/views/auth', () => ({
   getSession: vi.fn(async () => ({ user: null })),
 }))
 
@@ -28,8 +28,6 @@ interface PosterRecord {
 const JPEG = new Uint8Array([0xff, 0xd8, 0xff, 0xd9])
 const SOURCE = 'https://cdn.example.com/poster.jpg'
 const ID = 'movie-1'
-
-type Handler = (request: Request) => Promise<Response>
 
 /** Builds the handler with everything but the pieces under test stubbed out. */
 function setup(overrides: Partial<ImageControllerDeps> = {}) {
@@ -48,7 +46,7 @@ function setup(overrides: Partial<ImageControllerDeps> = {}) {
 
   const app = createImageController(deps)
 
-  return { deps, handle: app.handle as unknown as Handler }
+  return { deps, handle: (request: Request) => app.request(request) }
 }
 
 const request = (fileName: string, cookie?: string) =>

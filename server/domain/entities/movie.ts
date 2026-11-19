@@ -52,8 +52,9 @@ export type MovieView = typeof movieView.$inferSelect
 /** Create payload: `poster` is the source URL, mapped to `posterSource` by the repository. */
 export type MovieCreate = Omit<
   Movie,
-  'id' | 'createdBy' | 'seen' | 'seenRating' | 'seenComment' | 'poster' | 'posterSource'
+  'id' | 'createdBy' | 'seen' | 'seenRating' | 'seenComment' | 'poster' | 'posterSource' | 'provider'
 > & {
+  provider: 'omdb' | 'manual'
   poster: string | null
 }
 export type MovieUpdate = Pick<

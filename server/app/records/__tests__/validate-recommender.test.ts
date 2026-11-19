@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@/infra', () => ({
+vi.mock('@server/infra', () => ({
   userRepository: { exists: vi.fn() },
 }))
 
-const { userRepository } = await import('@/infra')
+const { userRepository } = await import('@server/infra')
 const { isValidRecommender } = await import('../validate-recommender')
 
 describe('isValidRecommender', () => {

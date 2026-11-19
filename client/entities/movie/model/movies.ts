@@ -67,7 +67,7 @@ export const useMovies = defineStore('movies', () => {
       }
     },
 
-    async markAsViewed(id: string, date: string, rating: number, comment) {
+    async markAsViewed(id: string, date: string, rating: number, comment: string) {
       const existed = all.value.find((movie) => movie.id === id)
 
       if (existed) {
@@ -95,6 +95,11 @@ export const useMovies = defineStore('movies', () => {
       }
 
       const data = await api.search.byId(existed.extId, 'omdb')
+
+      if (!data) {
+        return
+      }
+
       const extra = { ...existed.extra }
 
       if (isOmdb(data)) {

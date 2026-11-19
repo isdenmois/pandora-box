@@ -1,19 +1,19 @@
-import { t } from 'elysia'
+import * as v from 'valibot'
 
-export const RegisterUserBody = t.Object({
-  username: t.String({ minLength: 3, maxLength: 31 }),
-  password: t.String({ minLength: 4 }),
+export const RegisterUserBody = v.object({
+  username: v.pipe(v.string(), v.minLength(3), v.maxLength(31)),
+  password: v.pipe(v.string(), v.minLength(4)),
 })
 
-export const BackupRestoreBody = t.Any({})
+export const BackupRestoreBody = v.unknown()
 
-export const ImportBody = t.Object({
-  series: t.Array(t.Any()),
-  movies: t.Array(t.Any()),
+export const ImportBody = v.object({
+  series: v.array(v.any()),
+  movies: v.array(v.any()),
 })
 
-export const ReassignAttributionBody = t.Object({
-  movies: t.Optional(t.Array(t.String())),
-  series: t.Optional(t.Array(t.String())),
-  createdBy: t.String(),
+export const ReassignAttributionBody = v.object({
+  movies: v.optional(v.array(v.string())),
+  series: v.optional(v.array(v.string())),
+  createdBy: v.string(),
 })

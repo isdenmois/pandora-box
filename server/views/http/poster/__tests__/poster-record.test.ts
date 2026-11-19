@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@/infra', () => ({
+vi.mock('@server/infra', () => ({
   movieRepository: { byId: vi.fn() },
   seriesRepository: { byId: vi.fn() },
 }))
 
-const { movieRepository, seriesRepository } = await import('@/infra')
+const { movieRepository, seriesRepository } = await import('@server/infra')
 const { findPosterRow } = await import('../poster-record')
 
 const MOVIE = {

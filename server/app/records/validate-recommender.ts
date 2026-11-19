@@ -1,4 +1,4 @@
-import { userRepository } from '@/infra'
+import { userRepository } from '@server/infra'
 
 /**
  * A recommender is optional, but when present it must be a real user and must not be the same

@@ -1,11 +1,15 @@
-import type { SearchItem, SearchItemDetails } from '@/server/entities'
-import { http } from './http'
-
-const v1 = http.url('/v1/search')
+import type { SearchAppType } from '@server/views/http/app-type'
+import type { SearchItem, SearchItemDetails } from '@/server/search-provider'
+import { createClient } from './client'
+import { unwrap } from './request'
 
 export type { SearchItem, SearchItemDetails }
 
+const searchClient = createClient<SearchAppType>('/api/v1/search')
+
 export const search = {
-  external: (q: string, provider = 'omdb') => v1.query({ q }).get(`/external/${provider}`).json<SearchItem[]>(),
-  byId: (id: string, provider = 'omdb') => v1.get(`/external/${provider}/${id}`).json<SearchItemDetails>(),
+  external: async (q: string, provider: 'omdb' = 'omdb') =>
+    unwrap(await searchClient.external[':provider'].$get({ param: { provider }, query: { q } })),
+  byId: async (id: string, provider: 'omdb' = 'omdb') =>
+    unwrap(await searchClient.external[':provider'][':id'].$get({ param: { provider, id } })),
 }

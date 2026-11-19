@@ -1,12 +1,15 @@
-import { Elysia } from 'elysia'
-import { getSession } from './session'
+import { createMiddleware } from 'hono/factory'
+import { unauthorized } from '../http/error'
+import { type AppEnv, getSession } from './session'
 
-export const authGuard = new Elysia({ name: 'auth guard' })
-  // Check if user session exist
-  .derive({ as: 'scoped' }, async ({ cookie, status }) => {
-    const { user } = await getSession(cookie)
+export const requireAuth = createMiddleware<AppEnv>(async (c, next) => {
+  const { user } = await getSession(c)
 
-    if (!user?.id) return status(401)
+  if (!user?.id) {
+    return unauthorized(c)
+  }
 
-    return { user }
-  })
+  c.set('user', user)
+
+  await next()
+})

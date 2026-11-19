@@ -1,13 +1,14 @@
+import type { UserAppType } from '@server/views/http/app-type'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useAuth } from '../../lib/auth/auth-state'
+import { createClient } from '../client'
 
 const mockFetchStatus = (status: number, body = JSON.stringify({ message: 'unauthorized' })) => {
-  // The api's customError parses the body as JSON before the catchers run.
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(body, { status })))
 }
 
-describe('http auth catchers', () => {
+describe('client auth hook', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     useAuth().setUser({ id: 'u1', username: 'me', role: 'user' })
@@ -15,21 +16,15 @@ describe('http auth catchers', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals()
-    vi.resetModules()
     vi.clearAllMocks()
   })
 
   it('clears the auth user when the API answers 401', async () => {
     // arrange
-    const { http } = await import('../http')
     mockFetchStatus(401)
 
     // act
-    await http
-      .url('/probe')
-      .get()
-      .res()
-      .catch(() => {})
+    await createClient<UserAppType>('/api/v1/user').current.$get()
 
     // assert
     expect(useAuth().user).toBeNull()
@@ -37,15 +32,10 @@ describe('http auth catchers', () => {
 
   it('clears the auth user when the API answers 403', async () => {
     // arrange
-    const { http } = await import('../http')
     mockFetchStatus(403)
 
     // act
-    await http
-      .url('/probe')
-      .get()
-      .res()
-      .catch(() => {})
+    await createClient<UserAppType>('/api/v1/user').current.$get()
 
     // assert
     expect(useAuth().user).toBeNull()
@@ -53,15 +43,10 @@ describe('http auth catchers', () => {
 
   it('clears the auth user when a 401 body is not JSON', async () => {
     // arrange
-    const { http } = await import('../http')
     mockFetchStatus(401, 'unauthorized')
 
     // act
-    await http
-      .url('/probe')
-      .get()
-      .res()
-      .catch(() => {})
+    await createClient<UserAppType>('/api/v1/user').current.$get()
 
     // assert
     expect(useAuth().user).toBeNull()
@@ -69,15 +54,10 @@ describe('http auth catchers', () => {
 
   it('keeps the auth user when the API fails with another status', async () => {
     // arrange
-    const { http } = await import('../http')
     mockFetchStatus(500)
 
     // act
-    await http
-      .url('/probe')
-      .get()
-      .res()
-      .catch(() => {})
+    await createClient<UserAppType>('/api/v1/user').current.$get()
 
     // assert
     expect(useAuth().user).toEqual({ id: 'u1', username: 'me', role: 'user' })

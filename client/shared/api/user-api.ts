@@ -1,18 +1,23 @@
-import type { UserSummary } from '@/server/entities'
-import { http } from './http'
+import type { UserAppType } from '@server/views/http/app-type'
+import { createClient } from './client'
+import { unwrap } from './request'
+
+const v1 = createClient<UserAppType>('/api/v1/user')
+
+/** The name directory shape; mirrors the server's sanitized pick. */
+export interface UserSummary {
+  id: string
+  username: string
+}
 
 export interface User {
   id: string
   username: string
-  role: string
+  role: string | null
 }
 
-export type { UserSummary }
-
-const v1 = http.url('/v1/user')
-
 export const user = {
-  current: () => v1.get('/current').json<User>(),
+  current: async () => unwrap(await v1.current.$get()),
   /** Public directory: names only, for attribution labels and the recommender picker. */
-  list: () => v1.get('').json<UserSummary[]>(),
+  list: async () => unwrap(await v1.index.$get()),
 }

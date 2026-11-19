@@ -1,4 +1,4 @@
-import { env } from '@/infra/env'
+import { env } from '@server/infra/env'
 import { createPosterRepository } from './poster.repository'
 
 export const posterRepository = createPosterRepository({

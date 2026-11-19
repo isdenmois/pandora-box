@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
-import { table } from '@/domain'
-import { db } from '@/infra'
-import { hashPassword } from '@/shared'
+import { table } from '@server/domain'
+import { db } from '@server/infra'
+import { hashPassword } from '@server/shared'
 import { app } from '../../index'
 
 /**
@@ -55,13 +55,11 @@ export async function request<T = unknown>({
     headers.cookie = cookie
   }
 
-  const response = await app.handle(
-    new Request(urlFor(base, path), {
-      method,
-      headers,
-      body: form ?? (body === undefined ? undefined : JSON.stringify(body)),
-    }),
-  )
+  const response = await app.request(urlFor(base, path), {
+    method,
+    headers,
+    body: form ?? (body === undefined ? undefined : JSON.stringify(body)),
+  })
   const text = await response.text()
   const setCookie = response.headers.getSetCookie().find((value) => value.startsWith('auth-session=')) ?? null
 
@@ -80,9 +78,10 @@ export async function requestBytes(options: RequestOptions) {
     headers.cookie = options.cookie
   }
 
-  const response = await app.handle(
-    new Request(urlFor(options.base ?? 'api', options.path), { method: options.method, headers }),
-  )
+  const response = await app.request(urlFor(options.base ?? 'api', options.path), {
+    method: options.method,
+    headers,
+  })
 
   return {
     status: response.status,

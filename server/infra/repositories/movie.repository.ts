@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
+import { type Movie, type MovieCreate, type MovieUpdate, table } from '@server/domain'
 import { eq, or } from 'drizzle-orm'
-import { type Movie, type MovieCreate, type MovieUpdate, table } from '@/domain'
 import { db } from '../db'
 import { posterRepository } from './poster.instance'
 import { posterFieldsFor } from './poster-fields'

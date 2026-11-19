@@ -1,4 +1,4 @@
-import { isLocalPoster, posterPath } from '@/domain'
+import { isLocalPoster, posterPath } from '@server/domain'
 
 export interface PosterFields {
   poster: string | null

@@ -1,4 +1,4 @@
-import { t } from 'elysia'
+import * as v from 'valibot'
 
 /**
  * The file part only carries the size cap: the image allowlist is enforced from the bytes (a
@@ -6,12 +6,13 @@ import { t } from 'elysia'
  * `extensionFromContentType` can map.
  */
 export const posterUploadBody = (maxBytes: number) =>
-  t.Object({
-    /**
-     * JSON body for the record fields, so the update contract stays the single shape.
-     * Elysia parses multipart values that start with `{` before validation, so the part can
-     * arrive either as raw JSON or as the already-parsed object.
-     */
-    data: t.Union([t.String({ minLength: 1 }), t.Record(t.String(), t.Unknown())]),
-    file: t.File({ maxSize: maxBytes }),
+  v.object({
+    /** The record fields, JSON-encoded; the update contract stays the single shape. */
+    data: v.pipe(v.string(), v.minLength(1)),
+    file: v.pipe(
+      v.instance(File),
+      v.check((file) => file.size <= maxBytes, `The image must be ${maxBytes} bytes or smaller`),
+    ),
   })
+
+export type PosterUploadForm = v.InferOutput<ReturnType<typeof posterUploadBody>>

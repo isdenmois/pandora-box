@@ -63,14 +63,14 @@ const { form, submit, submitting, errors } = useForm({
     const data = {
       ...input,
       extId: params.id,
-      provider: 'omdb',
+      provider: 'omdb' as const,
       language,
       genre,
       extra,
       private: forMe,
     }
     if (type === 'series') {
-      await series.create({ ...data, season })
+      await series.create({ ...data, season: season ?? 1 })
     } else if (type === 'movie') {
       await movies.create(data)
     }
@@ -83,6 +83,11 @@ onMounted(async () => {
   try {
     const data = await api.search.byId(params.id)
 
+    if (!data) {
+      error.value = true
+      return
+    }
+
     fields.type = data.type
     fields.title = data.title
     fields.rating = data.rating ? String(data.rating) : ''
@@ -92,7 +97,7 @@ onMounted(async () => {
     language = data.language || null
     genre = data.genre || null
     extra = data.extra ?? {}
-    totalSeasons = 'totalSeasons' in extra ? +extra.totalSeasons : null
+    totalSeasons = 'totalSeasons' in extra ? Number(extra.totalSeasons) : null
   } catch {
     error.value = true
   } finally {

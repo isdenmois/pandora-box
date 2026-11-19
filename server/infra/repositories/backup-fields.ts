@@ -1,4 +1,4 @@
-import type { toBackup } from '@/domain'
+import type { toBackup } from '@server/domain'
 import { posterRestoreFor } from './poster-fields'
 
 export type BackupTable = keyof typeof toBackup

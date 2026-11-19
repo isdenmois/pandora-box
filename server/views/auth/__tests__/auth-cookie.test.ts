@@ -1,90 +1,75 @@
-import type { Cookie } from 'elysia'
-import { describe, expect, it, vi } from 'vitest'
-import type { Session } from '@/domain'
-import { authCookie, type Cookies, sessionCookieName } from '../auth-cookie'
-
-const createCookies = (value: unknown): Cookies => {
-  const cookie = {
-    value,
-    path: '',
-    expires: undefined,
-    httpOnly: false,
-    remove: vi.fn(),
-  } as unknown as Cookie<unknown>
-
-  return { [sessionCookieName]: cookie }
-}
+import type { Session } from '@server/domain'
+import { Hono } from 'hono'
+import { describe, expect, it } from 'vitest'
+import { authCookie, sessionCookieName } from '../auth-cookie'
 
 const session: Session = {
   id: 'session-1',
   userId: 'user-1',
-  expiresAt: new Date('2030-01-01T00:00:00Z'),
+  // Hono refuses an `Expires` more than 400 days ahead, matching the RFC.
+  expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
 }
 
+const readApp = new Hono().get('/', (c) => c.text(authCookie.getSessionId(c) ?? 'null'))
+const writeApp = new Hono()
+  .get('/set', (c) => {
+    authCookie.setSession(c, session)
+
+    return c.body(null, 204)
+  })
+  .get('/delete', (c) => {
+    authCookie.deleteSession(c)
+
+    return c.body(null, 204)
+  })
+
+const call = (app: Hono, path = '/', cookie?: string) =>
+  app.request(`http://localhost${path}`, { headers: cookie ? { cookie } : undefined })
+
 describe('authCookie.getSessionId', () => {
-  it('returns the id stored in the cookie', () => {
-    // arrange
-    const cookies = createCookies('session-1')
-
+  it('returns the id stored in the cookie', async () => {
     // act
-    const id = authCookie.getSessionId(cookies)
+    const response = await call(readApp, '/', `${sessionCookieName}=session-1`)
 
     // assert
-    expect(id).toBe('session-1')
+    expect(await response.text()).toBe('session-1')
   })
 
-  it('returns null for an empty value', () => {
-    // arrange
-    const cookies = createCookies('')
-
+  it('returns null when the cookie is absent or empty', async () => {
     // act
-    const id = authCookie.getSessionId(cookies)
+    const absent = await call(readApp)
+    const empty = await call(readApp, '/', `${sessionCookieName}=`)
 
     // assert
-    expect(id).toBeNull()
-  })
-
-  it('returns null when the value is not a string', () => {
-    // arrange
-    const cookies = createCookies({ signed: 'session-1' })
-
-    // act
-    const id = authCookie.getSessionId(cookies)
-
-    // assert
-    expect(id).toBeNull()
+    expect(await absent.text()).toBe('null')
+    expect(await empty.text()).toBe('null')
   })
 })
 
 describe('authCookie.setSession', () => {
-  it('stores the session id with the hardening flags', () => {
-    // arrange
-    const cookies = createCookies('')
-
+  it('stores the session id with the hardening flags', async () => {
     // act
-    authCookie.setSession(cookies, session)
+    const response = await call(writeApp, '/set')
 
     // assert
-    expect(cookies[sessionCookieName]).toMatchObject({
-      value: 'session-1',
-      path: '/',
-      expires: session.expiresAt,
-      httpOnly: true,
-    })
+    const setCookie = response.headers.getSetCookie().find((value) => value.startsWith(sessionCookieName))
+
+    expect(setCookie).toContain(`${sessionCookieName}=session-1`)
+    expect(setCookie).toContain('Path=/')
+    expect(setCookie).toContain('HttpOnly')
+    expect(setCookie).toContain('Expires=')
   })
 })
 
 describe('authCookie.deleteSession', () => {
-  it('removes the cookie and forgets it', () => {
-    // arrange
-    const cookies = createCookies('session-1')
-    const cookie = cookies[sessionCookieName]
-
+  it('clears the cookie', async () => {
     // act
-    authCookie.deleteSession(cookies)
+    const response = await call(writeApp, '/delete', `${sessionCookieName}=session-1`)
 
     // assert
-    expect(cookie.remove).toHaveBeenCalledOnce()
-    expect(cookies).not.toHaveProperty(sessionCookieName)
+    const setCookie = response.headers.getSetCookie().find((value) => value.startsWith(sessionCookieName))
+
+    expect(setCookie).toContain(`${sessionCookieName}=`)
+    expect(setCookie).toContain('Max-Age=0')
   })
 })

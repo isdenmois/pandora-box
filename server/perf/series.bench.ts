@@ -29,9 +29,9 @@ process.env.IMAGE_DIR = join(tmpdir(), 'pandora-perf-images')
 process.env.IMAGE_FETCH = 'off'
 
 const { app } = await import('../index')
-const { db } = await import('@/infra')
-const { table } = await import('@/domain')
-const { hashPassword } = await import('@/shared')
+const { db } = await import('@server/infra')
+const { table } = await import('@server/domain')
+const { hashPassword } = await import('@server/shared')
 
 const PASSWORD = 'perf-benchmark-password'
 const ENDPOINT = '/api/v1/series'
@@ -91,10 +91,10 @@ async function run() {
   const options = parseOptions()
   const seeded = await seed(options.rows)
 
-  const server = app.listen(0)
+  const server = Bun.serve({ port: 0, fetch: app.fetch })
 
   try {
-    const port = server.server?.port
+    const port = server.port
 
     if (!port) {
       throw new Error('The server did not report a listening port')
@@ -137,7 +137,7 @@ async function run() {
       }
     }
   } finally {
-    server.stop()
+    server.stop(true)
   }
 }
 

@@ -16,7 +16,8 @@ export interface SearchItemDetails {
   rating?: number | null
   genre?: string | null
   language?: string | null
-  extra?: object
+  /** A JSON object; `object` itself makes Hono's JSON type mapping degenerate to `never`. */
+  extra?: Record<string, unknown>
 }
 
 export type SearchItemType = SearchItem['type']

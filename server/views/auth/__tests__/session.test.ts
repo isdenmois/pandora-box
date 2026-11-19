@@ -1,16 +1,16 @@
-import type { Cookie } from 'elysia'
+import { sessionUC } from '@server/app'
+import { SESSION_EXPIRE_IN, type Session } from '@server/domain'
+import { sessionRepository } from '@server/infra'
+import { Hono } from 'hono'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { sessionUC } from '@/app'
-import { SESSION_EXPIRE_IN, type Session } from '@/domain'
-import { sessionRepository } from '@/infra'
-import { type Cookies, sessionCookieName } from '../auth-cookie'
+import { sessionCookieName } from '../auth-cookie'
 import { getSession } from '../session'
 
-vi.mock('@/app', () => ({
+vi.mock('@server/app', () => ({
   sessionUC: { validate: vi.fn() },
 }))
 
-vi.mock('@/infra', () => ({
+vi.mock('@server/infra', () => ({
   sessionRepository: { create: vi.fn(), delete: vi.fn() },
 }))
 
@@ -26,15 +26,16 @@ function createSession(ageInDays: number): Session {
   }
 }
 
-function createCookies(sessionId: string | null): Cookies {
-  // Elysia instantiates cookie objects on access, so the object always exists
-  const cookie = {
-    value: sessionId ?? '',
-    remove: vi.fn(),
-  } as unknown as Cookie<string>
+const app = new Hono().get('/', async (c) => {
+  const result = await getSession(c)
 
-  return { [sessionCookieName]: cookie }
-}
+  return c.json({ sessionId: result.session?.id ?? null, user: result.user })
+})
+
+const call = (sessionId?: string) =>
+  app.request('http://localhost/', {
+    headers: sessionId ? { cookie: `${sessionCookieName}=${sessionId}` } : undefined,
+  })
 
 describe('getSession', () => {
   beforeEach(() => {
@@ -46,16 +47,14 @@ describe('getSession', () => {
     const session = createSession(0)
     vi.mocked(sessionUC.validate).mockResolvedValue({ session, user })
 
-    const cookies = createCookies(session.id)
-
     // act
-    const result = await getSession(cookies)
+    const response = await call(session.id)
 
     // assert
-    expect(result).toEqual({ session, user })
+    expect(await response.json()).toEqual({ sessionId: session.id, user })
+    expect(response.headers.getSetCookie()).toEqual([])
     expect(sessionRepository.create).not.toHaveBeenCalled()
     expect(sessionRepository.delete).not.toHaveBeenCalled()
-    expect(cookies[sessionCookieName].value).toBe(session.id)
   })
 
   it('rotates a session older than 30 days and sets the cookie to the new session', async () => {
@@ -70,46 +69,40 @@ describe('getSession', () => {
     }
     vi.mocked(sessionRepository.create).mockResolvedValue(newSession)
 
-    const cookies = createCookies(session.id)
-
     // act
-    const result = await getSession(cookies)
+    const response = await call(session.id)
 
     // assert
     expect(sessionRepository.create).toHaveBeenCalledExactlyOnceWith(user.id)
+    const setCookie = response.headers.getSetCookie().find((value) => value.startsWith(sessionCookieName))
+
     // The cookie must point to the new session — not to the deleted old one
-    expect(cookies[sessionCookieName].value).toBe(newSession.id)
-    expect(cookies[sessionCookieName].expires).toEqual(newSession.expiresAt)
+    expect(setCookie).toContain(`${sessionCookieName}=${newSession.id}`)
+    expect(setCookie).toContain('Expires=')
     // Object.assign in rotateSession mutates the session fixture, so capture the id beforehand
     expect(sessionRepository.delete).toHaveBeenCalledExactlyOnceWith('old-session-id')
-    expect(result.session?.id).toBe(newSession.id)
-    expect(result.user).toEqual(user)
+    expect(await response.json()).toEqual({ sessionId: newSession.id, user })
   })
 
   it('returns nulls and does not rotate when the session is invalid', async () => {
     // arrange
     vi.mocked(sessionUC.validate).mockResolvedValue({ session: null, user: null })
 
-    const cookies = createCookies('unknown-session-id')
-
     // act
-    const result = await getSession(cookies)
+    const response = await call('unknown-session-id')
 
     // assert
-    expect(result).toEqual({ session: null, user: null })
+    expect(await response.json()).toEqual({ sessionId: null, user: null })
     expect(sessionRepository.create).not.toHaveBeenCalled()
     expect(sessionRepository.delete).not.toHaveBeenCalled()
   })
 
   it('returns nulls when no session cookie is present', async () => {
-    // arrange
-    const cookies = createCookies(null)
-
     // act
-    const result = await getSession(cookies)
+    const response = await call()
 
     // assert
-    expect(result).toEqual({ session: null, user: null })
+    expect(await response.json()).toEqual({ sessionId: null, user: null })
     expect(sessionUC.validate).not.toHaveBeenCalled()
   })
 })

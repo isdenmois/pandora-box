@@ -1,7 +1,9 @@
-import { CONTENT_TYPE_BY_EXTENSION } from '@/server'
-
-/** Every format the server can store; deriving `accept` keeps the picker and the writer in sync. */
-const POSTER_TYPES = new Set(Object.values(CONTENT_TYPE_BY_EXTENSION))
+/**
+ * Every format the server can store. The server's extension→MIME map lives in `server/domain`,
+ * but importing it here would pull runtime server code into the SPA bundle, so this list mirrors
+ * it; the server still sniffs the bytes and is the real allowlist.
+ */
+const POSTER_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'])
 
 export const POSTER_ACCEPT = [...POSTER_TYPES].join(',')
 

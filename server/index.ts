@@ -1,14 +1,11 @@
-import { openapi } from '@elysiajs/openapi'
-import { Elysia } from 'elysia'
-import { httpControllers, imageControllers } from './views'
-import { plainBody } from './views/plain-body'
+import { app } from './views/http/app'
 
 const port = +(process.env.PORT || 3000)
 
-export const app = new Elysia().use(openapi()).use(plainBody).use(httpControllers).use(imageControllers)
+export { app }
 
 if (import.meta.main) {
-  app.listen(port, ({ port }) => {
-    console.log(`🦊 Elysia is running at :${port}`)
-  })
+  Bun.serve({ port, fetch: app.fetch })
+
+  console.log(`🔥 Hono is running at :${port}`)
 }

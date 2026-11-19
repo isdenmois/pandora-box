@@ -1,5 +1,5 @@
-import { backupRepository, OFFSITE_RETENTION, offsiteConfigured, offsiteKey, offsiteRepository } from '@/infra'
-import { errorMessage } from '@/shared'
+import { backupRepository, OFFSITE_RETENTION, offsiteConfigured, offsiteKey, offsiteRepository } from '@server/infra'
+import { errorMessage } from '@server/shared'
 
 export type OffsiteResult =
   | { ok: true; key: string; bytes: number; pruned: string[] }

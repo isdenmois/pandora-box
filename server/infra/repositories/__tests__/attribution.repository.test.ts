@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-const { attributionRepository } = await import('@/infra')
+const { attributionRepository } = await import('@server/infra')
 const { insertMovie, insertSeries, resetDatabase } = await import('./db-fixtures')
 
 describe('attribution reassign', () => {

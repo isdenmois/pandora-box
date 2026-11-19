@@ -28,11 +28,11 @@ function omdbStub(input: RequestInfo | URL) {
   )
 }
 
-let server: ReturnType<typeof app.listen>
+let server: ReturnType<typeof Bun.serve>
 
 describe('server e2e over a real socket: search', () => {
   beforeAll(() => {
-    server = app.listen(0)
+    server = Bun.serve({ port: 0, fetch: app.fetch })
   })
 
   beforeEach(() => {
@@ -50,7 +50,7 @@ describe('server e2e over a real socket: search', () => {
   })
 
   afterAll(() => {
-    server.stop()
+    server.stop(true)
   })
 
   it('searches an external provider by query', async () => {
@@ -58,7 +58,7 @@ describe('server e2e over a real socket: search', () => {
     const alice = await seedSession('alice')
 
     // act
-    const response = await fetch(`http://localhost:${server.server?.port}/api/v1/search/external/omdb?q=matrix`, {
+    const response = await fetch(`http://localhost:${server.port}/api/v1/search/external/omdb?q=matrix`, {
       headers: { cookie: alice.cookie },
     })
 
@@ -75,7 +75,7 @@ describe('server e2e over a real socket: search', () => {
     const alice = await seedSession('alice')
 
     // act
-    const response = await fetch(`http://localhost:${server.server?.port}/api/v1/search/external/omdb/tt0133093`, {
+    const response = await fetch(`http://localhost:${server.port}/api/v1/search/external/omdb/tt0133093`, {
       headers: { cookie: alice.cookie },
     })
 

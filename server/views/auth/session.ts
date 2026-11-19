@@ -1,7 +1,21 @@
-import { sessionUC } from '@/app'
-import { SESSION_ROTATE_IN, type Session } from '@/domain'
-import { sessionRepository } from '@/infra'
-import { authCookie, type Cookies } from './auth-cookie'
+import { sessionUC } from '@server/app'
+import { SESSION_ROTATE_IN, type Session } from '@server/domain'
+import { sessionRepository } from '@server/infra'
+import type { Context } from 'hono'
+import { authCookie } from './auth-cookie'
+
+export interface AuthUser {
+  id: string
+  role: string | null
+  username: string
+}
+
+/** What the auth middleware puts on the context for every guarded handler. */
+export interface AppEnv {
+  Variables: {
+    user: AuthUser
+  }
+}
 
 export interface GetSessionOptions {
   /**
@@ -12,15 +26,15 @@ export interface GetSessionOptions {
   rotate?: boolean
 }
 
-export async function getSession(cookies: Cookies, options: GetSessionOptions = {}) {
-  const sessionId = authCookie.getSessionId(cookies)
+export async function getSession(c: Context, options: GetSessionOptions = {}) {
+  const sessionId = authCookie.getSessionId(c)
 
   if (sessionId) {
     const { session, user } = await sessionUC.validate(sessionId)
 
     if (session && user) {
       if (options.rotate ?? true) {
-        await rotateSession(cookies, session)
+        await rotateSession(c, session)
       }
 
       return { session, user }
@@ -30,13 +44,13 @@ export async function getSession(cookies: Cookies, options: GetSessionOptions = 
   return { session: null, user: null }
 }
 
-async function rotateSession(cookies: Cookies, session: Session) {
+async function rotateSession(c: Context, session: Session) {
   const renewSession = Date.now() >= session.expiresAt.getTime() - SESSION_ROTATE_IN
 
   if (renewSession) {
     const newSession = await sessionRepository.create(session.userId)
 
-    authCookie.setSession(cookies, newSession)
+    authCookie.setSession(c, newSession)
 
     await sessionRepository.delete(session.id)
 

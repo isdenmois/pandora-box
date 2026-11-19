@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@/infra', () => ({
+vi.mock('@server/infra', () => ({
   env: { IMAGE_MAX_BYTES: 5 * 1024 * 1024 },
   seriesRepository: {
     create: vi.fn(),
@@ -16,17 +16,18 @@ vi.mock('@/infra', () => ({
   userRepository: { exists: vi.fn() },
 }))
 
-vi.mock('@/views/auth', async () => {
-  const { Elysia } = await import('elysia')
+vi.mock('@server/views/auth', async () => {
+  const { createMiddleware } = await import('hono/factory')
 
   return {
-    authGuard: new Elysia({ name: 'auth guard' }).derive({ as: 'scoped' }, () => ({
-      user: { id: 'reader', role: 'user' },
-    })),
+    requireAuth: createMiddleware(async (c, next) => {
+      c.set('user', { id: 'reader', role: 'user', username: 'reader' })
+      await next()
+    }),
   }
 })
 
-const { seriesRepository, posterRepository, userRepository } = await import('@/infra')
+const { seriesRepository, posterRepository, userRepository } = await import('@server/infra')
 const { seriesController } = await import('../series.controller')
 
 const OWN_ROW = {
@@ -60,11 +61,10 @@ const BODY = {
   extra: {},
 }
 
-type Handler = (request: Request) => Promise<Response>
-const handle = seriesController.handle as unknown as Handler
+const handle = (request: Request) => seriesController.request(request)
 
 const request = (path: string, method = 'GET', body?: unknown) =>
-  new Request(`http://localhost/v1/series${path}`, {
+  new Request(`http://localhost${path || '/'}`, {
     method,
     headers: body ? { 'content-type': 'application/json' } : undefined,
     body: body ? JSON.stringify(body) : undefined,
@@ -79,7 +79,7 @@ function upload(id: string, data: unknown = { title: 'Renamed' }) {
   form.append('data', JSON.stringify(data))
   form.append('file', new File([PNG], 'p.png', { type: 'image/png' }))
 
-  return new Request(`http://localhost/v1/series/${id}/poster`, { method: 'PATCH', body: form })
+  return new Request(`http://localhost/${id}/poster`, { method: 'PATCH', body: form })
 }
 
 describe('series ownership rules', () => {
@@ -122,7 +122,7 @@ describe('series ownership rules', () => {
 
     // assert
     expect(response.status).toBe(422)
-    expect(await response.json()).toEqual({ message: 'Unknown or invalid recommender' })
+    expect(await response.json()).toEqual({ error: { code: 'validation', message: 'Unknown or invalid recommender' } })
     expect(seriesRepository.create).not.toHaveBeenCalled()
     expect(userRepository.exists).not.toHaveBeenCalled()
   })
@@ -147,7 +147,7 @@ describe('series ownership rules', () => {
 
     // assert
     expect(response.status).toBe(404)
-    expect(await response.json()).toEqual({ message: 'Not found' })
+    expect(await response.json()).toEqual({ error: { code: 'not_found', message: 'Not found' } })
   })
 
   it('answers 200 when the creator asks for their private row', async () => {
@@ -215,7 +215,7 @@ describe('series ownership rules', () => {
 
     // assert
     expect(response.status).toBe(422)
-    expect(await response.json()).toEqual({ message: 'Unknown or invalid recommender' })
+    expect(await response.json()).toEqual({ error: { code: 'validation', message: 'Unknown or invalid recommender' } })
     expect(userRepository.exists).toHaveBeenCalledExactlyOnceWith('ghost')
     expect(seriesRepository.update).not.toHaveBeenCalled()
   })
@@ -338,7 +338,7 @@ describe('PATCH /v1/series/:id/poster', () => {
 
     // assert
     expect(response.status).toBe(404)
-    expect(await response.json()).toEqual({ message: 'Not found' })
+    expect(await response.json()).toEqual({ error: { code: 'not_found', message: 'Not found' } })
     expect(posterRepository.save).not.toHaveBeenCalled()
     expect(seriesRepository.update).not.toHaveBeenCalled()
   })

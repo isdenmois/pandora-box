@@ -1,14 +1,12 @@
-import { WretchError } from 'wretch/resolver'
+import { ApiError } from '../api/error'
 
 export const getMessage = (error: unknown): string => {
-  if (error && typeof error === 'object') {
-    if ('json' in error && error instanceof WretchError) {
-      return getMessage(error.json)
-    }
+  if (error instanceof ApiError) {
+    return error.message
+  }
 
-    if ('message' in error) {
-      return String(error.message)
-    }
+  if (error && typeof error === 'object' && 'message' in error) {
+    return String(error.message)
   }
 
   return String(error)

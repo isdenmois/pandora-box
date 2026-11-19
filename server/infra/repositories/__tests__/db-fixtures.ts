@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
-import { table } from '@/domain'
-import { db } from '@/infra'
+import { table } from '@server/domain'
+import { db } from '@server/infra'
 
 /** A fresh set of rows for every test; the server test env points `DATABASE_URL` at `:memory:`. */
 export async function resetDatabase() {

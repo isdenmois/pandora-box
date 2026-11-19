@@ -1,38 +1,42 @@
-import { t } from 'elysia'
+import * as v from 'valibot'
 
-export const createMovieBody = t.Object({
-  extId: t.Nullable(t.String()),
-  provider: t.UnionEnum(['omdb', 'manual']),
-  title: t.String({ minLength: 1 }),
-  poster: t.Nullable(t.String({ minLength: 1 })),
-  year: t.Nullable(t.Integer({ minimum: 1 })),
-  rating: t.Nullable(t.Number()),
-  language: t.Nullable(t.String()),
-  genre: t.Nullable(t.String()),
-  reason: t.Nullable(t.String()),
-  recommendedBy: t.Nullable(t.String()),
-  private: t.Boolean(),
-  scheduled: t.Nullable(t.Integer()),
-  tags: t.Nullable(t.Array(t.String())),
-  extra: t.Any(),
+const title = v.pipe(v.string(), v.minLength(1))
+const poster = v.nullable(v.pipe(v.string(), v.minLength(1)))
+const year = v.nullable(v.pipe(v.number(), v.integer(), v.minValue(1)))
+
+export const createMovieBody = v.object({
+  extId: v.nullable(v.string()),
+  provider: v.picklist(['omdb', 'manual']),
+  title,
+  poster,
+  year,
+  rating: v.nullable(v.number()),
+  language: v.nullable(v.string()),
+  genre: v.nullable(v.string()),
+  reason: v.nullable(v.string()),
+  recommendedBy: v.nullable(v.string()),
+  private: v.boolean(),
+  scheduled: v.nullable(v.pipe(v.number(), v.integer())),
+  tags: v.nullable(v.array(v.string())),
+  extra: v.any(),
 })
 
-export const updateMovieBody = t.Object({
-  title: t.String({ minLength: 1 }),
-  poster: t.Nullable(t.String({ minLength: 1 })),
-  year: t.Nullable(t.Integer({ minimum: 1 })),
-  rating: t.Nullable(t.Number()),
-  reason: t.Nullable(t.String()),
-  recommendedBy: t.Nullable(t.String()),
-  private: t.Boolean(),
-  scheduled: t.Nullable(t.Integer()),
-  tags: t.Nullable(t.Array(t.String())),
+export const updateMovieBody = v.object({
+  title,
+  poster,
+  year,
+  rating: v.nullable(v.number()),
+  reason: v.nullable(v.string()),
+  recommendedBy: v.nullable(v.string()),
+  private: v.boolean(),
+  scheduled: v.nullable(v.pipe(v.number(), v.integer())),
+  tags: v.nullable(v.array(v.string())),
 })
 
-export const patchMovieBody = t.Partial(updateMovieBody)
+export const patchMovieBody = v.partial(updateMovieBody)
 
-export const markMovieViewedBody = t.Object({
-  date: t.String({ minLength: 5 }),
-  rating: t.Number({ minimum: 0, maximum: 10 }),
-  comment: t.String({}),
+export const markMovieViewedBody = v.object({
+  date: v.pipe(v.string(), v.minLength(5)),
+  rating: v.pipe(v.number(), v.minValue(0), v.maxValue(10)),
+  comment: v.string(),
 })

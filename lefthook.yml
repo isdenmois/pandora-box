@@ -4,10 +4,12 @@ pre-commit:
       glob: "*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,vue,html,css,json,jsonc}"
       run: biome check --write --no-errors-on-unmatched {staged_files}
       stage_fixed: true
-    # Server-only for now: there is no vue-tsc, and `tsc` cannot read `.vue` files.
-    - name: typecheck
+    - name: typecheck:server
       glob: "server/**/*.ts"
-      run: npm run typecheck
+      run: npm run typecheck:server
+    - name: typecheck:client
+      glob: "client/**/*.{ts,vue}"
+      run: npm run typecheck:client
 
 pre-push:
   parallel: true

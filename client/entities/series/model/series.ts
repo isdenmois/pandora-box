@@ -108,6 +108,11 @@ export const useSeries = defineStore('series', () => {
       }
 
       const data = await api.search.byId(existed.extId, 'omdb')
+
+      if (!data) {
+        return
+      }
+
       const extra = { ...existed.extra }
 
       if (isOmdb(data)) {

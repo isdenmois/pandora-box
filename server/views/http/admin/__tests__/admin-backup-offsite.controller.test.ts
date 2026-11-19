@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@/app', () => ({
+vi.mock('@server/app', () => ({
   admin: { registerUser: vi.fn() },
   offsiteUC: { list: vi.fn(), upload: vi.fn() },
 }))
 
-vi.mock('@/infra', () => ({
+vi.mock('@server/infra', () => ({
   attributionRepository: { getGlobal: vi.fn(), reassign: vi.fn() },
   backupRepository: { create: vi.fn(), restore: vi.fn() },
   importRepository: { import: vi.fn(), status: vi.fn() },
@@ -16,23 +16,23 @@ vi.mock('@/infra', () => ({
   userRepository: { exists: vi.fn() },
 }))
 
-vi.mock('@/views/auth', async () => {
-  const { Elysia } = await import('elysia')
+vi.mock('@server/views/auth', async () => {
+  const { createMiddleware } = await import('hono/factory')
 
   return {
-    adminGuard: new Elysia({ name: 'admin guard' }).derive({ as: 'scoped' }, () => ({
-      user: { id: 'admin', role: 'admin' },
-    })),
+    requireAdmin: createMiddleware(async (c, next) => {
+      c.set('user', { id: 'admin', role: 'admin', username: 'root' })
+      await next()
+    }),
   }
 })
 
-const { offsiteUC } = await import('@/app')
+const { offsiteUC } = await import('@server/app')
 const { adminController } = await import('../admin.controller')
 
-type Handler = (request: Request) => Promise<Response>
-const handle = adminController.handle as unknown as Handler
+const handle = (request: Request) => adminController.request(request)
 
-const call = (method: string) => handle(new Request('http://localhost/v1/admin/backup/offsite', { method }))
+const call = (method: string) => handle(new Request('http://localhost/backup/offsite', { method }))
 
 describe('admin offsite backup', () => {
   beforeEach(() => {

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const state = vi.hoisted(() => ({ configured: true }))
 
-vi.mock('@/infra', () => ({
+vi.mock('@server/infra', () => ({
   backupRepository: { create: vi.fn() },
   get offsiteConfigured() {
     return state.configured
@@ -12,7 +12,7 @@ vi.mock('@/infra', () => ({
   OFFSITE_RETENTION: 14,
 }))
 
-const { backupRepository, offsiteRepository } = await import('@/infra')
+const { backupRepository, offsiteRepository } = await import('@server/infra')
 const { upload } = await import('../upload')
 
 const payload = { movie: [{ id: 'm1' }], user: [] }

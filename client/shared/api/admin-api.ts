@@ -1,7 +1,7 @@
+import type { AdminAppType } from '@server/views/http/app-type'
 import type { Movie, Series } from '@/server/domain'
-import { http } from './http'
-
-const v1 = http.url('/v1/admin')
+import { createClient } from './client'
+import { ensure, unwrap, unwrapBlob } from './request'
 
 export interface ImportStatus {
   inProgress: boolean
@@ -38,17 +38,24 @@ export interface OffsiteUpload {
   pruned: string[]
 }
 
+const adminClient = createClient<AdminAppType>('/api/v1/admin')
+
 export const admin = {
-  register: (username: string, password: string) => v1.url('/register').post({ username, password }).json(),
-  backup: () => v1.url('/backup').get().blob(),
-  backupRestore: (data: unknown) => v1.url('/backup').post(data).res(),
-  offsiteStatus: () => v1.url('/backup/offsite').get().json<OffsiteStatus>(),
-  offsiteUpload: () => v1.url('/backup/offsite').post().json<OffsiteUpload>(),
-  import: (data: unknown) => v1.url('/import').post(data).res(),
-  importStatus: () => v1.get('/import').json<ImportStatus>(),
+  register: async (username: string, password: string) =>
+    unwrap(await adminClient.register.$post({ json: { username, password } })),
+  backup: async () => unwrapBlob(await adminClient.backup.$get()),
+  backupRestore: async (data: unknown) => {
+    await ensure(await adminClient.backup.$post({ json: data }))
+  },
+  offsiteStatus: async () => unwrap(await adminClient.backup.offsite.$get()),
+  offsiteUpload: async () => unwrap(await adminClient.backup.offsite.$post()),
+  import: async (data: unknown) =>
+    unwrap(await adminClient.import.$post({ json: data as { movies: unknown[]; series: unknown[] } })),
+  importStatus: async () => unwrap(await adminClient.import.$get()),
   /** Deletes poster files no record references and reports how many were removed. */
-  removeOrphanImages: () => v1.url('/images/orphans').delete().json<{ removed: number }>(),
+  removeOrphanImages: async () => unwrap(await adminClient.images.orphans.$delete()),
   /** Shared (non-private) rows only; private rows belong to their creator alone. */
-  attribution: () => v1.url('/attribution').get().json<AttributionData>(),
-  reassignAttribution: (body: AttributionReassign) => v1.url('/attribution').patch(body).json<{ updated: number }>(),
+  attribution: async () => unwrap(await adminClient.attribution.$get()),
+  reassignAttribution: async (body: AttributionReassign) =>
+    unwrap(await adminClient.attribution.$patch({ json: body })),
 }

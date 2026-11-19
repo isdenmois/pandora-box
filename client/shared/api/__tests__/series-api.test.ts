@@ -1,108 +1,126 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { series } from '../series-api'
 
-const chain = vi.hoisted(() => {
-  const fake = {
-    post: vi.fn(),
-    patch: vi.fn(),
-    get: vi.fn(),
-    delete: vi.fn(),
-    url: vi.fn(),
-    json: vi.fn(),
-    text: vi.fn(),
-  }
+const jsonResponse = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } })
 
-  fake.post.mockReturnValue(fake)
-  fake.patch.mockReturnValue(fake)
-  fake.get.mockReturnValue(fake)
-  fake.delete.mockReturnValue(fake)
-  fake.url.mockReturnValue(fake)
-
-  return fake
-})
-
-vi.mock('@/shared/api/http', () => ({
-  http: { url: vi.fn(() => chain) },
-}))
+const fetchMock = vi.fn()
 
 beforeEach(() => {
-  vi.clearAllMocks()
+  fetchMock.mockReset()
+  vi.stubGlobal('fetch', fetchMock)
 })
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
+
+const lastCall = () => fetchMock.mock.calls.at(-1) as [string, RequestInit]
 
 describe('series api', () => {
   it('targets the series collection', async () => {
     // arrange
+    fetchMock.mockResolvedValue(jsonResponse([]))
+
     // act
-    await series.getAll()
+    const shows = await series.getAll()
 
     // assert
-    expect(chain.get).toHaveBeenCalledExactlyOnceWith()
-    expect(chain.json).toHaveBeenCalledOnce()
+    expect(shows).toEqual([])
+    expect(String(lastCall()[0])).toBe('/api/v1/series')
   })
 
   it('savePoster sends the fields and the file as multipart form data', async () => {
     // arrange
     const data = { title: 'Some Series' }
     const file = new File([new Uint8Array([1])], 'poster.png', { type: 'image/png' })
+    fetchMock.mockResolvedValue(jsonResponse({ id: 'series-1', ...data }))
 
     // act
     await series.savePoster('series-1', data, file)
 
     // assert
-    expect(chain.url).toHaveBeenCalledExactlyOnceWith('/series-1/poster')
+    const [url, init] = lastCall()
 
-    const body = chain.patch.mock.calls[0]?.[0] as FormData
+    expect(String(url)).toBe('/api/v1/series/series-1/poster')
+    expect(init.method).toBe('PATCH')
+    expect(new Headers(init.headers).has('content-type')).toBe(false)
+
+    const body = init.body as FormData
 
     expect(body).toBeInstanceOf(FormData)
     expect(body.get('data')).toBe(JSON.stringify(data))
     expect(body.get('file')).toBe(file)
     expect(body.has('poster')).toBe(false)
-    expect(chain.json).toHaveBeenCalledOnce()
   })
 
   it('patch sends the data object to the row url', async () => {
     // arrange
     const data = { title: 'Some Series', season: 2 }
+    fetchMock.mockResolvedValue(jsonResponse({ id: 'series-1', ...data }))
 
     // act
     await series.patch('series-1', data)
 
     // assert
-    expect(chain.url).toHaveBeenCalledExactlyOnceWith('/series-1')
-    expect(chain.patch).toHaveBeenCalledExactlyOnceWith(data)
-    expect(chain.json).toHaveBeenCalledOnce()
+    const [url, init] = lastCall()
+
+    expect(String(url)).toBe('/api/v1/series/series-1')
+    expect(init.method).toBe('PATCH')
+    expect(JSON.parse(String(init.body))).toEqual(data)
   })
 
   it('delete sends a DELETE to the row url', async () => {
     // arrange
+    fetchMock.mockResolvedValue(new Response(null, { status: 200 }))
+
     // act
     await series.delete('series-1')
 
     // assert
-    expect(chain.url).toHaveBeenCalledExactlyOnceWith('/series-1')
-    expect(chain.delete).toHaveBeenCalledOnce()
-    expect(chain.text).toHaveBeenCalledOnce()
+    const [url, init] = lastCall()
+
+    expect(String(url)).toBe('/api/v1/series/series-1')
+    expect(init.method).toBe('DELETE')
   })
 
   it('markAsViewed posts the view to the viewed url', async () => {
     // arrange
+    fetchMock.mockResolvedValue(jsonResponse({ id: 'view-1' }))
+
     // act
     await series.markAsViewed('series-1', '2024-05-06', 8, 'Great')
 
     // assert
-    expect(chain.url).toHaveBeenCalledExactlyOnceWith('/series-1/viewed')
-    expect(chain.post).toHaveBeenCalledExactlyOnceWith({ date: '2024-05-06', rating: 8, comment: 'Great' })
-    expect(chain.json).toHaveBeenCalledOnce()
+    const [url, init] = lastCall()
+
+    expect(String(url)).toBe('/api/v1/series/series-1/viewed')
+    expect(init.method).toBe('POST')
+    expect(JSON.parse(String(init.body))).toEqual({ date: '2024-05-06', rating: 8, comment: 'Great' })
   })
 
   it('removeSeriesView deletes the view url', async () => {
     // arrange
+    fetchMock.mockResolvedValue(new Response(null, { status: 200 }))
+
     // act
     await series.removeSeriesView('series-1')
 
     // assert
-    expect(chain.url).toHaveBeenCalledExactlyOnceWith('/series-1/view')
-    expect(chain.delete).toHaveBeenCalledOnce()
-    expect(chain.text).toHaveBeenCalledOnce()
+    const [url, init] = lastCall()
+
+    expect(String(url)).toBe('/api/v1/series/series-1/view')
+    expect(init.method).toBe('DELETE')
+  })
+
+  it('reads the view history from the static views path', async () => {
+    // arrange
+    fetchMock.mockResolvedValue(jsonResponse([]))
+
+    // act
+    await series.getViews()
+
+    // assert
+    expect(String(lastCall()[0])).toBe('/api/v1/series/views')
   })
 })

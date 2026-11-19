@@ -1,4 +1,4 @@
-import { offsiteConfigured, offsiteRepository } from '@/infra'
+import { offsiteConfigured, offsiteRepository } from '@server/infra'
 
 /** Newest first; `null` means the feature has no credentials, which the routes answer 503 for. */
 export async function list(): Promise<string[] | null> {

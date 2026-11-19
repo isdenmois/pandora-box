@@ -1,4 +1,4 @@
-import { movieRepository, seriesRepository } from '@/infra'
+import { movieRepository, seriesRepository } from '@server/infra'
 
 export interface PosterRow {
   poster: string | null

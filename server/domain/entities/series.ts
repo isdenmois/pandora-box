@@ -49,27 +49,31 @@ export const seriesView = sqliteTable('series_view', {
 })
 
 export type Series = typeof series.$inferSelect
-export type SeriesView = typeof series.$inferSelect
+export type SeriesView = typeof seriesView.$inferSelect
 
 /** Create payload: `poster` is the source URL, mapped to `posterSource` by the repository. */
 export type SeriesCreate = Omit<
   Series,
-  'id' | 'createdBy' | 'seasonHistory' | 'seen' | 'seenRating' | 'seenComment' | 'poster' | 'posterSource'
+  | 'id'
+  | 'createdBy'
+  | 'seasonHistory'
+  | 'seen'
+  | 'seenRating'
+  | 'seenComment'
+  | 'poster'
+  | 'posterSource'
+  | 'provider'
+  | 'season'
 > & {
+  provider: 'omdb' | 'manual'
   poster: string | null
+  season: number
 }
 export type SeriesUpdate = Pick<
   Series,
-  | 'title'
-  | 'season'
-  | 'seasonHistory'
-  | 'year'
-  | 'rating'
-  | 'reason'
-  | 'recommendedBy'
-  | 'private'
-  | 'scheduled'
-  | 'tags'
+  'title' | 'seasonHistory' | 'year' | 'rating' | 'reason' | 'recommendedBy' | 'private' | 'scheduled' | 'tags'
 > & {
+  /** The update contract keeps the season non-null, unlike the nullable column. */
+  season?: number
   poster?: string | null
 }

@@ -1,7 +1,8 @@
-import Elysia, { status } from 'elysia'
-import { canAccess } from '@/domain'
-import { posterRepository } from '@/infra'
-import { authGuard } from '@/views/auth'
+import { canAccess } from '@server/domain'
+import { posterRepository } from '@server/infra'
+import { type AppEnv, requireAuth } from '@server/views/auth'
+import { Hono } from 'hono'
+import { conflict, notFound } from '../error'
 import { findPosterRow, type PosterRow } from './poster-record'
 
 export interface PosterControllerDeps {
@@ -15,29 +16,23 @@ export interface PosterControllerDeps {
  * movie and series edit routes.
  */
 export function createPosterController(deps: PosterControllerDeps) {
-  return new Elysia({
-    prefix: '/v1/poster',
-    detail: {
-      tags: ['poster'],
-    },
+  return new Hono<AppEnv>().use(requireAuth).delete('/:id', async (c) => {
+    const id = c.req.param('id')
+    const row = await deps.findRow(id)
+
+    if (!row || !canAccess(row, c.get('user').id)) {
+      return notFound(c)
+    }
+
+    // Nothing to re-download from: the row never had a source, so the file is all it has.
+    if (!row.posterSource) {
+      return conflict(c, 'Poster has no source')
+    }
+
+    await deps.remove(id)
+
+    return c.json(row, 200)
   })
-    .use(authGuard)
-    .delete('/:id', async ({ params: { id }, user }) => {
-      const row = await deps.findRow(id)
-
-      if (!row || !canAccess(row, user.id)) {
-        return status(404, { message: 'Not found' })
-      }
-
-      // Nothing to re-download from: the row never had a source, so the file is all it has.
-      if (!row.posterSource) {
-        return status(409, { message: 'Poster has no source' })
-      }
-
-      await deps.remove(id)
-
-      return row
-    })
 }
 
 export const posterController = createPosterController({

@@ -1,19 +1,17 @@
-import { Elysia } from 'elysia'
+import { Hono } from 'hono'
 import { describe, expect, it } from 'vitest'
 import { bearerToken, createBackupTokenGuard, tokenMatches } from '../backup-token.guard'
 
 const TOKEN = 'f0a4e1c7-2b7e-4f2f-9a41-6d0f1f2c9b3e'
 
 const appWith = (expected: string | undefined) =>
-  new Elysia().use(createBackupTokenGuard(expected)).post('/', () => 'ok')
+  new Hono().use(createBackupTokenGuard(expected)).post('/', (c) => c.text('ok', 200))
 
 const call = (expected: string | undefined, authorization?: string) =>
-  appWith(expected).handle(
-    new Request('http://localhost/', {
-      method: 'POST',
-      headers: authorization ? { authorization } : undefined,
-    }),
-  )
+  appWith(expected).request('http://localhost/', {
+    method: 'POST',
+    headers: authorization ? { authorization } : undefined,
+  })
 
 describe('tokenMatches', () => {
   it('only accepts an identical secret', () => {
@@ -44,6 +42,7 @@ describe('backup token guard', () => {
 
     // assert
     expect(response.status).toBe(503)
+    expect(await response.json()).toMatchObject({ error: { code: 'unavailable' } })
   })
 
   it('answers 401 without a header', async () => {

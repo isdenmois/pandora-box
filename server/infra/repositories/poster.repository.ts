@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto'
 import { mkdir, readdir, readFile, rename, stat, unlink, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { CONTENT_TYPE_BY_EXTENSION, contentTypeForExtension } from '@/domain'
+import { CONTENT_TYPE_BY_EXTENSION, contentTypeForExtension } from '@server/domain'
 import { createPosterFetcher, type DownloadedPoster } from './poster-fetcher'
 
 export interface PosterFile {

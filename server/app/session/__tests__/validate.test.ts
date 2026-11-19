@@ -1,9 +1,9 @@
+import { SESSION_EXPIRE_IN, type Session } from '@server/domain'
+import { sessionRepository } from '@server/infra'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { SESSION_EXPIRE_IN, type Session } from '@/domain'
-import { sessionRepository } from '@/infra'
 import { validate } from '../validate'
 
-vi.mock('@/infra', () => ({
+vi.mock('@server/infra', () => ({
   sessionRepository: { getById: vi.fn(), delete: vi.fn() },
 }))
 

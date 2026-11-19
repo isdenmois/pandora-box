@@ -1,16 +1,12 @@
-import { Elysia } from 'elysia'
-import { offsiteUC } from '@/app'
-import { backupTokenGuard } from '@/views/auth'
+import { offsiteUC } from '@server/app'
+import { backupTokenGuard } from '@server/views/auth'
+import { Hono } from 'hono'
 import { respond } from './respond'
 
 /**
  * Machine route for the host cron: `POST /api/v1/backup/offsite` with `Authorization: Bearer`.
  * The admin equivalent (cookie, plus the status listing) lives in `adminController`.
  */
-export const offsiteController = new Elysia({ prefix: '/v1', detail: { tags: ['backup'] } })
+export const offsiteController = new Hono()
   .use(backupTokenGuard)
-  .post('/backup/offsite', async () => respond(await offsiteUC.upload()), {
-    detail: {
-      description: 'Snapshots the database into Firebase Realtime Database',
-    },
-  })
+  .post('/offsite', async (c) => respond(c, await offsiteUC.upload()))

@@ -1,8 +1,8 @@
-import { t } from 'elysia'
+import * as v from 'valibot'
 
-export const loginBody = t.Object({
-  username: t.String(),
-  password: t.String(),
+export const loginBody = v.object({
+  username: v.string(),
+  password: v.string(),
 })
 
-export type loginBody = typeof loginBody.static
+export type LoginBody = v.InferOutput<typeof loginBody>

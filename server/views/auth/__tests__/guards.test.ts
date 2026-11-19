@@ -1,19 +1,20 @@
-import { Elysia } from 'elysia'
+import { Hono } from 'hono'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { AppEnv } from '../session'
 
 vi.mock('../session', () => ({ getSession: vi.fn() }))
 
 const { getSession } = await import('../session')
-const { authGuard } = await import('../auth.guard')
-const { adminGuard } = await import('../admin.guard')
+const { requireAuth } = await import('../auth.guard')
+const { requireAdmin } = await import('../admin.guard')
 
 const user = { id: 'user-1', username: 'john', role: 'user' }
 const admin = { id: 'admin-1', username: 'root', role: 'admin' }
 
-const appWith = (guard: typeof authGuard) => new Elysia().use(guard).get('/', ({ user }) => user)
-const call = (app: ReturnType<typeof appWith>) => app.handle(new Request('http://localhost/'))
+const appWith = (guard: typeof requireAuth) => new Hono<AppEnv>().use(guard).get('/', (c) => c.json(c.get('user'), 200))
+const call = (app: ReturnType<typeof appWith>) => app.request('http://localhost/')
 
-describe('authGuard', () => {
+describe('requireAuth', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -23,10 +24,11 @@ describe('authGuard', () => {
     vi.mocked(getSession).mockResolvedValue({ session: null, user: null })
 
     // act
-    const response = await call(appWith(authGuard))
+    const response = await call(appWith(requireAuth))
 
     // assert
     expect(response.status).toBe(401)
+    expect(await response.json()).toMatchObject({ error: { code: 'unauthorized' } })
   })
 
   it('injects the session user into the handler', async () => {
@@ -34,7 +36,7 @@ describe('authGuard', () => {
     vi.mocked(getSession).mockResolvedValue({ user } as never)
 
     // act
-    const response = await call(appWith(authGuard))
+    const response = await call(appWith(requireAuth))
 
     // assert
     expect(response.status).toBe(200)
@@ -42,7 +44,7 @@ describe('authGuard', () => {
   })
 })
 
-describe('adminGuard', () => {
+describe('requireAdmin', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -52,7 +54,7 @@ describe('adminGuard', () => {
     vi.mocked(getSession).mockResolvedValue({ user } as never)
 
     // act
-    const response = await call(appWith(adminGuard))
+    const response = await call(appWith(requireAdmin))
 
     // assert
     expect(response.status).toBe(401)
@@ -63,7 +65,7 @@ describe('adminGuard', () => {
     vi.mocked(getSession).mockResolvedValue({ session: null, user: null })
 
     // act
-    const response = await call(appWith(adminGuard))
+    const response = await call(appWith(requireAdmin))
 
     // assert
     expect(response.status).toBe(401)
@@ -74,7 +76,7 @@ describe('adminGuard', () => {
     vi.mocked(getSession).mockResolvedValue({ user: admin } as never)
 
     // act
-    const response = await call(appWith(adminGuard))
+    const response = await call(appWith(requireAdmin))
 
     // assert
     expect(response.status).toBe(200)

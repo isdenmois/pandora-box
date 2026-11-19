@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // The importer sleeps 5 s per item to respect OMDB's rate limit; e2e must not wait for it.
-vi.mock('@/shared', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/shared')>()),
+vi.mock('@server/shared', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@server/shared')>()),
   sleep: vi.fn(() => Promise.resolve()),
 }))
 

@@ -10,7 +10,10 @@
     "client:preview": "vite preview",
     "format": "biome check --write .",
     "lint": "biome check .",
-    "typecheck": "tsc -p server/tsconfig.json --noEmit",
+    "typecheck": "npm run typecheck:server && npm run typecheck:client",
+    "typecheck:server": "tsc -p server/tsconfig.json --noEmit",
+    "typecheck:client": "vue-tsc -p client/tsconfig.app.json --noEmit",
+    "typecheck:perf": "vue-tsc -p client/tsconfig.app.json --noEmit --extendedDiagnostics",
     "test:client": "vitest --run ",
     "test:server": "bun --bun x vitest --run --config vitest.config.server.ts",
     "test:unit": "npm run test:client && npm run test:server",
@@ -46,13 +49,12 @@
     "playwright": "1.65.1",
     "typescript": "5.9.3",
     "vite": "8.3.8",
-    "vitest": "5.1.1"
+    "vitest": "5.1.1",
+    "vue-tsc": "3.3.14"
   },
   "dependencies": {
-    "@elysiajs/openapi": "1.4.17",
-    "@sinclair/typebox": "0.34.52",
     "@vueuse/core": "15.0.0",
-    "elysia": "1.4.32",
+    "hono": "4.13.19",
     "pinia": "4.1.0",
     "unocss": "66.13.0",
     "valibot": "1.5.0",

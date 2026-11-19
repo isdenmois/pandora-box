@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-const { backupRepository, movieRepository } = await import('@/infra')
+const { backupRepository, movieRepository } = await import('@server/infra')
 const { insertMovie, insertUser, resetDatabase } = await import('./db-fixtures')
 
 type Backup = Parameters<typeof backupRepository.restore>[0]

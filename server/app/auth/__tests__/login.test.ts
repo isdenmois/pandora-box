@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@/infra', () => ({
+vi.mock('@server/infra', () => ({
   userRepository: { getByUsername: vi.fn() },
   sessionRepository: { create: vi.fn() },
 }))
 
 const { login } = await import('../login')
-const { sessionRepository, userRepository } = await import('@/infra')
-const { hashPassword } = await import('@/shared')
+const { sessionRepository, userRepository } = await import('@server/infra')
+const { hashPassword } = await import('@server/shared')
 
 const storedUser = {
   id: 'user-1',
