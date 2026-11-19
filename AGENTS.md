@@ -27,6 +27,7 @@ npm run test:unit    # test:client + test:server
 npm run typecheck    # tsc -p server/tsconfig.json --noEmit (server only)
 npm run test:pw      # playwright (chromium only; auto-starts dev server on :5173)
 npm run test         # unit + pw  (manual full run)
+bun run perf:series  # GET /api/v1/series baseline over a real socket; --compare <json> gates p95/rps at 10%
 npm run db:generate  # generate migration from schema  (needs DATABASE_URL)
 npm run db:migrate   # apply migrations (also runs automatically on server start)
 npm run db:studio    # drizzle studio
